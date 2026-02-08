@@ -192,18 +192,18 @@ class GestaoFinanceira {
         }
     }
 
-function abrirModalMeta() {
-        document.getElementById('conteudoModalMeta').innerHTML = `
-            <div class="space-y-4">
-                <div><label class="block text-sm font-semibold mb-2">🎯 Objetivo da Meta</label><input type="text" id="objetivoMeta" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="Ex: Pagar dívida do cartão"></div>
-                <div><label class="block text-sm font-semibold mb-2">💰 Valor Total (R$)</label><input type="number" id="valorMeta" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="5000.00" step="0.01"></div>
-                <div><label class="block text-sm font-semibold mb-2">📅 Prazo (dias)</label><select id="prazoMeta" class="w-full px-4 py-2 rounded-lg cm-input"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="180">180 dias</option></select></div>
-                <div><label class="block text-sm font-semibold mb-2">🎨 Tipo de Meta</label><select id="tipoMeta" class="w-full px-4 py-2 rounded-lg cm-input"><option value="economizar">💰 Economizar</option><option value="pagar_divida">🔥 Pagar Dívida</option><option value="investir">📈 Investir</option><option value="renda_extra">💼 Renda Extra</option></select></div>
-                <div><label class="block text-sm font-semibold mb-2">📝 Estratégia</label><textarea id="estrategiaMeta" class="w-full px-4 py-2 rounded-lg cm-input" rows="3"></textarea></div>
-                <button onclick="app.salvarMeta()" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg">🎯 Criar Meta</button>
-            </div>`;
-        document.getElementById('modalMeta').classList.add('active');
-    }
+abrirModalMeta() {
+    document.getElementById('conteudoModalMeta').innerHTML = `
+        <div class="space-y-4">
+            <div><label class="block text-sm font-semibold mb-2">🎯 Objetivo da Meta</label><input type="text" id="objetivoMeta" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="Ex: Pagar dívida do cartão"></div>
+            <div><label class="block text-sm font-semibold mb-2">💰 Valor Total (R$)</label><input type="number" id="valorMeta" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="5000.00" step="0.01"></div>
+            <div><label class="block text-sm font-semibold mb-2">📅 Prazo (dias)</label><select id="prazoMeta" class="w-full px-4 py-2 rounded-lg cm-input"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="180">180 dias</option></select></div>
+            <div><label class="block text-sm font-semibold mb-2">🎨 Tipo de Meta</label><select id="tipoMeta" class="w-full px-4 py-2 rounded-lg cm-input"><option value="economizar">💰 Economizar</option><option value="pagar_divida">🔥 Pagar Dívida</option><option value="investir">📈 Investir</option><option value="renda_extra">💼 Renda Extra</option></select></div>
+            <div><label class="block text-sm font-semibold mb-2">📝 Estratégia</label><textarea id="estrategiaMeta" class="w-full px-4 py-2 rounded-lg cm-input" rows="3"></textarea></div>
+            <button onclick="app.salvarMeta()" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg">🎯 Criar Meta</button>
+        </div>`;
+    document.getElementById('modalMeta').classList.add('active');
+}
 
     salvarMeta() {
         const meta = {id: Date.now(), objetivo: document.getElementById('objetivoMeta').value, valorTotal: parseFloat(document.getElementById('valorMeta').value), valorAtual: 0, prazo: parseInt(document.getElementById('prazoMeta').value), tipo: document.getElementById('tipoMeta').value, estrategia: document.getElementById('estrategiaMeta').value, dataInicio: new Date().toISOString(), status: 'ativa'};
