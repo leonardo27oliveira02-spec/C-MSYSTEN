@@ -6,20 +6,32 @@
     <title>C&M Financial Pro - Gestão Financeira Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden;
+    }
+
     :root {
         /* 🎯 Azul base (foco/clareza) */
         --cm-azul-principal: #2563EB;
         --cm-azul-claro: #E8F0FE;
         --cm-azul-muito-claro: #F4F8FF;
-
         /* 🔥 Laranja ação */
         --cm-laranja: #FF9944;
         --cm-laranja-escuro: #D97B3A;
-
         /* 🌱 Verde progresso */
         --cm-verde: #22C55E;
         --cm-verde-claro: #ECFDF5;
-
+        --cm-verde-escuro: #059669;
+        /* Bege */
+        --cm-bege: #FFF8F0;
         /* 🖤 Texto */
         --cm-texto-escuro: #1F2933;
     }
@@ -27,21 +39,21 @@
     /* Backgrounds principais */
     .bg-cm-laranja { background-color: var(--cm-laranja); }
     .bg-cm-laranja-escuro { background-color: var(--cm-laranja-escuro); }
-
     .bg-cm-escuro,
     .bg-cm-azul { background-color: var(--cm-azul-principal); }
-
     .bg-cm-azul-claro { background-color: var(--cm-azul-claro); }
     .bg-cm-azul-muito-claro { background-color: var(--cm-azul-muito-claro); }
-
     .bg-cm-verde { background-color: var(--cm-verde); }
     .bg-cm-verde-claro { background-color: var(--cm-verde-claro); }
+    .bg-cm-verde-escuro { background-color: var(--cm-verde-escuro); }
+    .bg-cm-bege { background-color: var(--cm-bege); }
 
     /* Textos */
     .text-cm-laranja { color: var(--cm-laranja); }
     .text-cm-escuro { color: var(--cm-texto-escuro); }
     .text-cm-azul { color: var(--cm-azul-principal); }
     .text-cm-verde { color: var(--cm-verde); }
+    .text-cm-verde-escuro { color: var(--cm-verde-escuro); }
 
     /* Bordas */
     .border-cm-laranja { border-color: var(--cm-laranja); }
@@ -53,7 +65,7 @@
     .despesa { border-left: 5px solid #EF4444; }
     .investimento { border-left: 5px solid var(--cm-laranja); }
 
-    /* Modal (AQUI estava o branco matando tudo) */
+    /* Modal */
     .modal { 
         display: none; 
         position: fixed; 
@@ -62,17 +74,17 @@
         top: 0; 
         width: 100%; 
         height: 100%; 
-        background-color: rgba(37, 99, 235, 0.25); /* azul translúcido */
+        background-color: rgba(37, 99, 235, 0.25);
         overflow-y: auto; 
     }
-
+    
     .modal.active { 
         display: flex; 
         align-items: center; 
         justify-content: center; 
         padding: 20px; 
     }
-
+    
     .modal-content { 
         background: linear-gradient(135deg, var(--cm-azul-muito-claro), #FFFFFF);
         border-radius: 16px; 
@@ -85,18 +97,33 @@
         color: var(--cm-texto-escuro);
     }
 
+    /* Inputs */
     .cm-input {
-    background: #F4F8FF;
-    border: 2px solid #BFDBFE; /* azul claro */
-    color: #1F2933;
-}
+        background: #F4F8FF;
+        border: 2px solid #BFDBFE;
+        color: #1F2933;
+    }
+    
+    .cm-input:focus {
+        outline: none;
+        border-color: #2563EB;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
 
-.cm-input:focus {
-    outline: none;
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-}
+    /* FIX: Remove altura mínima forçada */
+    .min-h-screen {
+        min-height: auto !important;
+    }
 
+    /* FIX: Container principal sem padding excessivo */
+    .max-w-7xl {
+        padding-top: 0 !important;
+    }
+
+    /* Scroll suave */
+    html {
+        scroll-behavior: smooth;
+    }
 </style>
 
 </head>
@@ -365,8 +392,8 @@ abrirModalMeta() {
     const diasRestantes = this.calcularDiasRestantes();
     const metasAtivas = this.metas.filter(m => m.status === 'ativa');
     
-    return `
-        <div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+ return `
+    <div class="bg-gradient-to-br from-gray-50 to-cm-bege">
             <!-- Header -->
             <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
                 <div class="max-w-7xl mx-auto px-4 py-4">
