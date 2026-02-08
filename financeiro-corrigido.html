@@ -361,47 +361,200 @@ abrirModalMeta() {
     }
 
     renderDashboard() {
-        const resumo = this.calcularResumo('mes');
-        const diasRestantes = this.calcularDiasRestantes();
-        const metasAtivas = this.metas.filter(m => m.status === 'ativa');
-        return `<div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+    const resumo = this.calcularResumo('mes');
+    const diasRestantes = this.calcularDiasRestantes();
+    const metasAtivas = this.metas.filter(m => m.status === 'ativa');
+    
+    return `
+        <div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+            <!-- Header -->
             <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
-                <div class="max-w-7xl mx-auto px-4 py-6"><div class="flex items-center gap-4">
-                    <div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">C&M</div>
-                    <div><h1 class="text-3xl font-bold">💼 Dashboard Financeiro</h1><p class="text-sm mt-1 opacity-90">Financial Pro - Gestão Inteligente</p></div>
-                </div></div>
+                <div class="max-w-7xl mx-auto px-4 py-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">
+                            C&M
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold">💼 Dashboard Financeiro</h1>
+                            <p class="text-sm mt-1 opacity-90">Financial Pro - Gestão Inteligente</p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             ${this.renderMenu('dashboard')}
-            <div class="max-w-7xl mx-auto px-4 py-8">
-                <div class="bg-gradient-to-br from-cm-verde-escuro via-cm-verde-claro to-cm-laranja text-white rounded-2xl shadow-2xl p-8 mb-8 border-4 border-white">
-                    <div class="flex justify-between items-start mb-6">
-                        <div><div class="bg-cm-azul-claro text-cm-verde-escuro px-4 py-2 rounded-lg inline-block mb-3"><span class="font-black text-xl">C&M</span></div>
-                        <h2 class="text-3xl font-bold mb-2">Resumo de Fevereiro 2026</h2><p class="text-sm opacity-90">Faltam ${diasRestantes} dias</p></div>
-                        <div class="text-right bg-cm-azul-claro bg-opacity-20 rounded-xl p-4"><div class="text-sm opacity-90">Saldo do Mês</div>
-                        <div class="text-4xl font-black">${resumo.saldo >= 0 ? '💰' : '⚠️'} R$ ${resumo.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div></div>
+
+            <!-- Main Content -->
+            <div class="max-w-7xl mx-auto px-4 py-4">
+                
+                <!-- Card Resumo do Mês -->
+                <div class="bg-gradient-to-br from-cm-verde-escuro via-cm-verde-claro to-cm-laranja text-white rounded-2xl shadow-2xl p-5 mb-5 border-4 border-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="bg-cm-azul-claro text-cm-verde-escuro px-4 py-2 rounded-lg inline-block mb-3">
+                                <span class="font-black text-xl">C&M</span>
+                            </div>
+                            <h2 class="text-3xl font-bold mb-2">Resumo de Fevereiro 2026</h2>
+                            <p class="text-sm opacity-90">Faltam ${diasRestantes} dias</p>
+                        </div>
+                        <div class="text-right bg-cm-azul-claro bg-opacity-20 rounded-xl p-4">
+                            <div class="text-sm opacity-90">Saldo do Mês</div>
+                            <div class="text-4xl font-black">
+                                ${resumo.saldo >= 0 ? '💰' : '⚠️'} 
+                                R$ ${resumo.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-5 border-2 border-white border-opacity-30"><div class="text-sm opacity-90 mb-1">💰 Receitas</div><div class="text-3xl font-black">R$ ${resumo.receitas.toLocaleString('pt-BR')}</div></div>
-                        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-5 border-2 border-white border-opacity-30"><div class="text-sm opacity-90 mb-1">💸 Despesas</div><div class="text-3xl font-black">R$ ${resumo.despesas.toLocaleString('pt-BR')}</div></div>
-                        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-5 border-2 border-white border-opacity-30"><div class="text-sm opacity-90 mb-1">📈 Investimentos</div><div class="text-3xl font-black">R$ ${resumo.investimentos.toLocaleString('pt-BR')}</div></div>
+                    
+                    <!-- Grid Resumo -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border-2 border-white border-opacity-30">
+                            <div class="text-sm opacity-90 mb-1">💰 Receitas</div>
+                            <div class="text-3xl font-black">R$ ${resumo.receitas.toLocaleString('pt-BR')}</div>
+                        </div>
+                        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border-2 border-white border-opacity-30">
+                            <div class="text-sm opacity-90 mb-1">💸 Despesas</div>
+                            <div class="text-3xl font-black">R$ ${resumo.despesas.toLocaleString('pt-BR')}</div>
+                        </div>
+                        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border-2 border-white border-opacity-30">
+                            <div class="text-sm opacity-90 mb-1">📈 Investimentos</div>
+                            <div class="text-3xl font-black">R$ ${resumo.investimentos.toLocaleString('pt-BR')}</div>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-6 border-l-4 border-cm-laranja hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">Taxa de Investimento</div><div class="text-4xl font-black text-cm-laranja">${resumo.taxaInvestimento}%</div><div class="text-xs text-gray-500 mt-1">Meta: 30%</div></div><div class="text-5xl">📊</div></div></div>
-                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-6 border-l-4 border-cm-verde-escuro hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">Transações</div><div class="text-4xl font-black text-cm-verde-escuro">${resumo.total}</div><div class="text-xs text-gray-500 mt-1">Este mês</div></div><div class="text-5xl">💳</div></div></div>
-                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">Metas Ativas</div><div class="text-4xl font-black text-purple-600">${metasAtivas.length}</div><div class="text-xs text-gray-500 mt-1">Em progresso</div></div><div class="text-5xl">🎯</div></div></div>
-                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-6 border-l-4 ${this.calcularDividasAtrasadas().quantidade > 0 ? 'border-red-500' : 'border-green-500'} hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">${this.calcularDividasAtrasadas().quantidade > 0 ? 'Contas Atrasadas' : 'Contas em Dia'}</div><div class="text-4xl font-black ${this.calcularDividasAtrasadas().quantidade > 0 ? 'text-red-600' : 'text-green-600'}">${this.calcularDividasAtrasadas().quantidade > 0 ? this.calcularDividasAtrasadas().quantidade : '✓'}</div><div class="text-xs text-gray-500 mt-1">${this.calcularDividasAtrasadas().quantidade > 0 ? `R$ ${this.calcularDividasAtrasadas().valor.toLocaleString('pt-BR')}` : 'Tudo OK'}</div></div><div class="text-5xl">${this.calcularDividasAtrasadas().quantidade > 0 ? '⚠️' : '✅'}</div></div></div>
+
+                <!-- Cards Indicadores -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
+                    <!-- Taxa de Investimento -->
+                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-4 border-l-4 border-cm-laranja hover:shadow-2xl transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-gray-600 text-sm mb-2 font-semibold">Taxa de Investimento</div>
+                                <div class="text-4xl font-black text-cm-laranja">${resumo.taxaInvestimento}%</div>
+                                <div class="text-xs text-gray-500 mt-1">Meta: 30%</div>
+                            </div>
+                            <div class="text-5xl">📊</div>
+                        </div>
+                    </div>
+
+                    <!-- Transações -->
+                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-4 border-l-4 border-cm-verde-escuro hover:shadow-2xl transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-gray-600 text-sm mb-2 font-semibold">Transações</div>
+                                <div class="text-4xl font-black text-cm-verde-escuro">${resumo.total}</div>
+                                <div class="text-xs text-gray-500 mt-1">Este mês</div>
+                            </div>
+                            <div class="text-5xl">💳</div>
+                        </div>
+                    </div>
+
+                    <!-- Metas Ativas -->
+                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-4 border-l-4 border-purple-500 hover:shadow-2xl transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-gray-600 text-sm mb-2 font-semibold">Metas Ativas</div>
+                                <div class="text-4xl font-black text-purple-600">${metasAtivas.length}</div>
+                                <div class="text-xs text-gray-500 mt-1">Em progresso</div>
+                            </div>
+                            <div class="text-5xl">🎯</div>
+                        </div>
+                    </div>
+
+                    <!-- Contas -->
+                    <div class="bg-cm-azul-claro rounded-xl shadow-lg p-4 border-l-4 ${this.calcularDividasAtrasadas().quantidade > 0 ? 'border-red-500' : 'border-green-500'} hover:shadow-2xl transition-all">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-gray-600 text-sm mb-2 font-semibold">
+                                    ${this.calcularDividasAtrasadas().quantidade > 0 ? 'Contas Atrasadas' : 'Contas em Dia'}
+                                </div>
+                                <div class="text-4xl font-black ${this.calcularDividasAtrasadas().quantidade > 0 ? 'text-red-600' : 'text-green-600'}">
+                                    ${this.calcularDividasAtrasadas().quantidade > 0 ? this.calcularDividasAtrasadas().quantidade : '✓'}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    ${this.calcularDividasAtrasadas().quantidade > 0 ? `R$ ${this.calcularDividasAtrasadas().valor.toLocaleString('pt-BR')}` : 'Tudo OK'}
+                                </div>
+                            </div>
+                            <div class="text-5xl">
+                                ${this.calcularDividasAtrasadas().quantidade > 0 ? '⚠️' : '✅'}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                ${resumo.despesasPendentes > 0 ? `<div class="bg-red-50 border-l-4 border-red-500 rounded-xl shadow-lg p-6 mb-8"><div class="flex items-center gap-4"><div class="text-4xl">⚠️</div><div class="flex-1"><h3 class="text-xl font-bold text-red-800">Despesas Pendentes</h3><p class="text-red-700 mt-1">Você tem <strong>R$ ${resumo.despesasPendentes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong> em contas não pagas</p></div><button onclick="app.paginaAtual='transacoes';app.render();" class="bg-red-500 text-white px-6 py-3 rounded-lg font-bold">Ver Contas</button></div></div>` : ''}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <button onclick="app.abrirModalTransacao('receita')" class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-8 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">💰</div><div>Nova Receita</div></button>
-                    <button onclick="app.abrirModalTransacao('despesa')" class="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-8 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">💸</div><div>Nova Despesa</div></button>
-                    <button onclick="app.abrirModalTransacao('investimento')" class="bg-gradient-to-br from-cm-laranja to-cm-laranja-escuro hover:from-cm-laranja-escuro hover:to-cm-verde-escuro text-white p-8 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">📈</div><div>Investimento</div></button>
+
+                <!-- Alerta Despesas Pendentes -->
+                ${resumo.despesasPendentes > 0 ? `
+                    <div class="bg-red-50 border-l-4 border-red-500 rounded-xl shadow-lg p-4 mb-5">
+                        <div class="flex items-center gap-4">
+                            <div class="text-4xl">⚠️</div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-red-800">Despesas Pendentes</h3>
+                                <p class="text-red-700 mt-1">
+                                    Você tem <strong>R$ ${resumo.despesasPendentes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong> em contas não pagas
+                                </p>
+                            </div>
+                            <button onclick="app.paginaAtual='transacoes';app.render();" 
+                                class="bg-red-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-600">
+                                Ver Contas
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Botões de Ação -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                    <button onclick="app.abrirModalTransacao('receita')" 
+                        class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-6 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white">
+                        <div class="text-6xl mb-3">💰</div>
+                        <div>Nova Receita</div>
+                    </button>
+                    
+                    <button onclick="app.abrirModalTransacao('despesa')" 
+                        class="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-6 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white">
+                        <div class="text-6xl mb-3">💸</div>
+                        <div>Nova Despesa</div>
+                    </button>
+                    
+                    <button onclick="app.abrirModalTransacao('investimento')" 
+                        class="bg-gradient-to-br from-cm-laranja to-cm-laranja-escuro hover:from-cm-laranja-escuro hover:to-cm-verde-escuro text-white p-6 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white">
+                        <div class="text-6xl mb-3">📈</div>
+                        <div>Investimento</div>
+                    </button>
                 </div>
-                <div class="bg-gradient-to-r from-cm-bege to-white rounded-2xl shadow-lg p-6 border-4 border-cm-laranja"><div class="flex items-center gap-3 mb-4"><div class="bg-cm-laranja text-white p-3 rounded-lg"><span class="text-2xl">⚡</span></div><h3 class="text-2xl font-black text-cm-verde-escuro">Lançamento Rápido</h3></div><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><input type="text" id="quickDesc" placeholder="Descrição" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold"><input type="number" id="quickValor" placeholder="R$ 0,00" step="0.01" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold"><select id="quickTipo" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold"><option value="despesa">💸 Despesa</option><option value="receita">💰 Receita</option><option value="investimento">📈 Investimento</option></select><button onclick="app.lancamentoRapido()" class="bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro hover:from-cm-verde-escuro hover:to-cm-verde-claro text-white py-3 rounded-lg font-black text-lg">⚡ LANÇAR</button></div></div>
+
+                <!-- Lançamento Rápido -->
+                <div class="bg-gradient-to-r from-cm-bege to-white rounded-2xl shadow-lg p-4 border-4 border-cm-laranja">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-cm-laranja text-white p-3 rounded-lg">
+                            <span class="text-2xl">⚡</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-cm-verde-escuro">Lançamento Rápido</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <input type="text" id="quickDesc" placeholder="Descrição" 
+                            class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold">
+                        
+                        <input type="number" id="quickValor" placeholder="R$ 0,00" step="0.01" 
+                            class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold">
+                        
+                        <select id="quickTipo" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold">
+                            <option value="despesa">💸 Despesa</option>
+                            <option value="receita">💰 Receita</option>
+                            <option value="investimento">📈 Investimento</option>
+                        </select>
+                        
+                        <button onclick="app.lancamentoRapido()" 
+                            class="bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro hover:from-cm-verde-escuro hover:to-cm-verde-claro text-white py-3 rounded-lg font-black text-lg">
+                            ⚡ LANÇAR
+                        </button>
+                    </div>
+                </div>
+
             </div>
-        </div>`;
-    }
+        </div>
+    `;
+}
 
     renderTransacoes() {
         const ultimas = [...this.transacoes].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 50);
