@@ -415,24 +415,42 @@ abrirModalMeta() {
             <div class="max-w-7xl mx-auto px-4 py-4">
                 
                 <!-- Card Resumo do Mês -->
-                <div class="bg-gradient-to-br from-cm-verde-escuro via-cm-verde-claro to-cm-laranja text-white rounded-2xl shadow-2xl p-5 mb-5 border-4 border-white">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <div class="bg-cm-azul-claro text-cm-verde-escuro px-4 py-2 rounded-lg inline-block mb-3">
-                                <span class="font-black text-xl">C&M</span>
-                            </div>
-                            <h2 class="text-3xl font-bold mb-2">Resumo de Fevereiro 2026</h2>
-                            <p class="text-sm opacity-90">Faltam ${diasRestantes} dias</p>
-                        </div>
-                        <div class="text-right bg-cm-azul-claro bg-opacity-20 rounded-xl p-4">
-                            <div class="text-sm opacity-90">Saldo do Mês</div>
-                            <div class="text-4xl font-black">
-                                ${resumo.saldo >= 0 ? '💰' : '⚠️'} 
-                                R$ ${resumo.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                            </div>
-                        </div>
-                    </div>
-                    
+              <div class="bg-gradient-to-br from-cm-verde-escuro via-cm-verde-claro to-cm-laranja text-white rounded-2xl shadow-2xl p-4 mb-4 border-4 border-white">
+    <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center gap-3">
+            <div class="bg-cm-azul-claro text-cm-verde-escuro px-3 py-1 rounded-lg font-black text-lg">
+                C&M
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold">Resumo de Fevereiro 2026</h2>
+                <p class="text-sm opacity-90">Faltam ${diasRestantes} dias</p>
+            </div>
+        </div>
+        <div class="text-right bg-cm-azul-claro bg-opacity-20 rounded-xl px-4 py-2">
+            <div class="text-xs opacity-90">Saldo do Mês</div>
+            <div class="text-3xl font-black">
+                ${resumo.saldo >= 0 ? '💰' : '⚠️'} 
+                R$ ${resumo.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grid Resumo -->
+    <div class="grid grid-cols-3 gap-3">
+        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-3 border-2 border-white border-opacity-30">
+            <div class="text-xs opacity-90 mb-1">💰 Receitas</div>
+            <div class="text-2xl font-black">R$ ${resumo.receitas.toLocaleString('pt-BR')}</div>
+        </div>
+        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-3 border-2 border-white border-opacity-30">
+            <div class="text-xs opacity-90 mb-1">💸 Despesas</div>
+            <div class="text-2xl font-black">R$ ${resumo.despesas.toLocaleString('pt-BR')}</div>
+        </div>
+        <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-3 border-2 border-white border-opacity-30">
+            <div class="text-xs opacity-90 mb-1">📈 Investimentos</div>
+            <div class="text-2xl font-black">R$ ${resumo.investimentos.toLocaleString('pt-BR')}</div>
+        </div>
+    </div>
+</div>
                     <!-- Grid Resumo -->
                     <div class="grid grid-cols-3 gap-3">
                         <div class="bg-cm-azul-claro bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border-2 border-white border-opacity-30">
