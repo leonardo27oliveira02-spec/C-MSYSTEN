@@ -84,6 +84,19 @@
         box-shadow: 0 30px 80px rgba(37, 99, 235, 0.25);
         color: var(--cm-texto-escuro);
     }
+
+    .cm-input {
+    background: #F4F8FF;
+    border: 2px solid #BFDBFE; /* azul claro */
+    color: #1F2933;
+}
+
+.cm-input:focus {
+    outline: none;
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
 </style>
 
 </head>
@@ -140,11 +153,11 @@ class GestaoFinanceira {
         const categorias = tipo === 'receita' ? CATEGORIAS.receitas : tipo === 'despesa' ? CATEGORIAS.despesas : CATEGORIAS.investimentos;
         document.getElementById('conteudoModalTransacao').innerHTML = `
             <div class="space-y-4">
-                <div><label class="block text-sm font-semibold mb-2">📝 Descrição</label><input type="text" id="descTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ex: Salário de fevereiro"></div>
-                <div><label class="block text-sm font-semibold mb-2">💵 Valor (R$)</label><input type="number" id="valorTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="0.00" step="0.01"></div>
-                <div><label class="block text-sm font-semibold mb-2">📁 Categoria</label><select id="categoriaTransacao" class="w-full px-4 py-2 border-2 rounded-lg">${categorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
-                <div><label class="block text-sm font-semibold mb-2">📅 Data</label><input type="date" id="dataTransacao" value="${new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2 border-2 rounded-lg"></div>
-                <div><label class="block text-sm font-semibold mb-2">🔁 Recorrente?</label><select id="recorrenteTransacao" class="w-full px-4 py-2 border-2 rounded-lg"><option value="false">Não</option><option value="mensal">Mensal</option><option value="semanal">Semanal</option></select></div>
+                <div><label class="block text-sm font-semibold mb-2">📝 Descrição</label><input type="text" id="descTransacao" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="Ex: Salário de fevereiro"></div>
+                <div><label class="block text-sm font-semibold mb-2">💵 Valor (R$)</label><input type="number" id="valorTransacao" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="0.00" step="0.01"></div>
+                <div><label class="block text-sm font-semibold mb-2">📁 Categoria</label><select id="categoriaTransacao" class="w-full px-4 py-2 rounded-lg cm-input">${categorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
+                <div><label class="block text-sm font-semibold mb-2">📅 Data</label><input type="date" id="dataTransacao" value="${new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2 rounded-lg cm-input"></div>
+                <div><label class="block text-sm font-semibold mb-2">🔁 Recorrente?</label><select id="recorrenteTransacao" class="w-full px-4 py-2 rounded-lg cm-input"><option value="false">Não</option><option value="mensal">Mensal</option><option value="semanal">Semanal</option></select></div>
                 <button onclick="app.salvarTransacao('${tipo}')" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg hover:opacity-90">💾 Salvar</button>
             </div>`;
         document.getElementById('modalTransacao').classList.add('active');
@@ -181,11 +194,11 @@ class GestaoFinanceira {
     abrirModalMeta() {
         document.getElementById('conteudoModalMeta').innerHTML = `
             <div class="space-y-4">
-                <div><label class="block text-sm font-semibold mb-2">🎯 Objetivo da Meta</label><input type="text" id="objetivoMeta" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ex: Pagar dívida do cartão"></div>
-                <div><label class="block text-sm font-semibold mb-2">💰 Valor Total (R$)</label><input type="number" id="valorMeta" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="5000.00" step="0.01"></div>
-                <div><label class="block text-sm font-semibold mb-2">📅 Prazo (dias)</label><select id="prazoMeta" class="w-full px-4 py-2 border-2 rounded-lg"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="180">180 dias</option></select></div>
-                <div><label class="block text-sm font-semibold mb-2">🎨 Tipo de Meta</label><select id="tipoMeta" class="w-full px-4 py-2 border-2 rounded-lg"><option value="economizar">💰 Economizar</option><option value="pagar_divida">🔥 Pagar Dívida</option><option value="investir">📈 Investir</option><option value="renda_extra">💼 Renda Extra</option></select></div>
-                <div><label class="block text-sm font-semibold mb-2">📝 Estratégia</label><textarea id="estrategiaMeta" class="w-full px-4 py-2 border-2 rounded-lg" rows="3"></textarea></div>
+                <div><label class="block text-sm font-semibold mb-2">🎯 Objetivo da Meta</label><input type="text" id="objetivoMeta" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="Ex: Pagar dívida do cartão"></div>
+                <div><label class="block text-sm font-semibold mb-2">💰 Valor Total (R$)</label><input type="number" id="valorMeta" class="w-full px-4 py-2 rounded-lg cm-input" placeholder="5000.00" step="0.01"></div>
+                <div><label class="block text-sm font-semibold mb-2">📅 Prazo (dias)</label><select id="prazoMeta" class="w-full px-4 py-2 rounded-lg cm-input"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="180">180 dias</option></select></div>
+                <div><label class="block text-sm font-semibold mb-2">🎨 Tipo de Meta</label><select id="tipoMeta" class="w-full px-4 py-2 rounded-lg cm-input"><option value="economizar">💰 Economizar</option><option value="pagar_divida">🔥 Pagar Dívida</option><option value="investir">📈 Investir</option><option value="renda_extra">💼 Renda Extra</option></select></div>
+                <div><label class="block text-sm font-semibold mb-2">📝 Estratégia</label><textarea id="estrategiaMeta" class="w-full px-4 py-2 rounded-lg cm-input" rows="3"></textarea></div>
                 <button onclick="app.salvarMeta()" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg">🎯 Criar Meta</button>
             </div>`;
         document.getElementById('modalMeta').classList.add('active');
