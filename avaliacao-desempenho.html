@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C&M Leadership Academy - Sistema Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --cor-laranja: #D97B3A;
+            --cor-escuro: #8B5A3C;
+            --cor-clara: #F4E4D7;
+        }
+        .bg-cm-laranja { background-color: var(--cor-laranja); }
+        .bg-cm-escuro { background-color: var(--cor-escuro); }
+        .text-cm-laranja { color: var(--cor-laranja); }
+        .text-cm-escuro { color: var(--cor-escuro); }
+        
+        .card-ferramenta {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .card-ferramenta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .matriz-box {
+            border: 2px solid #D97B3A;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+        
+        .exemplo-pratico {
+            background: linear-gradient(135deg, #F4E4D7, #fff);
+            border-left: 4px solid #D97B3A;
+        }
+        
+        .dica-campo {
+            background: linear-gradient(135deg, #D97B3A, #8B5A3C);
+            color: white;
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .accordion-content.active {
+            max-height: 5000px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app"></div>
+    
+    <script>
+// ========== BIBLIOTECA DE CONHECIMENTO ==========
+const BIBLIOTECA = {
+    kpis: {
+        titulo: "KPIs - Indicadores de Desempenho",
+        exemplos: [
+            "📊 Consultor com 68% entregas → Plano 30 dias: 70% → 75% → 80%",
+            "⚠️ 89% produtividade mas 12% erros → Reduzir ritmo + checklist qualidade",
+            "🏆 95% entregas + 92% prod + 2% erros → Reconhecer e dar novos desafios"
+        ],
+        dicas: [
+            "📊 Meça semanalmente, não só fim do mês",
+            "🎯 Metas progressivas: 60→70→80%",
+            "💬 Contextualize números com conversas",
+            "⚠️ Erros >5% = intervenção imediata"
+        ]
+    },
+    smart: {
+        titulo: "Metas SMART",
+        template: "Eu vou [AÇÃO] até [DATA] através de [MÉTODO] para [RESULTADO]",
+        exemplos: [
+            "❌ 'Vender mais' → ✅ 'Vender 100k em fev com 15 reuniões/sem, 30% conversão'",
+            "❌ 'Melhorar atendimento' → ✅ 'Responder 100% em 2h até 28/02'",
+            "❌ 'Ser organizado' → ✅ 'Atualizar CRM diário até 18h em fevereiro'"
+        ],
+        dicas: [
+            "🎯 Seja específico, não genérico",
+            "📏 Se não mede, não é meta",
+            "🚀 Stretch 120% ok, 300% desmotiva",
+            "✅ Revise semanalmente"
+        ]
+    },
+    cha: {
+        titulo: "CHA - Diagnóstico",
+        perfis: [
+            "C(5) H(2) A(5) = Sabe mas não faz → TREINO PRÁTICO",
+            "C(4) H(5) A(2) = Talento desmotivado → CONVERSA PROFUNDA urgente",
+            "C(2) H(2) A(5) = Quer muito → CAPACITAÇÃO estruturada",
+            "C(5) H(5) A(5) = Top performer → DESENVOLVER p/ liderança"
+        ],
+        regra: "⚡ Se ATITUDE baixa, trabalhe MOTIVAÇÃO antes de treinar"
+    },
+    feedback: {
+        titulo: "Feedback 4 Etapas",
+        etapas: [
+            "1️⃣ O que funciona (abre a guarda)",
+            "2️⃣ O que melhorar (específico + dados)",
+            "3️⃣ Impacto (consequências)",
+            "4️⃣ Próximo passo (ação clara)"
+        ],
+        dicas: [
+            "⏰ Dê próximo ao evento, não semanas depois",
+            "🚫 Negativo sempre em privado",
+            "👂 Ouça 70%, fale 30%",
+            "🔄 Follow-up em 1 semana"
+        ]
+    },
+    matriz: {
+        titulo: "Matriz Desempenho x Cultura",
+        quadrantes: {
+            desenvolver: "🟢 Alta entrega + Boa cultura = PROMOVER e DESAFIAR",
+            alerta: "🟡 Alta entrega + Má cultura = FEEDBACK 60 dias ou DESLIGAR",
+            treinar: "🔵 Baixa entrega + Boa cultura = CAPACITAR 90 dias",
+            desligar: "🔴 Baixa entrega + Má cultura = PIP 30 dias e DESLIGAR"
+        }
+    },
+    oneOnOne: {
+        titulo: "1-on-1 Semanal - 30min",
+        estrutura: [
+            "5min - Check-in pessoal (como está?)",
+            "10min - Metas & obstáculos (números + bloqueios)",
+            "10min - Desenvolvimento (aprendizado + carreira)",
+            "5min - Próximos passos (prioridades + feedback reverso)"
+        ],
+        regras: [
+            "🚫 NUNCA cancele",
+            "👂 Ouça 70%, fale 30%",
+            "📝 Anote e CUMPRA",
+            "🔒 Confidencial"
+        ]
+    }
+};
+
+// ========== CLASSE PRINCIPAL ==========
+class AvaliacaoDesempenho {
+    constructor() {
+        this.paginaAtual = 'home';
+        this.metaMensal = 450000;
+        this.colaboradores = [];
+        this.colaboradorEditando = null;
+        this.guiaAberto = null;
+        
+        this.carregarDados();
+        this.render();
+    }
+
+    // === GESTÃO ===
+    adicionarColaborador() {
+        const nome = prompt('Nome:');
+        if (!nome) return;
+        
+        this.colaboradores.push({
+            id: Date.now(),
+            nome,
+            cargo: prompt('Cargo:', 'Consultor') || 'Consultor',
+            kpis: { entregas: 0, produtividade: 0, erros: 0 },
+            metas: { especifica: '', mensuravel: 0, atingivel: '', relevante: '', temporal: '' },
+            cha: { conhecimento: 3, habilidade: 3, atitude: 3 },
+            competencias: { responsabilidade: 3, comunicacao: 3, organizacao: 3, proatividade: 3, trabalhoEquipe: 3, lideranca: 3 },
+            feedback: { funcionando: '', melhorar: '', impacto: '', ajuste: '' },
+            avaliacao360: { autoavaliacao: 3, lider: 3, pares: 3, subordinados: 3 },
+            pdi: { pontoForte: '', pontoMelhoria: '', acaoPratica: '', prazo: '', responsavel: '' }
+        });
+        
+        this.salvarDados();
+        alert(`✅ ${nome} adicionado!`);
+        this.paginaAtual = 'colaboradores';
+        this.render();
+    }
+
+    editarColaborador(id) {
+        this.colaboradorEditando = JSON.parse(JSON.stringify(this.colaboradores.find(c => c.id === id)));
+        this.paginaAtual = 'editar';
+        this.render();
+    }
+
+    excluirColaborador(id) {
+        if (confirm('Excluir?')) {
+            this.colaboradores = this.colaboradores.filter(c => c.id !== id);
+            this.salvarDados();
+            this.render();
+        }
+    }
+
+    salvarEdicao() {
+        const idx = this.colaboradores.findIndex(c => c.id === this.colaboradorEditando.id);
+        if (idx !== -1) {
+            this.colaboradores[idx] = this.colaboradorEditando;
+            this.salvarDados();
+            alert('✅ Salvo!');
+        }
+        this.colaboradorEditando = null;
+        this.paginaAtual = 'colaboradores';
+        this.render();
+    }
+
+    // === CÁLCULOS ===
+    calcularMediaGeral(c) {
+        const kpi = (c.kpis.entregas + c.kpis.produtividade) / 2;
+        const cha = (c.cha.conhecimento + c.cha.habilidade + c.cha.atitude) / 3;
+        const comp = Object.values(c.competencias).reduce((a,b) => a+b, 0) / 6;
+        const a360 = Object.values(c.avaliacao360).reduce((a,b) => a+b, 0) / 4;
+        return ((kpi + cha + comp + a360) / 4).toFixed(1);
+    }
+
+    determinarMatrizDesempenho(c) {
+        const e = c.kpis.produtividade;
+        const cult = parseFloat(this.calcularMediaGeral(c));
+        if (e >= 80 && cult >= 3.5) return 'Desenvolver';
+        if (e >= 80 && cult < 3.5) return 'Alerta';
+        if (e < 80 && cult >= 3.5) return 'Treinar';
+        return 'Desligar';
+    }
+
+    getCorMatriz(tipo) {
+        const cores = {
+            'Desenvolver': 'bg-green-100 border-green-500 text-green-800',
+            'Alerta': 'bg-yellow-100 border-yellow-500 text-yellow-800',
+            'Treinar': 'bg-blue-100 border-blue-500 text-blue-800',
+            'Desligar': 'bg-red-100 border-red-500 text-red-800'
+        };
+        return cores[tipo] || 'bg-gray-100';
+    }
+
+    calcularProgressoMeta() {
+        const total = this.colaboradores.reduce((s, c) => s + (c.metas.mensuravel || 0), 0);
+        const perc = (total / this.metaMensal) * 100;
+        return { total, percentual: perc.toFixed(1), faltam: this.metaMensal - total };
+    }
+
+    // === PERSISTÊNCIA ===
+    salvarDados() {
+        localStorage.setItem('colabs', JSON.stringify(this.colaboradores));
+        localStorage.setItem('meta', this.metaMensal);
+    }
+
+    carregarDados() {
+        const c = localStorage.getItem('colabs');
+        if (c) this.colaboradores = JSON.parse(c);
+        const m = localStorage.getItem('meta');
+        if (m) this.metaMensal = parseFloat(m);
+    }
+
+    atualizarMeta() {
+        const v = parseFloat(document.getElementById('inputMeta').value);
+        if (v > 0) {
+            this.metaMensal = v;
+            this.salvarDados();
+            alert('✅ Meta atualizada!');
+            this.render();
+        }
+    }
+
+    exportarDados() {
+        const dados = { metaMensal: this.metaMensal, colaboradores: this.colaboradores, data: new Date().toISOString() };
+        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `avaliacao-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        alert('✅ Exportado!');
+    }
+
+    limparDados() {
+        if (confirm('⚠️ Apagar TUDO?') && confirm('Confirma?')) {
+            localStorage.clear();
+            this.colaboradores = [];
+            this.metaMensal = 450000;
+            alert('✅ Limpo!');
+            this.paginaAtual = 'home';
+            this.render();
+        }
+    }
+
+    toggleGuia(secao) {
+        this.guiaAberto = this.guiaAberto === secao ? null : secao;
+        this.render();
+    }
+
+    // === RENDERIZAÇÃO ===
+    render() {
+        const app = document.getElementById('app');
+        const pages = {
+            'home': () => this.renderHome(),
+            'colaboradores': () => this.renderColaboradores(),
+            'editar': () => this.renderEditar(),
+            'dashboard': () => this.renderDashboard(),
+            'treinamento': () => this.renderTreinamento(),
+            'config': () => this.renderConfig()
+        };
+        app.innerHTML = pages[this.paginaAtual]();
+    }
+
+    renderMenu(ativo) {
+        const menus = ['home', 'colaboradores', 'dashboard', 'treinamento', 'config'];
+        const icones = ['🏠 Início', '👥 Colaboradores', '📊 Dashboard', '🎓 Treinamento', '⚙️ Config'];
+        
+        return `
+            <div class="bg-white shadow border-b sticky top-0 z-40">
+                <div class="max-w-7xl mx-auto flex gap-4 px-4 py-3 overflow-x-auto">
+                    ${menus.map((m, i) => `
+                        <button onclick="app.paginaAtual='${m}';app.render();" 
+                            class="px-4 py-2 rounded-lg font-semibold whitespace-nowrap ${ativo === m ? 'bg-cm-laranja text-white' : 'bg-gray-200 text-gray-700'}">
+                            ${icones[i]}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    renderHome() {
+        const prog = this.calcularProgressoMeta();
+        return `
+            <div class="min-h-screen bg-gray-50">
+                <div class="bg-cm-escuro text-white shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <h1 class="text-3xl font-bold">🎓 C&M Leadership Academy</h1>
+                        <p class="text-sm mt-2 opacity-90">Avaliação + Treinamento de Líderes</p>
+                    </div>
+                </div>
+                ${this.renderMenu('home')}
+                <div class="max-w-7xl mx-auto px-4 py-8">
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl shadow-lg p-8 mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h2 class="text-3xl font-bold">Meta do Mês</h2>
+                                <p class="text-xl mt-2">R$ ${this.metaMensal.toLocaleString('pt-BR')}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-5xl font-bold">${prog.percentual}%</div>
+                                <div class="text-sm">${this.colaboradores.length} colaboradores</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-white bg-opacity-30 rounded-full h-6 mb-3">
+                            <div class="bg-white h-6 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm" 
+                                style="width: ${Math.min(prog.percentual, 100)}%">
+                                R$ ${prog.total.toLocaleString('pt-BR')}
+                            </div>
+                        </div>
+                        <p class="text-sm">Faltam R$ ${prog.faltam.toLocaleString('pt-BR')}</p>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-cm-escuro mb-6">🎯 8 Ferramentas</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        ${['KPIs', 'SMART', 'CHA', 'Competências', 'Feedback', '360°', 'Matriz', 'PDI'].map((f, i) => `
+                            <div class="card-ferramenta bg-white rounded-xl shadow-lg p-4 border-t-4 border-cm-laranja text-center">
+                                <div class="w-10 h-10 bg-cm-laranja rounded-full flex items-center justify-center text-white font-bold mx-auto mb-2">${i+1}</div>
+                                <h3 class="font-bold text-cm-escuro">${f}</h3>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button onclick="app.adicionarColaborador()" class="bg-cm-laranja hover:opacity-90 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
+                            ➕ Adicionar Colaborador
+                        </button>
+                        <button onclick="app.paginaAtual='treinamento';app.render();" class="bg-cm-escuro hover:opacity-90 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
+                            🎓 Academia de Liderança
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderColaboradores() {
+        return `
+            <div class="min-h-screen bg-gray-50">
+                <div class="bg-cm-escuro text-white shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <h1 class="text-3xl font-bold">👥 Colaboradores</h1>
+                    </div>
+                </div>
+                ${this.renderMenu('colaboradores')}
+                <div class="max-w-7xl mx-auto px-4 py-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-cm-escuro">Squad (${this.colaboradores.length})</h2>
+                        <button onclick="app.adicionarColaborador()" class="bg-cm-laranja text-white px-6 py-3 rounded-lg font-bold">
+                            ➕ Novo
+                        </button>
+                    </div>
+                    ${this.colaboradores.length === 0 ? `
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg">
+                            <h3 class="text-lg font-bold text-yellow-800 mb-2">🎯 Comece Aqui!</h3>
+                            <p class="text-gray-700 mb-4">Adicione colaboradores para começar.</p>
+                            <button onclick="app.adicionarColaborador()" class="bg-cm-laranja text-white px-6 py-2 rounded-lg font-semibold">
+                                ➕ Adicionar Primeiro
+                            </button>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${this.colaboradores.map(c => {
+                                const media = this.calcularMediaGeral(c);
+                                const matriz = this.determinarMatrizDesempenho(c);
+                                const cor = this.getCorMatriz(matriz);
+                                return `
+                                    <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-cm-laranja">
+                                        <div class="flex justify-between mb-4">
+                                            <div>
+                                                <h3 class="text-xl font-bold text-cm-escuro">${c.nome}</h3>
+                                                <p class="text-sm text-gray-600">${c.cargo}</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-3xl font-bold text-cm-laranja">${media}</div>
+                                                <div class="text-xs text-gray-500">Média</div>
+                                            </div>
+                                        </div>
+                                        <div class="px-4 py-2 rounded-lg text-center font-bold text-sm mb-4 ${cor}">
+                                            ${matriz}
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 mb-4 text-center text-xs">
+                                            <div>
+                                                <div class="font-bold text-lg text-cm-laranja">${c.kpis.produtividade}%</div>
+                                                <div class="text-gray-600">Prod.</div>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-lg text-cm-laranja">${c.cha.atitude}/5</div>
+                                                <div class="text-gray-600">Atitude</div>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-lg text-cm-laranja">R$ ${(c.metas.mensuravel||0).toLocaleString('pt-BR',{maximumFractionDigits:0})}</div>
+                                                <div class="text-gray-600">Meta</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button onclick="app.editarColaborador(${c.id})" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg font-semibold text-sm">
+                                                ✏️ Avaliar
+                                            </button>
+                                            <button onclick="app.excluirColaborador(${c.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm">
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+
+    renderEditar() {
+        const c = this.colaboradorEditando;
+        if (!c) return '';
+        
+        const renderEscala = (label, valor, caminho) => `
+            <div class="mb-4">
+                <div class="flex justify-between mb-2">
+                    <label class="text-sm font-semibold">${label}</label>
+                    <span class="text-2xl font-bold text-cm-laranja">${valor}/5</span>
+                </div>
+                <div class="flex gap-2">
+                    ${[1,2,3,4,5].map(i => `
+                        <button onclick="${caminho}=${i};app.render();" 
+                            class="flex-1 py-3 rounded-lg font-bold ${i <= valor ? 'bg-cm-laranja text-white' : 'bg-gray-200 text-gray-600'}">
+                            ${i}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        const renderGuia = (tipo) => {
+            if (this.guiaAberto !== tipo) return '';
+            const g = BIBLIOTECA[tipo];
+            return `
+                <div class="exemplo-pratico p-4 rounded-lg mb-4">
+                    <h4 class="font-bold text-cm-escuro mb-2">📚 ${g.titulo}</h4>
+                    ${g.exemplos ? g.exemplos.map(ex => `<p class="text-sm mb-1">• ${ex}</p>`).join('') : ''}
+                    ${g.perfis ? g.perfis.map(p => `<p class="text-sm mb-1">• ${p}</p>`).join('') : ''}
+                    ${g.template ? `<p class="text-sm italic mb-2">📝 ${g.template}</p>` : ''}
+                    ${g.etapas ? g.etapas.map(e => `<p class="text-sm mb-1">${e}</p>`).join('') : ''}
+                    ${g.regra ? `<p class="text-sm font-bold mt-2">${g.regra}</p>` : ''}
+                    <div class="dica-campo p-3 rounded-lg mt-3">
+                        <p class="font-bold text-sm mb-1">💡 Dicas:</p>
+                        ${g.dicas.map(d => `<p class="text-xs mb-1">${d}</p>`).join('')}
+                    </div>
+                </div>
+            `;
+        };
+
+        return `
+            <div class="min-h-screen bg-gray-50">
+                <div class="bg-cm-escuro text-white shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <h1 class="text-3xl font-bold">✏️ Avaliando: ${c.nome}</h1>
+                    </div>
+                </div>
+                <div class="max-w-7xl mx-auto px-4 py-8">
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                        <div class="space-y-6">
+                            <!-- KPIs -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <div class="flex justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-cm-escuro">1. KPIs</h3>
+                                    <button onclick="app.toggleGuia('kpis');app.render();" class="text-cm-laranja font-semibold text-sm">💡 Guia</button>
+                                </div>
+                                ${renderGuia('kpis')}
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">Entregas (%)</label>
+                                        <input type="number" value="${c.kpis.entregas}" 
+                                            onchange="app.colaboradorEditando.kpis.entregas=parseFloat(this.value)" 
+                                            class="w-full px-4 py-2 border-2 rounded-lg" min="0" max="100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">Produtividade (%)</label>
+                                        <input type="number" value="${c.kpis.produtividade}" 
+                                            onchange="app.colaboradorEditando.kpis.produtividade=parseFloat(this.value)" 
+                                            class="w-full px-4 py-2 border-2 rounded-lg" min="0" max="100">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2">Erros (%)</label>
+                                        <input type="number" value="${c.kpis.erros}" 
+                                            onchange="app.colaboradorEditando.kpis.erros=parseFloat(this.value)" 
+                                            class="w-full px-4 py-2 border-2 rounded-lg" min="0" max="100">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SMART -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <div class="flex justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-cm-escuro">2. Metas SMART</h3>
+                                    <button onclick="app.toggleGuia('smart');app.render();" class="text-cm-laranja font-semibold text-sm">💡 Guia</button>
+                                </div>
+                                ${renderGuia('smart')}
+                                <div class="space-y-3">
+                                    <input type="text" value="${c.metas.especifica}" 
+                                        onchange="app.colaboradorEditando.metas.especifica=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="S - Específica">
+                                    <input type="number" value="${c.metas.mensuravel}" 
+                                        onchange="app.colaboradorEditando.metas.mensuravel=parseFloat(this.value)" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="M - Mensurável (R$)">
+                                    <input type="text" value="${c.metas.atingivel}" 
+                                        onchange="app.colaboradorEditando.metas.atingivel=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="A - Atingível">
+                                    <input type="text" value="${c.metas.relevante}" 
+                                        onchange="app.colaboradorEditando.metas.relevante=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="R - Relevante">
+                                    <input type="text" value="${c.metas.temporal}" 
+                                        onchange="app.colaboradorEditando.metas.temporal=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="T - Temporal">
+                                </div>
+                            </div>
+
+                            <!-- CHA -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <div class="flex justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-cm-escuro">3. CHA</h3>
+                                    <button onclick="app.toggleGuia('cha');app.render();" class="text-cm-laranja font-semibold text-sm">💡 Guia</button>
+                                </div>
+                                ${renderGuia('cha')}
+                                ${renderEscala('🧠 Conhecimento', c.cha.conhecimento, 'app.colaboradorEditando.cha.conhecimento')}
+                                ${renderEscala('💪 Habilidade', c.cha.habilidade, 'app.colaboradorEditando.cha.habilidade')}
+                                ${renderEscala('⭐ Atitude', c.cha.atitude, 'app.colaboradorEditando.cha.atitude')}
+                            </div>
+
+                            <!-- Competências -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <h3 class="text-xl font-bold text-cm-escuro mb-4">4. Competências</h3>
+                                ${renderEscala('Responsabilidade', c.competencias.responsabilidade, 'app.colaboradorEditando.competencias.responsabilidade')}
+                                ${renderEscala('Comunicação', c.competencias.comunicacao, 'app.colaboradorEditando.competencias.comunicacao')}
+                                ${renderEscala('Organização', c.competencias.organizacao, 'app.colaboradorEditando.competencias.organizacao')}
+                                ${renderEscala('Proatividade', c.competencias.proatividade, 'app.colaboradorEditando.competencias.proatividade')}
+                                ${renderEscala('Trabalho Equipe', c.competencias.trabalhoEquipe, 'app.colaboradorEditando.competencias.trabalhoEquipe')}
+                                ${renderEscala('Liderança', c.competencias.lideranca, 'app.colaboradorEditando.competencias.lideranca')}
+                            </div>
+
+                            <!-- Feedback -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <div class="flex justify-between mb-4">
+                                    <h3 class="text-xl font-bold text-cm-escuro">5. Feedback</h3>
+                                    <button onclick="app.toggleGuia('feedback');app.render();" class="text-cm-laranja font-semibold text-sm">💡 Guia</button>
+                                </div>
+                                ${renderGuia('feedback')}
+                                <div class="space-y-3">
+                                    <textarea onchange="app.colaboradorEditando.feedback.funcionando=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" rows="2" 
+                                        placeholder="1. O que funciona...">${c.feedback.funcionando}</textarea>
+                                    <textarea onchange="app.colaboradorEditando.feedback.melhorar=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" rows="2" 
+                                        placeholder="2. O que melhorar...">${c.feedback.melhorar}</textarea>
+                                    <textarea onchange="app.colaboradorEditando.feedback.impacto=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" rows="2" 
+                                        placeholder="3. Impacto...">${c.feedback.impacto}</textarea>
+                                    <textarea onchange="app.colaboradorEditando.feedback.ajuste=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" rows="2" 
+                                        placeholder="4. Próximo passo...">${c.feedback.ajuste}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- 360 -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <h3 class="text-xl font-bold text-cm-escuro mb-4">6. Avaliação 360°</h3>
+                                ${renderEscala('Autoavaliação', c.avaliacao360.autoavaliacao, 'app.colaboradorEditando.avaliacao360.autoavaliacao')}
+                                ${renderEscala('Líder', c.avaliacao360.lider, 'app.colaboradorEditando.avaliacao360.lider')}
+                                ${renderEscala('Pares', c.avaliacao360.pares, 'app.colaboradorEditando.avaliacao360.pares')}
+                                ${renderEscala('Subordinados', c.avaliacao360.subordinados, 'app.colaboradorEditando.avaliacao360.subordinados')}
+                            </div>
+
+                            <!-- PDI -->
+                            <div class="border-2 border-cm-laranja rounded-lg p-6">
+                                <h3 class="text-xl font-bold text-cm-escuro mb-4">8. PDI</h3>
+                                <div class="space-y-3">
+                                    <input type="text" value="${c.pdi.pontoForte}" 
+                                        onchange="app.colaboradorEditando.pdi.pontoForte=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ponto Forte">
+                                    <input type="text" value="${c.pdi.pontoMelhoria}" 
+                                        onchange="app.colaboradorEditando.pdi.pontoMelhoria=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ponto Melhoria">
+                                    <input type="text" value="${c.pdi.acaoPratica}" 
+                                        onchange="app.colaboradorEditando.pdi.acaoPratica=this.value" 
+                                        class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ação Prática">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <input type="text" value="${c.pdi.prazo}" 
+                                            onchange="app.colaboradorEditando.pdi.prazo=this.value" 
+                                            class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Prazo">
+                                        <input type="text" value="${c.pdi.responsavel}" 
+                                            onchange="app.colaboradorEditando.pdi.responsavel=this.value" 
+                                            class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Responsável">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 mt-8">
+                            <button onclick="app.salvarEdicao()" class="flex-1 bg-cm-laranja text-white py-4 rounded-lg font-bold text-xl">
+                                💾 Salvar
+                            </button>
+                            <button onclick="app.colaboradorEditando=null;app.paginaAtual='colaboradores';app.render();" 
+                                class="bg-gray-400 text-white px-8 py-4 rounded-lg font-bold text-xl">
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderDashboard() {
+        const prog = this.calcularProgressoMeta();
+        const porMatriz = {};
+        this.colaboradores.forEach(c => {
+            const m = this.determinarMatrizDesempenho(c);
+            porMatriz[m] = (porMatriz[m] || []).concat([c]);
+        });
+
+        return `
+            <div class="min-h-screen bg-gray-50">
+                <div class="bg-cm-escuro text-white shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <h1 class="text-3xl font-bold">📊 Dashboard</h1>
+                    </div>
+                </div>
+                ${this.renderMenu('dashboard')}
+                <div class="max-w-7xl mx-auto px-4 py-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-blue-500">
+                            <div class="text-gray-600 text-sm mb-2">Colaboradores</div>
+                            <div class="text-4xl font-bold text-blue-600">${this.colaboradores.length}</div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-green-500">
+                            <div class="text-gray-600 text-sm mb-2">Meta Mensal</div>
+                            <div class="text-2xl font-bold text-green-600">R$ ${this.metaMensal.toLocaleString('pt-BR')}</div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-orange-500">
+                            <div class="text-gray-600 text-sm mb-2">Alcançado</div>
+                            <div class="text-2xl font-bold text-orange-600">R$ ${prog.total.toLocaleString('pt-BR')}</div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-purple-500">
+                            <div class="text-gray-600 text-sm mb-2">% da Meta</div>
+                            <div class="text-4xl font-bold text-purple-600">${prog.percentual}%</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                        <h2 class="text-2xl font-bold text-cm-escuro mb-6">📊 Matriz Desempenho x Cultura</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${['Desenvolver', 'Alerta', 'Treinar', 'Desligar'].map(tipo => {
+                                const colabs = porMatriz[tipo] || [];
+                                const cor = this.getCorMatriz(tipo);
+                                return `
+                                    <div class="matriz-box ${cor} rounded-lg p-4">
+                                        <h3 class="font-bold text-lg mb-2">${tipo}</h3>
+                                        <div class="text-3xl font-bold mb-2">${colabs.length}</div>
+                                        <div class="text-xs">
+                                            ${colabs.map(c => `<div>• ${c.nome}</div>`).join('') || '<div class="text-gray-400">Nenhum</div>'}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h2 class="text-2xl font-bold text-cm-escuro mb-6">🏆 Ranking</h2>
+                        ${this.colaboradores.length === 0 ? `
+                            <p class="text-gray-500 text-center py-8">Nenhum colaborador</p>
+                        ` : `
+                            <div class="space-y-3">
+                                ${this.colaboradores
+                                    .map(c => ({ ...c, media: parseFloat(this.calcularMediaGeral(c)) }))
+                                    .sort((a, b) => b.media - a.media)
+                                    .map((c, i) => `
+                                        <div class="flex items-center gap-4 p-4 rounded-lg ${i === 0 ? 'bg-yellow-50 border-2 border-yellow-400' : 'bg-gray-50'}">
+                                            <div class="w-12 h-12 rounded-full ${i === 0 ? 'bg-yellow-400' : i === 1 ? 'bg-gray-300' : i === 2 ? 'bg-orange-300' : 'bg-gray-200'} flex items-center justify-center font-bold text-lg">
+                                                ${i + 1}
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="font-bold text-lg">${c.nome}</div>
+                                                <div class="text-sm text-gray-600">${this.determinarMatrizDesempenho(c)}</div>
+                                            </div>
+                                            <div class="text-right">
+                                                <div class="text-2xl font-bold text-cm-laranja">${c.media.toFixed(1)}</div>
+                                                <div class="text-xs text-gray-500">Média</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderTreinamento() {
+        const renderModulo = (id, titulo, conteudo) => {
+            const aberto = this.guiaAberto === id;
+            return `
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+                    <button onclick="app.guiaAberto='${id}';app.render();" 
+                        class="w-full bg-cm-escuro text-white p-6 text-left hover:opacity-90">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-2xl font-bold">${titulo}</h2>
+                            <span class="text-3xl">${aberto ? '▼' : '▶'}</span>
+                        </div>
+                    </button>
+                    <div class="accordion-content ${aberto ? 'active' : ''}">
+                        <div class="p-6">
+                            ${conteudo}
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        return `
+            <div class="min-h-screen bg-gray-50">
+                <div class="bg-cm-escuro text-white shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <h1 class="text-3xl font-bold">🎓 Academia de Liderança</h1>
+                        <p class="text-sm mt-2 opacity-90">Guias práticos e técnicas profissionais</p>
+                    </div>
+                </div>
+                ${this.renderMenu('treinamento')}
+                <div class="max-w-7xl mx-auto px-4 py-8">
+                    ${renderModulo('matriz', '📈 Matriz Desempenho x Cultura', `
+                        <div class="space-y-4">
+                            ${Object.entries(BIBLIOTECA.matriz.quadrantes).map(([key, texto]) => `
+                                <div class="border-2 rounded-lg p-4 ${this.getCorMatriz(key.charAt(0).toUpperCase() + key.slice(1))}">
+                                    <p class="font-bold">${texto}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `)}
+                    
+                    ${renderModulo('oneOnOne', '🤝 1-on-1 - A Ferramenta Mais Poderosa', `
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded mb-4">
+                            <p class="text-sm">Reuniões semanais individuais para construir relacionamento e performance.</p>
+                        </div>
+                        <h4 class="font-bold mb-3">📋 Estrutura (30 min):</h4>
+                        ${BIBLIOTECA.oneOnOne.estrutura.map(e => `<p class="text-sm mb-2">• ${e}</p>`).join('')}
+                        <div class="dica-campo p-4 rounded-lg mt-4">
+                            <p class="font-bold mb-2">⚠️ Regras de Ouro:</p>
+                            ${BIBLIOTECA.oneOnOne.regras.map(r => `<p class="text-sm mb-1">${r}</p>`).join('')}
+                        </div>
+                    `)}
+                    
+                    ${renderModulo('guia-rapido', '⚡ Guia Rápido das 8 Ferramentas', `
+                        <div class="space-y-4">
+                            ${Object.entries(BIBLIOTECA).map(([key, value]) => `
+                                <div class="border-2 border-cm-laranja rounded-lg p-4">
+                                    <h4 class="font-bold text-cm-escuro mb-2">${value.titulo}</h4>
+                                    ${value.exemplos ? value.exemplos.map(ex => `<p class="text-sm mb-1">• ${ex}</p>`).join('') : ''}
+                                    ${value.perfis ? value.perfis.map(p => `<p class="text-sm mb-1">• ${p}</p>`).join('') : ''}
+                                    ${value.quadrantes ? Object.entries(value.quadrantes).map(([k,v]) => `<p class="text-sm mb-1">• ${v}</p>`).join('') : ''}
+                                    ${value.estrutura ? value.estrutura.map(e => `<p class="text-sm mb-1">• ${e}</p>`).join('') : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `)}
+                </div>
+            </div>
+        `;
+    }
+
+    renderConfig() {
+        return `
+            <div class="min-h-screen bg-gray-50">
+                <div class="bg-cm-escuro text-white shadow-lg">
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <h1 class="text-3xl font-bold">⚙️ Configurações</h1>
+                    </div>
+                </div>
+                ${this.renderMenu('config')}
+                <div class="max-w-4xl mx-auto px-4 py-8">
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                        <h2 class="text-2xl font-bold text-cm-escuro mb-6">Meta Mensal</h2>
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold mb-2">💰 Meta de Vendas (R$)</label>
+                            <input type="number" id="inputMeta" value="${this.metaMensal}" 
+                                class="w-full px-4 py-3 border-2 rounded-lg text-xl font-bold" placeholder="450000">
+                        </div>
+                        <button onclick="app.atualizarMeta()" class="bg-cm-laranja text-white px-8 py-3 rounded-lg font-bold w-full">
+                            💾 Salvar Meta
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                        <h2 class="text-2xl font-bold text-cm-escuro mb-4">Dados do Sistema</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                <div>
+                                    <div class="font-bold">Colaboradores</div>
+                                    <div class="text-sm text-gray-600">${this.colaboradores.length} registros</div>
+                                </div>
+                            </div>
+                            <button onclick="app.exportarDados()" class="w-full bg-blue-500 text-white px-6 py-3 rounded-lg font-bold">
+                                📥 Exportar Dados (JSON)
+                            </button>
+                            <button onclick="app.limparDados()" class="w-full bg-red-500 text-white px-6 py-3 rounded-lg font-bold">
+                                🗑️ Limpar Todos os Dados
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-blue-800 mb-2">💡 Sobre</h3>
+                        <p class="text-gray-700 text-sm">
+                            Sistema C&M Leadership Academy com 8 ferramentas de avaliação + biblioteca de treinamento para líderes. 
+                            Dados salvos no navegador (LocalStorage).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Inicia o app
+const app = new AvaliacaoDesempenho();
+    </script>
+</body>
+</html>
