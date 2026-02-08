@@ -40,7 +40,51 @@
     /* Textos */
     .text-cm-laranja { color: var(--cm-laranja); }
     .text-cm-escuro { color: var(--cm-texto-escuro); }
-    .text-cm-azul { color:
+    .text-cm-azul { color: var(--cm-azul-principal); }
+    .text-cm-verde { color: var(--cm-verde); }
+
+    /* Bordas */
+    .border-cm-laranja { border-color: var(--cm-laranja); }
+    .border-cm-azul { border-color: var(--cm-azul-principal); }
+    .border-cm-verde { border-color: var(--cm-verde); }
+
+    /* Indicadores financeiros */
+    .receita { border-left: 5px solid var(--cm-verde); }
+    .despesa { border-left: 5px solid #EF4444; }
+    .investimento { border-left: 5px solid var(--cm-laranja); }
+
+    /* Modal (AQUI estava o branco matando tudo) */
+    .modal { 
+        display: none; 
+        position: fixed; 
+        z-index: 50; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        height: 100%; 
+        background-color: rgba(37, 99, 235, 0.25); /* azul translúcido */
+        overflow-y: auto; 
+    }
+
+    .modal.active { 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 20px; 
+    }
+
+    .modal-content { 
+        background: linear-gradient(135deg, var(--cm-azul-muito-claro), #FFFFFF);
+        border-radius: 16px; 
+        max-width: 600px; 
+        width: 100%; 
+        max-height: 90vh; 
+        overflow-y: auto;
+        border: 2px solid var(--cm-azul-claro);
+        box-shadow: 0 30px 80px rgba(37, 99, 235, 0.25);
+        color: var(--cm-texto-escuro);
+    }
+</style>
 
 </head>
 <body class="bg-gray-50">
