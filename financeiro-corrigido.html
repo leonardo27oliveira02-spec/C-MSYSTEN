@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C&M Financial Pro - Gestão Financeira Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --cm-laranja: #FF9944;
@@ -13,69 +12,28 @@
             --cm-verde-escuro: #2C5F4F;
             --cm-verde-claro: #3D8B73;
             --cm-bege: #F5E6D3;
-            --cm-cinza-claro: #F8F9FA;
-            --cor-verde: #10B981;
-            --cor-vermelho: #EF4444;
-            --cor-azul: #3B82F6;
         }
-        
         .bg-cm-laranja { background-color: var(--cm-laranja); }
         .bg-cm-laranja-escuro { background-color: var(--cm-laranja-escuro); }
-        .bg-cm-escuro { background-color: var(--cm-verde-escuro); }
-        .bg-cm-verde-escuro { background-color: var(--cm-verde-escuro); }
+        .bg-cm-escuro, .bg-cm-verde-escuro { background-color: var(--cm-verde-escuro); }
         .bg-cm-verde-claro { background-color: var(--cm-verde-claro); }
         .bg-cm-bege { background-color: var(--cm-bege); }
         .text-cm-laranja { color: var(--cm-laranja); }
         .text-cm-laranja-escuro { color: var(--cm-laranja-escuro); }
-        .text-cm-escuro { color: var(--cm-verde-escuro); }
-        .text-cm-verde-escuro { color: var(--cm-verde-escuro); }
+        .text-cm-verde-escuro, .text-cm-escuro { color: var(--cm-verde-escuro); }
         .border-cm-laranja { border-color: var(--cm-laranja); }
         .border-cm-escuro { border-color: var(--cm-verde-escuro); }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        
-        .receita { border-left: 4px solid var(--cor-verde); }
-        .despesa { border-left: 4px solid var(--cor-vermelho); }
+        .receita { border-left: 4px solid #10B981; }
+        .despesa { border-left: 4px solid #EF4444; }
         .investimento { border-left: 4px solid var(--cm-laranja); }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 50;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            overflow-y: auto;
-        }
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-gray-50">
     <div id="app"></div>
-
-    <!-- Botão Flutuante Home -->
+    
     <button onclick="app.paginaAtual='dashboard';app.render();" 
         class="fixed bottom-6 right-6 bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro hover:from-cm-verde-escuro hover:to-cm-verde-claro text-white p-4 rounded-full shadow-2xl transform hover:scale-110 transition-all z-50 border-4 border-white">
         <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -83,7 +41,6 @@
         </svg>
     </button>
 
-    <!-- Modal Adicionar Transação -->
     <div id="modalTransacao" class="modal">
         <div class="modal-content">
             <div class="bg-cm-escuro text-white p-6 rounded-t-xl">
@@ -96,7 +53,6 @@
         </div>
     </div>
 
-    <!-- Modal Definir Meta -->
     <div id="modalMeta" class="modal">
         <div class="modal-content">
             <div class="bg-cm-escuro text-white p-6 rounded-t-xl">
@@ -108,174 +64,39 @@
             <div class="p-6" id="conteudoModalMeta"></div>
         </div>
     </div>
-
+    
     <script>
-// ========== TÉCNICAS DE ALAVANCAGEM FINANCEIRA ==========
-const TECNICAS_ALAVANCAGEM = {
-    curto_prazo: {
-        titulo: "Alavancagem de Curto Prazo (7-30 dias)",
-        tecnicas: [
-            {
-                nome: "Regra 50/30/20 Turbo",
-                descricao: "50% Essencial | 30% Investimento/Dívidas | 20% Estilo de Vida",
-                acao: "Inverta prioridades: pague dívidas e invista ANTES de gastar",
-                impacto: "Reduz juros e acelera patrimônio em 3-6 meses"
-            },
-            {
-                nome: "Efeito Bola de Neve (Snowball)",
-                descricao: "Pague menor dívida primeiro, depois use esse valor na próxima",
-                acao: "Liste dívidas da menor para maior. Ataque a menor com tudo",
-                impacto: "Motivação psicológica + libertação progressiva"
-            },
-            {
-                nome: "Método Avalanche",
-                descricao: "Pague dívida com MAIOR juros primeiro",
-                acao: "Calcule juros reais. Elimine cartão/cheque especial primeiro",
-                impacto: "Economia máxima de juros (pode ser 40%+ ao ano)"
-            },
-            {
-                nome: "Renda Extra Direcionada",
-                descricao: "100% da renda extra vai para meta específica",
-                acao: "Freela, venda, bico = direto para dívida ou investimento",
-                impacto: "Acelera metas em 2-3x"
-            },
-            {
-                nome: "Desafio Sem Gastos (No Spend Challenge)",
-                descricao: "7-30 dias sem gastos não essenciais",
-                acao: "Congele cartões, use só dinheiro, zero delivery/uber",
-                impacto: "Economiza 20-40% da renda facilmente"
-            },
-            {
-                nome: "Automatização Financeira",
-                descricao: "Automatize investimento/pagamento no dia do salário",
-                acao: "Configure débito automático para poupança/investimento",
-                impacto: "Remove tentação, garante disciplina"
-            }
-        ]
-    },
-    
-    medio_prazo: {
-        titulo: "Alavancagem de Médio Prazo (1-6 meses)",
-        tecnicas: [
-            {
-                nome: "Reserva de Emergência Mínima",
-                descricao: "3-6 meses de despesas essenciais",
-                acao: "Calcule despesas fixas × 3. Meta: acumular em 6 meses",
-                impacto: "Segurança para não voltar a se endividar"
-            },
-            {
-                nome: "Renegociação Agressiva",
-                descricao: "Negocie TUDO: dívidas, planos, assinaturas",
-                acao: "Ligue para cada credor. Peça 50-70% desconto à vista",
-                impacto: "Reduz dívida total em 30-60%"
-            },
-            {
-                nome: "Múltiplas Fontes de Renda",
-                descricao: "2-3 fontes de renda paralelas",
-                acao: "Monetize habilidade: aulas, freela, digital",
-                impacto: "Aumenta renda em 30-100%"
-            }
-        ]
-    },
-    
-    regras_ouro: [
-        "💰 Pague a SI MESMO primeiro - separe investimento antes de gastar",
-        "🔥 Juros compostos trabalham a SEU FAVOR ou CONTRA você",
-        "📊 Acompanhe DIARIAMENTE - 5min/dia salva seu futuro",
-        "🎯 Meta sem prazo = sonho. Prazo sem ação = ilusão",
-        "⚡ Ação imperfeita HOJE > plano perfeito amanhã",
-        "🚫 Dívida de consumo é VENENO. Dívida de investimento é ALAVANCA",
-        "💪 Desconforto temporário = liberdade permanente"
-    ]
-};
+const TECNICAS_ALAVANCAGEM={curto_prazo:{titulo:"Alavancagem de Curto Prazo (7-30 dias)",tecnicas:[{nome:"Regra 50/30/20 Turbo",descricao:"50% Essencial | 30% Investimento/Dívidas | 20% Estilo de Vida",acao:"Inverta prioridades: pague dívidas e invista ANTES de gastar",impacto:"Reduz juros e acelera patrimônio em 3-6 meses"},{nome:"Efeito Bola de Neve (Snowball)",descricao:"Pague menor dívida primeiro, depois use esse valor na próxima",acao:"Liste dívidas da menor para maior. Ataque a menor com tudo",impacto:"Motivação psicológica + libertação progressiva"},{nome:"Método Avalanche",descricao:"Pague dívida com MAIOR juros primeiro",acao:"Calcule juros reais. Elimine cartão/cheque especial primeiro",impacto:"Economia máxima de juros (pode ser 40%+ ao ano)"},{nome:"Renda Extra Direcionada",descricao:"100% da renda extra vai para meta específica",acao:"Freela, venda, bico = direto para dívida ou investimento",impacto:"Acelera metas em 2-3x"},{nome:"Desafio Sem Gastos (No Spend Challenge)",descricao:"7-30 dias sem gastos não essenciais",acao:"Congele cartões, use só dinheiro, zero delivery/uber",impacto:"Economiza 20-40% da renda facilmente"},{nome:"Automatização Financeira",descricao:"Automatize investimento/pagamento no dia do salário",acao:"Configure débito automático para poupança/investimento",impacto:"Remove tentação, garante disciplina"}]},medio_prazo:{titulo:"Alavancagem de Médio Prazo (1-6 meses)",tecnicas:[{nome:"Reserva de Emergência Mínima",descricao:"3-6 meses de despesas essenciais",acao:"Calcule despesas fixas × 3. Meta: acumular em 6 meses",impacto:"Segurança para não voltar a se endividar"},{nome:"Renegociação Agressiva",descricao:"Negocie TUDO: dívidas, planos, assinaturas",acao:"Ligue para cada credor. Peça 50-70% desconto à vista",impacto:"Reduz dívida total em 30-60%"},{nome:"Múltiplas Fontes de Renda",descricao:"2-3 fontes de renda paralelas",acao:"Monetize habilidade: aulas, freela, digital",impacto:"Aumenta renda em 30-100%"}]},regras_ouro:["💰 Pague a SI MESMO primeiro - separe investimento antes de gastar","🔥 Juros compostos trabalham a SEU FAVOR ou CONTRA você","📊 Acompanhe DIARIAMENTE - 5min/dia salva seu futuro","🎯 Meta sem prazo = sonho. Prazo sem ação = ilusão","⚡ Ação imperfeita HOJE > plano perfeito amanhã","🚫 Dívida de consumo é VENENO. Dívida de investimento é ALAVANCA","💪 Desconforto temporário = liberdade permanente"]};
+const CATEGORIAS={receitas:['Salário','Freela','Investimentos','Vendas','Bônus','Outros'],despesas:['Moradia','Alimentação','Transporte','Saúde','Educação','Lazer','Dívidas','Outros'],investimentos:['Poupança','Tesouro Direto','CDB','Ações','Fundos','Cripto','Outros']};
 
-// ========== CATEGORIAS PADRÃO ==========
-const CATEGORIAS = {
-    receitas: ['Salário', 'Freela', 'Investimentos', 'Vendas', 'Bônus', 'Outros'],
-    despesas: ['Moradia', 'Alimentação', 'Transporte', 'Saúde', 'Educação', 'Lazer', 'Dívidas', 'Outros'],
-    investimentos: ['Poupança', 'Tesouro Direto', 'CDB', 'Ações', 'Fundos', 'Cripto', 'Outros']
-};
-
-// ========== CLASSE PRINCIPAL ==========
 class GestaoFinanceira {
     constructor() {
         this.paginaAtual = 'dashboard';
         this.transacoes = [];
         this.metas = [];
-        this.orcamento = {
-            essencial: 50,
-            investimento: 30,
-            estilo_vida: 20
-        };
-        
+        this.orcamento = {essencial: 50, investimento: 30, estilo_vida: 20};
         this.carregarDados();
         this.render();
     }
 
-    // ===== TRANSAÇÕES =====
     abrirModalTransacao(tipo = 'receita') {
-        document.getElementById('tituloModalTransacao').textContent = 
-            tipo === 'receita' ? '💰 Nova Receita' : 
-            tipo === 'despesa' ? '💸 Nova Despesa' : '📈 Novo Investimento';
-        
-        const categorias = tipo === 'receita' ? CATEGORIAS.receitas : 
-                          tipo === 'despesa' ? CATEGORIAS.despesas : CATEGORIAS.investimentos;
-        
+        document.getElementById('tituloModalTransacao').textContent = tipo === 'receita' ? '💰 Nova Receita' : tipo === 'despesa' ? '💸 Nova Despesa' : '📈 Novo Investimento';
+        const categorias = tipo === 'receita' ? CATEGORIAS.receitas : tipo === 'despesa' ? CATEGORIAS.despesas : CATEGORIAS.investimentos;
         document.getElementById('conteudoModalTransacao').innerHTML = `
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-2">📝 Descrição</label>
-                    <input type="text" id="descTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ex: Salário de fevereiro">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">💵 Valor (R$)</label>
-                    <input type="number" id="valorTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="0.00" step="0.01">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">📁 Categoria</label>
-                    <select id="categoriaTransacao" class="w-full px-4 py-2 border-2 rounded-lg">
-                        ${categorias.map(c => `<option value="${c}">${c}</option>`).join('')}
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">📅 Data</label>
-                    <input type="date" id="dataTransacao" value="${new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2 border-2 rounded-lg">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">🔁 Recorrente?</label>
-                    <select id="recorrenteTransacao" class="w-full px-4 py-2 border-2 rounded-lg">
-                        <option value="false">Não</option>
-                        <option value="mensal">Mensal</option>
-                        <option value="semanal">Semanal</option>
-                    </select>
-                </div>
-                <button onclick="app.salvarTransacao('${tipo}')" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg hover:opacity-90">
-                    💾 Salvar ${tipo === 'receita' ? 'Receita' : tipo === 'despesa' ? 'Despesa' : 'Investimento'}
-                </button>
-            </div>
-        `;
-        
+                <div><label class="block text-sm font-semibold mb-2">📝 Descrição</label><input type="text" id="descTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ex: Salário de fevereiro"></div>
+                <div><label class="block text-sm font-semibold mb-2">💵 Valor (R$)</label><input type="number" id="valorTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="0.00" step="0.01"></div>
+                <div><label class="block text-sm font-semibold mb-2">📁 Categoria</label><select id="categoriaTransacao" class="w-full px-4 py-2 border-2 rounded-lg">${categorias.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
+                <div><label class="block text-sm font-semibold mb-2">📅 Data</label><input type="date" id="dataTransacao" value="${new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2 border-2 rounded-lg"></div>
+                <div><label class="block text-sm font-semibold mb-2">🔁 Recorrente?</label><select id="recorrenteTransacao" class="w-full px-4 py-2 border-2 rounded-lg"><option value="false">Não</option><option value="mensal">Mensal</option><option value="semanal">Semanal</option></select></div>
+                <button onclick="app.salvarTransacao('${tipo}')" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg hover:opacity-90">💾 Salvar</button>
+            </div>`;
         document.getElementById('modalTransacao').classList.add('active');
     }
 
     salvarTransacao(tipo) {
-        const transacao = {
-            id: Date.now(),
-            tipo,
-            descricao: document.getElementById('descTransacao').value,
-            valor: parseFloat(document.getElementById('valorTransacao').value),
-            categoria: document.getElementById('categoriaTransacao').value,
-            data: document.getElementById('dataTransacao').value,
-            recorrente: document.getElementById('recorrenteTransacao').value,
-            paga: tipo === 'despesa' ? false : true,
-            criado_em: new Date().toISOString()
-        };
-
-        if (!transacao.descricao || !transacao.valor || transacao.valor <= 0) {
-            alert('❌ Preencha descrição e valor válido!');
-            return;
-        }
-
+        const transacao = {id: Date.now(), tipo, descricao: document.getElementById('descTransacao').value, valor: parseFloat(document.getElementById('valorTransacao').value), categoria: document.getElementById('categoriaTransacao').value, data: document.getElementById('dataTransacao').value, recorrente: document.getElementById('recorrenteTransacao').value, paga: tipo === 'despesa' ? false : true, criado_em: new Date().toISOString()};
+        if (!transacao.descricao || !transacao.valor || transacao.valor <= 0) { alert('❌ Preencha descrição e valor válido!'); return; }
         this.transacoes.push(transacao);
         this.salvarDados();
         this.fecharModal('modalTransacao');
@@ -301,93 +122,38 @@ class GestaoFinanceira {
         }
     }
 
-    // ===== METAS =====
     abrirModalMeta() {
         document.getElementById('conteudoModalMeta').innerHTML = `
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold mb-2">🎯 Objetivo da Meta</label>
-                    <input type="text" id="objetivoMeta" class="w-full px-4 py-2 border-2 rounded-lg" 
-                        placeholder="Ex: Pagar dívida do cartão">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">💰 Valor Total (R$)</label>
-                    <input type="number" id="valorMeta" class="w-full px-4 py-2 border-2 rounded-lg" 
-                        placeholder="5000.00" step="0.01">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">📅 Prazo (dias)</label>
-                    <select id="prazoMeta" class="w-full px-4 py-2 border-2 rounded-lg">
-                        <option value="7">7 dias (1 semana)</option>
-                        <option value="15">15 dias</option>
-                        <option value="30" selected>30 dias (1 mês)</option>
-                        <option value="60">60 dias (2 meses)</option>
-                        <option value="90">90 dias (3 meses)</option>
-                        <option value="180">180 dias (6 meses)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">🎨 Tipo de Meta</label>
-                    <select id="tipoMeta" class="w-full px-4 py-2 border-2 rounded-lg">
-                        <option value="economizar">💰 Economizar/Juntar</option>
-                        <option value="pagar_divida">🔥 Pagar Dívida</option>
-                        <option value="investir">📈 Investir</option>
-                        <option value="renda_extra">💼 Gerar Renda Extra</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-2">📝 Estratégia (opcional)</label>
-                    <textarea id="estrategiaMeta" class="w-full px-4 py-2 border-2 rounded-lg" rows="3" 
-                        placeholder="Ex: Fazer 3 freelas por semana + cortar gastos supérfluos"></textarea>
-                </div>
-                <button onclick="app.salvarMeta()" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg hover:opacity-90">
-                    🎯 Criar Meta
-                </button>
-            </div>
-        `;
-        
+                <div><label class="block text-sm font-semibold mb-2">🎯 Objetivo da Meta</label><input type="text" id="objetivoMeta" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ex: Pagar dívida do cartão"></div>
+                <div><label class="block text-sm font-semibold mb-2">💰 Valor Total (R$)</label><input type="number" id="valorMeta" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="5000.00" step="0.01"></div>
+                <div><label class="block text-sm font-semibold mb-2">📅 Prazo (dias)</label><select id="prazoMeta" class="w-full px-4 py-2 border-2 rounded-lg"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30" selected>30 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="180">180 dias</option></select></div>
+                <div><label class="block text-sm font-semibold mb-2">🎨 Tipo de Meta</label><select id="tipoMeta" class="w-full px-4 py-2 border-2 rounded-lg"><option value="economizar">💰 Economizar</option><option value="pagar_divida">🔥 Pagar Dívida</option><option value="investir">📈 Investir</option><option value="renda_extra">💼 Renda Extra</option></select></div>
+                <div><label class="block text-sm font-semibold mb-2">📝 Estratégia</label><textarea id="estrategiaMeta" class="w-full px-4 py-2 border-2 rounded-lg" rows="3"></textarea></div>
+                <button onclick="app.salvarMeta()" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg">🎯 Criar Meta</button>
+            </div>`;
         document.getElementById('modalMeta').classList.add('active');
     }
 
     salvarMeta() {
-        const meta = {
-            id: Date.now(),
-            objetivo: document.getElementById('objetivoMeta').value,
-            valorTotal: parseFloat(document.getElementById('valorMeta').value),
-            valorAtual: 0,
-            prazo: parseInt(document.getElementById('prazoMeta').value),
-            tipo: document.getElementById('tipoMeta').value,
-            estrategia: document.getElementById('estrategiaMeta').value,
-            dataInicio: new Date().toISOString(),
-            status: 'ativa'
-        };
-
-        if (!meta.objetivo || !meta.valorTotal || meta.valorTotal <= 0) {
-            alert('❌ Preencha objetivo e valor válido!');
-            return;
-        }
-
+        const meta = {id: Date.now(), objetivo: document.getElementById('objetivoMeta').value, valorTotal: parseFloat(document.getElementById('valorMeta').value), valorAtual: 0, prazo: parseInt(document.getElementById('prazoMeta').value), tipo: document.getElementById('tipoMeta').value, estrategia: document.getElementById('estrategiaMeta').value, dataInicio: new Date().toISOString(), status: 'ativa'};
+        if (!meta.objetivo || !meta.valorTotal || meta.valorTotal <= 0) { alert('❌ Preencha objetivo e valor válido!'); return; }
         meta.dataFim = new Date(Date.now() + meta.prazo * 24 * 60 * 60 * 1000).toISOString();
         meta.valorDiario = meta.valorTotal / meta.prazo;
-
         this.metas.push(meta);
         this.salvarDados();
         this.fecharModal('modalMeta');
-        alert(`✅ Meta criada! Você precisa de R$ ${meta.valorDiario.toFixed(2)}/dia`);
+        alert(`✅ Meta criada! R$ ${meta.valorDiario.toFixed(2)}/dia`);
         this.render();
     }
 
     atualizarProgressoMeta(metaId) {
         const valor = parseFloat(prompt('Quanto você progrediu? (R$)'));
         if (!valor || valor <= 0) return;
-
         const meta = this.metas.find(m => m.id === metaId);
         if (meta) {
             meta.valorAtual += valor;
-            if (meta.valorAtual >= meta.valorTotal) {
-                meta.status = 'concluida';
-                alert('🎉 PARABÉNS! Meta concluída!');
-            }
+            if (meta.valorAtual >= meta.valorTotal) { meta.status = 'concluida'; alert('🎉 PARABÉNS! Meta concluída!'); }
             this.salvarDados();
             this.render();
         }
@@ -401,70 +167,44 @@ class GestaoFinanceira {
         }
     }
 
-    // ===== CÁLCULOS =====
     calcularResumo(periodo = 'mes') {
         const hoje = new Date();
         const filtradas = this.transacoes.filter(t => {
             const dataTransacao = new Date(t.data);
-            if (periodo === 'mes') {
-                return dataTransacao.getMonth() === hoje.getMonth() && 
-                       dataTransacao.getFullYear() === hoje.getFullYear();
-            } else if (periodo === 'semana') {
+            if (periodo === 'mes') return dataTransacao.getMonth() === hoje.getMonth() && dataTransacao.getFullYear() === hoje.getFullYear();
+            if (periodo === 'semana') {
                 const diffTime = Math.abs(hoje - dataTransacao);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 return diffDays <= 7;
             }
             return true;
         });
-
         const receitas = filtradas.filter(t => t.tipo === 'receita').reduce((s, t) => s + t.valor, 0);
         const despesas = filtradas.filter(t => t.tipo === 'despesa' && t.paga).reduce((s, t) => s + t.valor, 0);
         const despesasPendentes = filtradas.filter(t => t.tipo === 'despesa' && !t.paga).reduce((s, t) => s + t.valor, 0);
         const investimentos = filtradas.filter(t => t.tipo === 'investimento').reduce((s, t) => s + t.valor, 0);
-        
         const saldo = receitas - despesas - investimentos;
         const taxaInvestimento = receitas > 0 ? ((investimentos / receitas) * 100).toFixed(1) : 0;
         const taxaGastos = receitas > 0 ? ((despesas / receitas) * 100).toFixed(1) : 0;
-
-        return { receitas, despesas, investimentos, saldo, taxaInvestimento, taxaGastos, total: filtradas.length, despesasPendentes };
+        return {receitas, despesas, investimentos, saldo, taxaInvestimento, taxaGastos, total: filtradas.length, despesasPendentes};
     }
 
     calcularPorCategoria() {
         const porCategoria = {};
         this.transacoes.forEach(t => {
-            if (!porCategoria[t.categoria]) {
-                porCategoria[t.categoria] = { total: 0, count: 0 };
-            }
+            if (!porCategoria[t.categoria]) porCategoria[t.categoria] = {total: 0, count: 0};
             porCategoria[t.categoria].total += t.valor;
             porCategoria[t.categoria].count++;
         });
-        return Object.entries(porCategoria)
-            .sort((a, b) => b[1].total - a[1].total)
-            .slice(0, 10);
+        return Object.entries(porCategoria).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
     }
 
     lancamentoRapido() {
         const desc = document.getElementById('quickDesc').value;
         const valor = parseFloat(document.getElementById('quickValor').value);
         const tipo = document.getElementById('quickTipo').value;
-        
-        if (!desc || !valor || valor <= 0) {
-            alert('❌ Preencha descrição e valor!');
-            return;
-        }
-        
-        this.transacoes.push({
-            id: Date.now(),
-            tipo,
-            descricao: desc,
-            valor,
-            categoria: 'Outros',
-            data: new Date().toISOString().split('T')[0],
-            recorrente: 'false',
-            paga: tipo === 'despesa' ? false : true,
-            criado_em: new Date().toISOString()
-        });
-        
+        if (!desc || !valor || valor <= 0) { alert('❌ Preencha descrição e valor!'); return; }
+        this.transacoes.push({id: Date.now(), tipo, descricao: desc, valor, categoria: 'Outros', data: new Date().toISOString().split('T')[0], recorrente: 'false', paga: tipo === 'despesa' ? false : true, criado_em: new Date().toISOString()});
         this.salvarDados();
         document.getElementById('quickDesc').value = '';
         document.getElementById('quickValor').value = '';
@@ -479,9 +219,8 @@ class GestaoFinanceira {
             const dataTransacao = new Date(t.data);
             return dataTransacao < hoje;
         });
-        
         const valorTotal = atrasadas.reduce((s, t) => s + t.valor, 0);
-        return { quantidade: atrasadas.length, valor: valorTotal };
+        return {quantidade: atrasadas.length, valor: valorTotal};
     }
 
     calcularDiasRestantes() {
@@ -490,16 +229,10 @@ class GestaoFinanceira {
         return ultimoDia.getDate() - hoje.getDate();
     }
 
-    // ===== EXPORTAR =====
     exportarCSV() {
         let csv = 'Data,Tipo,Categoria,Descrição,Valor\n';
-        this.transacoes
-            .sort((a, b) => new Date(b.data) - new Date(a.data))
-            .forEach(t => {
-                csv += `${t.data},${t.tipo},${t.categoria},"${t.descricao}",${t.valor}\n`;
-            });
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        this.transacoes.sort((a, b) => new Date(b.data) - new Date(a.data)).forEach(t => { csv += `${t.data},${t.tipo},${t.categoria},"${t.descricao}",${t.valor}\n`; });
+        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `financas_${new Date().toISOString().split('T')[0]}.csv`;
@@ -508,14 +241,8 @@ class GestaoFinanceira {
     }
 
     exportarJSON() {
-        const dados = {
-            transacoes: this.transacoes,
-            metas: this.metas,
-            orcamento: this.orcamento,
-            exportado_em: new Date().toISOString()
-        };
-
-        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const dados = {transacoes: this.transacoes, metas: this.metas, orcamento: this.orcamento, exportado_em: new Date().toISOString()};
+        const blob = new Blob([JSON.stringify(dados, null, 2)], {type: 'application/json'});
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `backup_financeiro_${new Date().toISOString().split('T')[0]}.json`;
@@ -523,7 +250,6 @@ class GestaoFinanceira {
         alert('✅ Backup exportado!');
     }
 
-    // ===== PERSISTÊNCIA =====
     salvarDados() {
         localStorage.setItem('financeiro_transacoes', JSON.stringify(this.transacoes));
         localStorage.setItem('financeiro_metas', JSON.stringify(this.metas));
@@ -533,10 +259,8 @@ class GestaoFinanceira {
     carregarDados() {
         const t = localStorage.getItem('financeiro_transacoes');
         if (t) this.transacoes = JSON.parse(t);
-        
         const m = localStorage.getItem('financeiro_metas');
         if (m) this.metas = JSON.parse(m);
-        
         const o = localStorage.getItem('financeiro_orcamento');
         if (o) this.orcamento = JSON.parse(o);
     }
@@ -555,42 +279,211 @@ class GestaoFinanceira {
         document.getElementById(id).classList.remove('active');
     }
 
-    // ===== RENDERIZAÇÃO =====
     render() {
         const app = document.getElementById('app');
-        const pages = {
-            'dashboard': () => this.renderDashboard(),
-            'transacoes': () => this.renderTransacoes(),
-            'metas': () => this.renderMetas(),
-            'alavancagem': () => this.renderAlavancagem(),
-            'relatorios': () => this.renderRelatorios()
-        };
+        const pages = {'dashboard': () => this.renderDashboard(), 'transacoes': () => this.renderTransacoes(), 'metas': () => this.renderMetas(), 'alavancagem': () => this.renderAlavancagem(), 'relatorios': () => this.renderRelatorios()};
         app.innerHTML = pages[this.paginaAtual]();
     }
 
     renderMenu(ativo) {
-        const menus = [
-            { id: 'dashboard', label: '📊 Dashboard', icon: '📊' },
-            { id: 'transacoes', label: '💰 Transações', icon: '💰' },
-            { id: 'metas', label: '🎯 Metas', icon: '🎯' },
-            { id: 'alavancagem', label: '🚀 Alavancagem', icon: '🚀' },
-            { id: 'relatorios', label: '📈 Relatórios', icon: '📈' }
-        ];
+        const menus = [{id:'dashboard',label:'📊 Dashboard'},{id:'transacoes',label:'💰 Transações'},{id:'metas',label:'🎯 Metas'},{id:'alavancagem',label:'🚀 Alavancagem'},{id:'relatorios',label:'📈 Relatórios'}];
+        return `<div class="bg-white shadow-md border-b-4 border-cm-laranja sticky top-0 z-40"><div class="max-w-7xl mx-auto flex gap-2 px-4 py-3 overflow-x-auto">${menus.map(m => `<button onclick="app.paginaAtual='${m.id}';app.render();" class="px-6 py-3 rounded-lg font-bold whitespace-nowrap text-sm transition-all ${ativo === m.id ? 'bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro text-white shadow-lg scale-105' : 'bg-cm-bege text-cm-verde-escuro hover:bg-cm-laranja hover:text-white'}">${m.label}</button>`).join('')}</div></div>`;
+    }
 
-        return `
-            <div class="bg-white shadow-md border-b-4 border-cm-laranja sticky top-0 z-40">
-                <div class="max-w-7xl mx-auto flex gap-2 px-4 py-3 overflow-x-auto">
-                    ${menus.map(m => `
-                        <button onclick="app.paginaAtual='${m.id}';app.render();" 
-                            class="px-6 py-3 rounded-lg font-bold whitespace-nowrap text-sm transition-all ${
-                                ativo === m.id 
-                                ? 'bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro text-white shadow-lg scale-105' 
-                                : 'bg-cm-bege text-cm-verde-escuro hover:bg-cm-laranja hover:text-white'
-                            }">
-                            ${m.label}
-                        </button>
-                    `).join('')}
+    renderDashboard() {
+        const resumo = this.calcularResumo('mes');
+        const diasRestantes = this.calcularDiasRestantes();
+        const metasAtivas = this.metas.filter(m => m.status === 'ativa');
+        return `<div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+            <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
+                <div class="max-w-7xl mx-auto px-4 py-6"><div class="flex items-center gap-4">
+                    <div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">C&M</div>
+                    <div><h1 class="text-3xl font-bold">💼 Dashboard Financeiro</h1><p class="text-sm mt-1 opacity-90">Financial Pro - Gestão Inteligente</p></div>
+                </div></div>
+            </div>
+            ${this.renderMenu('dashboard')}
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="bg-gradient-to-br from-cm-verde-escuro via-cm-verde-claro to-cm-laranja text-white rounded-2xl shadow-2xl p-8 mb-8 border-4 border-white">
+                    <div class="flex justify-between items-start mb-6">
+                        <div><div class="bg-white text-cm-verde-escuro px-4 py-2 rounded-lg inline-block mb-3"><span class="font-black text-xl">C&M</span></div>
+                        <h2 class="text-3xl font-bold mb-2">Resumo de Fevereiro 2026</h2><p class="text-sm opacity-90">Faltam ${diasRestantes} dias</p></div>
+                        <div class="text-right bg-white bg-opacity-20 rounded-xl p-4"><div class="text-sm opacity-90">Saldo do Mês</div>
+                        <div class="text-4xl font-black">${resumo.saldo >= 0 ? '💰' : '⚠️'} R$ ${resumo.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-5 border-2 border-white border-opacity-30"><div class="text-sm opacity-90 mb-1">💰 Receitas</div><div class="text-3xl font-black">R$ ${resumo.receitas.toLocaleString('pt-BR')}</div></div>
+                        <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-5 border-2 border-white border-opacity-30"><div class="text-sm opacity-90 mb-1">💸 Despesas</div><div class="text-3xl font-black">R$ ${resumo.despesas.toLocaleString('pt-BR')}</div></div>
+                        <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-5 border-2 border-white border-opacity-30"><div class="text-sm opacity-90 mb-1">📈 Investimentos</div><div class="text-3xl font-black">R$ ${resumo.investimentos.toLocaleString('pt-BR')}</div></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-cm-laranja hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">Taxa de Investimento</div><div class="text-4xl font-black text-cm-laranja">${resumo.taxaInvestimento}%</div><div class="text-xs text-gray-500 mt-1">Meta: 30%</div></div><div class="text-5xl">📊</div></div></div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-cm-verde-escuro hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">Transações</div><div class="text-4xl font-black text-cm-verde-escuro">${resumo.total}</div><div class="text-xs text-gray-500 mt-1">Este mês</div></div><div class="text-5xl">💳</div></div></div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">Metas Ativas</div><div class="text-4xl font-black text-purple-600">${metasAtivas.length}</div><div class="text-xs text-gray-500 mt-1">Em progresso</div></div><div class="text-5xl">🎯</div></div></div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 ${this.calcularDividasAtrasadas().quantidade > 0 ? 'border-red-500' : 'border-green-500'} hover:shadow-2xl transition-all"><div class="flex items-center justify-between"><div><div class="text-gray-600 text-sm mb-2 font-semibold">${this.calcularDividasAtrasadas().quantidade > 0 ? 'Contas Atrasadas' : 'Contas em Dia'}</div><div class="text-4xl font-black ${this.calcularDividasAtrasadas().quantidade > 0 ? 'text-red-600' : 'text-green-600'}">${this.calcularDividasAtrasadas().quantidade > 0 ? this.calcularDividasAtrasadas().quantidade : '✓'}</div><div class="text-xs text-gray-500 mt-1">${this.calcularDividasAtrasadas().quantidade > 0 ? `R$ ${this.calcularDividasAtrasadas().valor.toLocaleString('pt-BR')}` : 'Tudo OK'}</div></div><div class="text-5xl">${this.calcularDividasAtrasadas().quantidade > 0 ? '⚠️' : '✅'}</div></div></div>
+                </div>
+                ${resumo.despesasPendentes > 0 ? `<div class="bg-red-50 border-l-4 border-red-500 rounded-xl shadow-lg p-6 mb-8"><div class="flex items-center gap-4"><div class="text-4xl">⚠️</div><div class="flex-1"><h3 class="text-xl font-bold text-red-800">Despesas Pendentes</h3><p class="text-red-700 mt-1">Você tem <strong>R$ ${resumo.despesasPendentes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong> em contas não pagas</p></div><button onclick="app.paginaAtual='transacoes';app.render();" class="bg-red-500 text-white px-6 py-3 rounded-lg font-bold">Ver Contas</button></div></div>` : ''}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <button onclick="app.abrirModalTransacao('receita')" class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-8 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">💰</div><div>Nova Receita</div></button>
+                    <button onclick="app.abrirModalTransacao('despesa')" class="bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-8 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">💸</div><div>Nova Despesa</div></button>
+                    <button onclick="app.abrirModalTransacao('investimento')" class="bg-gradient-to-br from-cm-laranja to-cm-laranja-escuro hover:from-cm-laranja-escuro hover:to-cm-verde-escuro text-white p-8 rounded-2xl font-black text-2xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">📈</div><div>Investimento</div></button>
+                </div>
+                <div class="bg-gradient-to-r from-cm-bege to-white rounded-2xl shadow-lg p-6 border-4 border-cm-laranja"><div class="flex items-center gap-3 mb-4"><div class="bg-cm-laranja text-white p-3 rounded-lg"><span class="text-2xl">⚡</span></div><h3 class="text-2xl font-black text-cm-verde-escuro">Lançamento Rápido</h3></div><div class="grid grid-cols-1 md:grid-cols-4 gap-3"><input type="text" id="quickDesc" placeholder="Descrição" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold"><input type="number" id="quickValor" placeholder="R$ 0,00" step="0.01" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold"><select id="quickTipo" class="px-4 py-3 border-2 border-cm-laranja rounded-lg font-semibold"><option value="despesa">💸 Despesa</option><option value="receita">💰 Receita</option><option value="investimento">📈 Investimento</option></select><button onclick="app.lancamentoRapido()" class="bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro hover:from-cm-verde-escuro hover:to-cm-verde-claro text-white py-3 rounded-lg font-black text-lg">⚡ LANÇAR</button></div></div>
+            </div>
+        </div>`;
+    }
+
+    renderTransacoes() {
+        const ultimas = [...this.transacoes].sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 50);
+        return `<div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+            <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
+                <div class="max-w-7xl mx-auto px-4 py-6"><div class="flex items-center gap-4"><div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">C&M</div><div><h1 class="text-3xl font-bold">💰 Gerenciar Transações</h1><p class="text-sm mt-1 opacity-90">Financial Pro</p></div></div></div>
+            </div>
+            ${this.renderMenu('transacoes')}
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black text-cm-verde-escuro">Histórico (${this.transacoes.length})</h2>
+                    <div class="flex gap-3">
+                        <button onclick="app.abrirModalTransacao('receita')" class="bg-green-500 text-white px-4 py-2 rounded-lg font-bold">➕ Receita</button>
+                        <button onclick="app.abrirModalTransacao('despesa')" class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">➕ Despesa</button>
+                        <button onclick="app.abrirModalTransacao('investimento')" class="bg-cm-laranja text-white px-4 py-2 rounded-lg font-bold">➕ Investimento</button>
+                    </div>
+                </div>
+                ${ultimas.length === 0 ? '<div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg"><h3 class="text-lg font-bold text-yellow-800 mb-2">📝 Comece Agora!</h3><p>Registre sua primeira transação.</p></div>' : `
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-cm-laranja">
+                        <table class="w-full">
+                            <thead class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white">
+                                <tr><th class="px-6 py-4 text-left font-bold">Data</th><th class="px-6 py-4 text-left font-bold">Descrição</th><th class="px-6 py-4 text-left font-bold">Categoria</th><th class="px-6 py-4 text-right font-bold">Valor</th><th class="px-6 py-4 text-center font-bold">Ações</th></tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                ${ultimas.map(t => {
+                                    const corValor = t.tipo === 'receita' ? 'text-green-600' : 'text-red-600';
+                                    const sinal = t.tipo === 'receita' ? '+' : '-';
+                                    return `<tr class="hover:bg-cm-bege ${t.tipo}">
+                                        <td class="px-6 py-4 text-sm">${new Date(t.data).toLocaleDateString('pt-BR')}</td>
+                                        <td class="px-6 py-4"><div class="font-bold">${t.descricao}</div>${t.recorrente !== 'false' ? `<div class="text-xs text-gray-500">🔁 ${t.recorrente}</div>` : ''}</td>
+                                        <td class="px-6 py-4"><span class="bg-cm-bege border border-cm-laranja px-3 py-1 rounded-full text-xs font-bold">${t.categoria}</span></td>
+                                        <td class="px-6 py-4 text-right"><span class="font-black ${corValor}">${sinal} R$ ${t.valor.toLocaleString('pt-BR')}</span></td>
+                                        <td class="px-6 py-4 text-center">
+                                            ${t.tipo === 'despesa' ? `<input type="checkbox" ${t.paga ? 'checked' : ''} onclick="app.marcarComoPaga(${t.id})" class="w-5 h-5 cursor-pointer mr-3">` : ''}
+                                            <button onclick="app.excluirTransacao(${t.id})" class="text-red-500 hover:text-red-700 font-bold">🗑️</button>
+                                        </td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-6 flex gap-4">
+                        <button onclick="app.exportarCSV()" class="bg-green-500 text-white px-6 py-3 rounded-lg font-bold">📥 Exportar CSV</button>
+                        <button onclick="app.exportarJSON()" class="bg-cm-laranja text-white px-6 py-3 rounded-lg font-bold">💾 Backup JSON</button>
+                    </div>
+                `}
+            </div>
+        </div>`;
+    }
+
+    renderMetas() {
+        const ativas = this.metas.filter(m => m.status === 'ativa');
+        const concluidas = this.metas.filter(m => m.status === 'concluida');
+        return `<div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+            <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
+                <div class="max-w-7xl mx-auto px-4 py-6"><div class="flex items-center gap-4"><div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">C&M</div><div><h1 class="text-3xl font-bold">🎯 Metas Financeiras</h1><p class="text-sm mt-1 opacity-90">Financial Pro</p></div></div></div>
+            </div>
+            ${this.renderMenu('metas')}
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black text-cm-verde-escuro">Suas Metas</h2>
+                    <button onclick="app.abrirModalMeta()" class="bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro text-white px-6 py-3 rounded-lg font-black">➕ Nova Meta</button>
+                </div>
+                ${ativas.length > 0 ? `<div class="mb-8"><h3 class="text-xl font-bold text-cm-laranja mb-4">🔥 Em Progresso</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${ativas.map(meta => {
+                    const progresso = (meta.valorAtual / meta.valorTotal * 100).toFixed(1);
+                    const diasPassados = Math.floor((new Date() - new Date(meta.dataInicio)) / (1000 * 60 * 60 * 24));
+                    const diasRestantes = meta.prazo - diasPassados;
+                    return `<div class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-cm-laranja">
+                        <div class="flex justify-between mb-4"><div><h4 class="text-xl font-black text-cm-verde-escuro">${meta.objetivo}</h4></div><button onclick="app.excluirMeta(${meta.id})" class="text-red-500">🗑️</button></div>
+                        <div class="mb-4"><div class="flex justify-between text-sm mb-2"><span>R$ ${meta.valorAtual.toLocaleString('pt-BR')} / R$ ${meta.valorTotal.toLocaleString('pt-BR')}</span><span class="font-bold">${progresso}%</span></div><div class="w-full bg-gray-200 rounded-full h-6"><div class="bg-gradient-to-r from-cm-laranja to-cm-verde-escuro h-6 rounded-full" style="width: ${Math.min(progresso, 100)}%"></div></div></div>
+                        <div class="grid grid-cols-2 gap-4 mb-4"><div class="bg-cm-bege rounded-lg p-3 text-center border-2 border-cm-laranja"><div class="text-3xl font-black text-cm-laranja">${diasRestantes}</div><div class="text-xs">dias restantes</div></div><div class="bg-cm-bege rounded-lg p-3 text-center border-2 border-cm-laranja"><div class="text-2xl font-black text-cm-laranja">R$ ${meta.valorDiario.toFixed(2)}</div><div class="text-xs">por dia</div></div></div>
+                        <button onclick="app.atualizarProgressoMeta(${meta.id})" class="w-full bg-green-500 text-white py-3 rounded-lg font-black">➕ Atualizar</button>
+                    </div>`;
+                }).join('')}</div></div>` : ''}
+                ${concluidas.length > 0 ? `<div><h3 class="text-xl font-bold text-green-600 mb-4">✅ Concluídas</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4">${concluidas.map(meta => `<div class="bg-green-50 border-2 border-green-500 rounded-lg p-4"><h4 class="font-bold text-green-800">${meta.objetivo}</h4><p class="text-sm text-green-600 mt-2">R$ ${meta.valorTotal.toLocaleString('pt-BR')}</p></div>`).join('')}</div></div>` : ''}
+                ${ativas.length === 0 && concluidas.length === 0 ? '<div class="bg-yellow-50 border-l-4 border-yellow-400 p-8 rounded-lg"><h3 class="text-xl font-bold text-yellow-800 mb-2">🎯 Crie sua Primeira Meta!</h3><button onclick="app.abrirModalMeta()" class="bg-cm-laranja text-white px-6 py-3 rounded-lg font-bold mt-4">➕ Criar Meta</button></div>' : ''}
+            </div>
+        </div>`;
+    }
+
+    renderAlavancagem() {
+        return `<div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+            <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
+                <div class="max-w-7xl mx-auto px-4 py-6"><div class="flex items-center gap-4"><div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">C&M</div><div><h1 class="text-3xl font-bold">🚀 Técnicas de Alavancagem</h1><p class="text-sm mt-1 opacity-90">Estratégias Comprovadas</p></div></div></div>
+            </div>
+            ${this.renderMenu('alavancagem')}
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="bg-gradient-to-r from-yellow-400 via-cm-laranja to-cm-laranja-escuro text-white rounded-2xl shadow-2xl p-8 mb-8 border-4 border-white">
+                    <h2 class="text-3xl font-black mb-6">⚡ 7 Regras de Ouro</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${TECNICAS_ALAVANCAGEM.regras_ouro.map(regra => `<div class="bg-white bg-opacity-20 rounded-xl p-5"><p class="font-bold text-lg">${regra}</p></div>`).join('')}</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border-t-4 border-cm-laranja">
+                    <h2 class="text-3xl font-black text-cm-verde-escuro mb-6">${TECNICAS_ALAVANCAGEM.curto_prazo.titulo}</h2>
+                    <div class="space-y-6">${TECNICAS_ALAVANCAGEM.curto_prazo.tecnicas.map((t,i) => `<div class="border-2 border-cm-laranja rounded-xl p-6 bg-gradient-to-r from-white to-cm-bege">
+                        <h3 class="text-2xl font-black text-cm-verde-escuro mb-4">💡 ${t.nome}</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg"><strong>📖 O que é:</strong> ${t.descricao}</div>
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg"><strong>🎯 Como fazer:</strong> ${t.acao}</div>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg"><strong>📈 Impacto:</strong> ${t.impacto}</div>
+                        </div>
+                    </div>`).join('')}</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl p-8 border-t-4 border-cm-verde-escuro">
+                    <h2 class="text-3xl font-black text-cm-verde-escuro mb-6">${TECNICAS_ALAVANCAGEM.medio_prazo.titulo}</h2>
+                    <div class="space-y-6">${TECNICAS_ALAVANCAGEM.medio_prazo.tecnicas.map(t => `<div class="border-2 border-cm-verde-escuro rounded-xl p-6 bg-gradient-to-r from-white to-green-50">
+                        <h3 class="text-2xl font-black text-cm-verde-escuro mb-4">💎 ${t.nome}</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg"><strong>📖:</strong> ${t.descricao}</div>
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg"><strong>🎯:</strong> ${t.acao}</div>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg"><strong>📈:</strong> ${t.impacto}</div>
+                        </div>
+                    </div>`).join('')}</div>
                 </div>
             </div>
-        `;
+        </div>`;
     }
+
+    renderRelatorios() {
+        const resumo = this.calcularResumo('mes');
+        const porCategoria = this.calcularPorCategoria();
+        return `<div class="min-h-screen bg-gradient-to-br from-gray-50 to-cm-bege">
+            <div class="bg-gradient-to-r from-cm-verde-escuro to-cm-verde-claro text-white shadow-xl">
+                <div class="max-w-7xl mx-auto px-4 py-6"><div class="flex items-center gap-4"><div class="bg-cm-laranja text-cm-verde-escuro font-black text-2xl px-4 py-2 rounded-lg shadow-lg">C&M</div><div><h1 class="text-3xl font-bold">📈 Relatórios e Análises</h1><p class="text-sm mt-1 opacity-90">Insights Inteligentes</p></div></div></div>
+            </div>
+            ${this.renderMenu('relatorios')}
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border-t-4 border-cm-laranja">
+                    <h2 class="text-3xl font-black text-cm-verde-escuro mb-6">📊 Resumo Geral</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div><h3 class="text-xl font-bold mb-4">💰 Fluxo de Caixa</h3><div class="space-y-3">
+                            <div class="flex justify-between p-4 bg-green-50 rounded-xl border-2 border-green-500"><span class="font-bold">💰 Receitas</span><span class="font-black text-green-600">R$ ${resumo.receitas.toLocaleString('pt-BR')}</span></div>
+                            <div class="flex justify-between p-4 bg-red-50 rounded-xl border-2 border-red-500"><span class="font-bold">💸 Despesas</span><span class="font-black text-red-600">R$ ${resumo.despesas.toLocaleString('pt-BR')}</span></div>
+                            <div class="flex justify-between p-4 bg-blue-50 rounded-xl border-2 border-blue-500"><span class="font-bold">📈 Investimentos</span><span class="font-black text-blue-600">R$ ${resumo.investimentos.toLocaleString('pt-BR')}</span></div>
+                            <div class="flex justify-between p-5 bg-gradient-to-r from-cm-laranja to-cm-laranja-escuro rounded-xl"><span class="font-black text-white">💼 SALDO</span><span class="font-black text-white text-2xl">R$ ${resumo.saldo.toLocaleString('pt-BR')}</span></div>
+                        </div></div>
+                        <div><h3 class="text-xl font-bold mb-4">📊 Top Categorias</h3><div class="space-y-2">${porCategoria.length > 0 ? porCategoria.map(([cat, dados], i) => `<div class="flex justify-between p-3 bg-cm-bege rounded-lg border-l-4 border-cm-laranja"><div class="flex items-center gap-3"><span class="bg-cm-laranja text-white font-black px-3 py-1 rounded-lg">${i+1}</span><span class="font-bold">${cat}</span></div><span class="font-black text-cm-laranja">R$ ${dados.total.toLocaleString('pt-BR')}</span></div>`).join('') : '<p class="text-center text-gray-500 py-8">Nenhuma transação</p>'}</div></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border-t-4 border-cm-verde-escuro">
+                    <h2 class="text-3xl font-black text-cm-verde-escuro mb-6">📥 Exportar Dados</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button onclick="app.exportarCSV()" class="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-2xl font-black text-xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">📊</div><div>Exportar Planilha</div></button>
+                        <button onclick="app.exportarJSON()" class="bg-gradient-to-br from-cm-laranja to-cm-laranja-escuro text-white p-8 rounded-2xl font-black text-xl shadow-xl transform hover:scale-105 transition-all border-4 border-white"><div class="text-6xl mb-3">💾</div><div>Backup Completo</div></button>
+                    </div>
+                </div>
+                <div class="bg-red-50 border-4 border-red-500 rounded-2xl p-8"><h2 class="text-3xl font-black text-red-800 mb-4">⚠️ Zona de Perigo</h2><p class="text-gray-700 mb-6 font-semibold">Cuidado! Esta ação não pode ser desfeita.</p><button onclick="app.limparDados()" class="bg-red-500 text-white px-8 py-4 rounded-xl font-black">🗑️ Apagar Todos os Dados</button></div>
+            </div>
+        </div>`;
+    }
+}
+
+const app = new GestaoFinanceira();
+    </script>
+</body>
+</html>
