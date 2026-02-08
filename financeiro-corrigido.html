@@ -180,7 +180,6 @@ class GestaoFinanceira {
         this.paginaAtual = 'dashboard';
         this.transacoes = [];
         this.metas = [];
-        this.caixaRapida = [];
         this.orcamento = {
             essencial: 50,
             investimento: 30,
@@ -202,20 +201,10 @@ class GestaoFinanceira {
         
         document.getElementById('conteudoModalTransacao').innerHTML = `
             <div class="space-y-4">
-              <div>
-    <label class="block text-sm font-semibold mb-2">📅 Data</label>
-    <input type="date" id="dataTransacao" value="${new Date().toISOString().split('T')[0]}" class="w-full px-4 py-2 border-2 rounded-lg">
-</div>
-${tipo === 'receita' ? `
-<div>
-    <label class="block text-sm font-semibold mb-2">💳 Status Pagamento</label>
-    <select id="statusPagamento" class="w-full px-4 py-2 border-2 rounded-lg">
-        <option value="pago">✅ Pago</option>
-        <option value="pendente">⏳ Pendente</option>
-        <option value="atrasado">⚠️ Atrasado</option>
-    </select>
-</div>
-` : ''}
+                <div>
+                    <label class="block text-sm font-semibold mb-2">📝 Descrição</label>
+                    <input type="text" id="descTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="Ex: Salário de fevereiro">
+                </div>
                 <div>
                     <label class="block text-sm font-semibold mb-2">💵 Valor (R$)</label>
                     <input type="number" id="valorTransacao" class="w-full px-4 py-2 border-2 rounded-lg" placeholder="0.00" step="0.01">
@@ -247,16 +236,17 @@ ${tipo === 'receita' ? `
         document.getElementById('modalTransacao').classList.add('active');
     }
 
-const transacao = {
-    id: Date.now(),
-    tipo,
-    descricao: document.getElementById('descTransacao').value,
-    valor: parseFloat(document.getElementById('valorTransacao').value),
-    categoria: document.getElementById('categoriaTransacao').value,
-    data: document.getElementById('dataTransacao').value,
-    statusPagamento: tipo === 'receita' ? document.getElementById('statusPagamento').value : 'pago', // NOVO
-    origem: 'normal' // NOVO: diferencia de caixa rápida
-};
+    salvarTransacao(tipo) {
+        const transacao = {
+            id: Date.now(),
+            tipo,
+            descricao: document.getElementById('descTransacao').value,
+            valor: parseFloat(document.getElementById('valorTransacao').value),
+            categoria: document.getElementById('categoriaTransacao').value,
+            data: document.getElementById('dataTransacao').value,
+            recorrente: document.getElementById('recorrenteTransacao').value,
+            criado_em: new Date().toISOString()
+        };
 
         if (!transacao.descricao || !transacao.valor || transacao.valor <= 0) {
             alert('❌ Preencha descrição e valor válido!');
@@ -269,7 +259,15 @@ const transacao = {
         alert('✅ Transação registrada!');
         this.render();
     }
-
+marcarComoPaga(id) {
+    const transacao = this.transacoes.find(t => t.id === id);
+    if (transacao && transacao.tipo === 'despesa') {
+        transacao.paga = !transacao.paga;
+        transacao.dataPagamento = transacao.paga ? new Date().toISOString() : null;
+        this.salvarDados();
+        this.render();
+    }
+}
     excluirTransacao(id) {
         if (confirm('Excluir esta transação?')) {
             this.transacoes = this.transacoes.filter(t => t.id !== id);
@@ -395,14 +393,15 @@ const transacao = {
         });
 
         const receitas = filtradas.filter(t => t.tipo === 'receita').reduce((s, t) => s + t.valor, 0);
-        const despesas = filtradas.filter(t => t.tipo === 'despesa').reduce((s, t) => s + t.valor, 0);
+        const despesas = filtradas.filter(t => t.tipo === 'despesa' && t.paga).reduce((s, t) => s + t.valor, 0);
+        const despesasPendentes = filtradas.filter(t => t.tipo === 'despesa' && !t.paga).reduce((s, t) => s + t.valor, 0);
         const investimentos = filtradas.filter(t => t.tipo === 'investimento').reduce((s, t) => s + t.valor, 0);
         
         const saldo = receitas - despesas - investimentos;
         const taxaInvestimento = receitas > 0 ? ((investimentos / receitas) * 100).toFixed(1) : 0;
         const taxaGastos = receitas > 0 ? ((despesas / receitas) * 100).toFixed(1) : 0;
 
-        return { receitas, despesas, investimentos, saldo, taxaInvestimento, taxaGastos, total: filtradas.length };
+        return { receitas, despesas, investimentos, saldo, taxaInvestimento, taxaGastos, total: filtradas.length, despesasPendentes };
     }
 
     calcularPorCategoria() {
@@ -419,6 +418,47 @@ const transacao = {
             .slice(0, 10);
     }
 
+    lancamentoRapido() {
+        const desc = document.getElementById('quickDesc').value;
+        const valor = parseFloat(document.getElementById('quickValor').value);
+        const tipo = document.getElementById('quickTipo').value;
+        
+        if (!desc || !valor || valor <= 0) {
+            alert('❌ Preencha descrição e valor!');
+            return;
+        }
+        
+        this.transacoes.push({
+            id: Date.now(),
+            tipo,
+            descricao: desc,
+            valor,
+            categoria: 'Outros',
+            data: new Date().toISOString().split('T')[0],
+            recorrente: 'false',
+            paga: tipo === 'despesa' ? false : true,
+            criado_em: new Date().toISOString()
+        });
+        
+        this.salvarDados();
+        document.getElementById('quickDesc').value = '';
+        document.getElementById('quickValor').value = '';
+        alert('✅ Lançado!');
+        this.render();
+    }
+
+    calcularDividasAtrasadas() {
+        const hoje = new Date();
+        const atrasadas = this.transacoes.filter(t => {
+            if (t.tipo !== 'despesa' || t.paga) return false;
+            const dataTransacao = new Date(t.data);
+            return dataTransacao < hoje;
+        });
+        
+        const valorTotal = atrasadas.reduce((s, t) => s + t.valor, 0);
+        return { quantidade: atrasadas.length, valor: valorTotal };
+    }
+    
     calcularDiasRestantes() {
         const hoje = new Date();
         const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
@@ -457,56 +497,12 @@ const transacao = {
         link.click();
         alert('✅ Backup exportado!');
     }
-// === CAIXA RÁPIDA ===
-adicionarCaixaRapida() {
-    const desc = prompt('Descrição da compra:');
-    if (!desc) return;
-    
-    const valor = parseFloat(prompt('Valor (R$):'));
-    if (!valor || valor <= 0) return;
 
-    const compra = {
-        id: Date.now(),
-        tipo: 'despesa',
-        descricao: desc,
-        valor: valor,
-        categoria: 'Outros',
-        data: new Date().toISOString().split('T')[0],
-        statusPagamento: 'pago',
-        origem: 'caixa_rapida'
-    };
-
-    this.transacoes.push(compra);
-    this.caixaRapida.push(compra);
-    this.salvarDados();
-    alert(`✅ R$ ${valor.toFixed(2)} registrado!`);
-    this.render();
-}
-
-alterarStatusPagamento(id) {
-    const t = this.transacoes.find(t => t.id === id);
-    if (!t) return;
-
-    const opcoes = ['pago', 'pendente', 'atrasado'];
-    const atual = opcoes.indexOf(t.statusPagamento);
-    const proximo = (atual + 1) % 3;
-    
-    t.statusPagamento = opcoes[proximo];
-    this.salvarDados();
-    this.render();
-}
-
-calcularPendencias() {
-    return this.transacoes
-        .filter(t => t.tipo === 'receita' && t.statusPagamento !== 'pago')
-        .reduce((s, t) => s + t.valor, 0);
-}
     // ===== PERSISTÊNCIA =====
     salvarDados() {
         localStorage.setItem('financeiro_transacoes', JSON.stringify(this.transacoes));
         localStorage.setItem('financeiro_metas', JSON.stringify(this.metas));
         localStorage.setItem('financeiro_orcamento', JSON.stringify(this.orcamento));
-        localStorage.setItem('fin_caixa', JSON.stringify(this.caixaRapida)); 
     }
 
     carregarDados() {
@@ -518,9 +514,6 @@ calcularPendencias() {
         
         const o = localStorage.getItem('financeiro_orcamento');
         if (o) this.orcamento = JSON.parse(o);
-
-        const c = localStorage.getItem('fin_caixa'); // NOVO
-        if (c) this.caixaRapida = JSON.parse(c); 
     }
 
     limparDados() {
@@ -621,21 +614,7 @@ calcularPendencias() {
                             </div>
                         </div>
                     </div>
-<!-- Valores Pendentes -->
-${this.calcularPendencias() > 0 ? `
-<div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6 mb-8">
-    <div class="flex justify-between items-center">
-        <div>
-            <h3 class="text-lg font-bold text-yellow-800">⚠️ Valores Pendentes</h3>
-            <p class="text-sm text-gray-700">Receitas ainda não recebidas</p>
-        </div>
-        <div class="text-right">
-            <div class="text-3xl font-bold text-yellow-600">R$ ${this.calcularPendencias().toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-            <button onclick="app.paginaAtual='transacoes';app.render();" class="text-sm text-blue-600 underline mt-2">Ver detalhes</button>
-        </div>
-    </div>
-</div>
-` : ''}
+
                     <!-- Indicadores Rápidos -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-green-500">
@@ -653,12 +632,37 @@ ${this.calcularPendencias() > 0 ? `
                             <div class="text-3xl font-bold text-purple-600">${metasAtivas.length}</div>
                             <div class="text-xs text-gray-500 mt-1">Em progresso</div>
                         </div>
-                        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 border-orange-500">
-                            <div class="text-gray-600 text-sm mb-2">Taxa de Gastos</div>
-                            <div class="text-3xl font-bold text-orange-600">${resumo.taxaGastos}%</div>
-                            <div class="text-xs text-gray-500 mt-1">da receita</div>
-                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-t-4 ${this.calcularDividasAtrasadas().quantidade > 0 ? 'border-red-500' : 'border-gray-300'}">
+    <div class="text-gray-600 text-sm mb-2">
+        ${this.calcularDividasAtrasadas().quantidade > 0 ? '🔴 Contas Atrasadas' : '✅ Sem Atrasos'}
+    </div>
+    <div class="text-3xl font-bold ${this.calcularDividasAtrasadas().quantidade > 0 ? 'text-red-600' : 'text-green-600'}">
+        ${this.calcularDividasAtrasadas().quantidade}
+    </div>
+    <div class="text-xs text-gray-500 mt-1">
+        ${this.calcularDividasAtrasadas().quantidade > 0 ? 
+            `R$ ${this.calcularDividasAtrasadas().valor.toLocaleString('pt-BR')}` : 
+            'Tudo em dia'}
+    </div>
+</div>
                     </div>
+                    
+<!-- Alertas de Despesas -->
+${resumo.despesasPendentes > 0 ? `
+    <div class="bg-red-50 border-l-4 border-red-500 rounded-xl shadow-lg p-6 mb-8">
+        <div class="flex items-center gap-4">
+            <div class="text-4xl">⚠️</div>
+            <div class="flex-1">
+                <h3 class="text-xl font-bold text-red-800">Despesas Pendentes</h3>
+                <p class="text-red-700 mt-1">Você tem <strong>R$ ${resumo.despesasPendentes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong> em contas não pagas este mês</p>
+            </div>
+            <button onclick="app.paginaAtual='transacoes';app.render();" 
+                class="bg-red-500 text-white px-6 py-3 rounded-lg font-bold whitespace-nowrap">
+                Ver Contas
+            </button>
+        </div>
+    </div>
+` : ''}
 
                     <!-- Metas em Destaque -->
                     ${metasAtivas.length > 0 ? `
@@ -710,32 +714,42 @@ ${this.calcularPendencias() > 0 ? `
                             </button>
                         </div>
                     `}
-<!-- Caixa Rápida -->
-<div class="bg-yellow-400 rounded-xl shadow-lg p-6 mb-6">
-    <div class="flex justify-between items-center">
-        <div>
-            <h3 class="text-xl font-bold text-gray-800">⚡ Caixa Rápida</h3>
-            <p class="text-sm text-gray-700">Registre compras do dia rapidamente</p>
-        </div>
-        <button onclick="app.adicionarCaixaRapida()" class="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 rounded-lg font-bold text-lg">
-            🛒 Compra Rápida
+
+                    <!-- Ações Rápidas -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <button onclick="app.abrirModalTransacao('receita')" 
+                            class="bg-green-500 hover:bg-green-600 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
+                            💰 + Receita
+                        </button>
+                        <button onclick="app.abrirModalTransacao('despesa')" 
+                            class="bg-red-500 hover:bg-red-600 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
+                            💸 + Despesa
+                        </button>
+                        <button onclick="app.abrirModalTransacao('investimento')" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
+                            📈 + Investimento
+                        </button>
+                    </div>
+                </div>
+            <!-- Lançamento Rápido -->
+<div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-cm-escuro mb-4">⚡ Lançamento Rápido</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input type="text" id="quickDesc" placeholder="Descrição" 
+            class="px-4 py-2 border-2 rounded-lg">
+        <input type="number" id="quickValor" placeholder="R$ 0,00" step="0.01"
+            class="px-4 py-2 border-2 rounded-lg">
+        <select id="quickTipo" class="px-4 py-2 border-2 rounded-lg">
+            <option value="despesa">💸 Despesa</option>
+            <option value="receita">💰 Receita</option>
+            <option value="investimento">📈 Investimento</option>
+        </select>
+        <button onclick="app.lancamentoRapido()" 
+            class="bg-cm-laranja text-white py-2 rounded-lg font-bold">
+            ⚡ Lançar
         </button>
     </div>
 </div>
-
-<!-- Ações -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <button onclick="app.abrirModalTransacao('receita')" class="bg-green-500 hover:bg-green-600 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
-        💰 + Receita
-    </button>
-    <button onclick="app.abrirModalTransacao('despesa')" class="bg-red-500 hover:bg-red-600 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
-        💸 + Despesa
-    </button>
-    <button onclick="app.abrirModalTransacao('investimento')" class="bg-blue-500 hover:bg-blue-600 text-white p-8 rounded-xl font-bold text-xl shadow-lg">
-        📈 + Investimento
-    </button>
-</div>
-                </div>
             </div>
         `;
     }
@@ -796,21 +810,29 @@ ${this.calcularPendencias() > 0 ? `
                                             const classeDiv = t.tipo === 'receita' ? 'receita' : t.tipo === 'despesa' ? 'despesa' : 'investimento';
                                             
                                             return `
-                                               <td class="px-6 py-4">
-    <div class="font-semibold">${t.descricao}</div>
-    ${t.tipo === 'receita' ? `
-        <button onclick="app.alterarStatusPagamento(${t.id})" 
-            class="text-xs px-2 py-1 rounded-full mt-1 ${
-                t.statusPagamento === 'pago' ? 'bg-green-100 text-green-800' :
-                t.statusPagamento === 'pendente' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-red-100 text-red-800'
-            }">
-            ${t.statusPagamento === 'pago' ? '✅ Pago' :
-              t.statusPagamento === 'pendente' ? '⏳ Pendente' :
-              '⚠️ Atrasado'}
-        </button>
+                                                <tr class="hover:bg-gray-50 ${classeDiv}">
+                                                    <td class="px-6 py-4 text-sm">${new Date(t.data).toLocaleDateString('pt-BR')}</td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="font-semibold">${t.descricao}</div>
+                                                        ${t.recorrente !== 'false' ? `<div class="text-xs text-gray-500">🔁 ${t.recorrente}</div>` : ''}
+                                                    </td>
+                                                    <td class="px-6 py-4 text-sm">
+                                                        <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold">${t.categoria}</span>
+                                                    </td>
+                                                    <td class="px-6 py-4 text-right">
+                                                        <span class="font-bold ${corValor}">${sinal} R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                                                    </td>
+                                                   <td class="px-6 py-4 text-center">
+    ${t.tipo === 'despesa' ? `
+        <input type="checkbox" 
+            ${t.paga ? 'checked' : ''} 
+            onclick="app.marcarComoPaga(${t.id})"
+            class="w-5 h-5 cursor-pointer mr-3">
     ` : ''}
-    ${t.origem === 'caixa_rapida' ? '<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-2">⚡ Rápida</span>' : ''}
+    <button onclick="app.excluirTransacao(${t.id})" 
+        class="text-red-500 hover:text-red-700 font-semibold text-sm">
+        🗑️
+    </button>
 </td>
                                                 </tr>
                                             `;
