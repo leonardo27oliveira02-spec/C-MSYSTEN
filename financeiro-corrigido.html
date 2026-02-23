@@ -17,128 +17,26 @@
     <title>C&M Financial Pro - Gestão Financeira Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow-x: hidden;
-    }
-
-    :root {
-        /* 🎯 Azul base (foco/clareza) */
-        --cm-azul-principal: #2563EB;
-        --cm-azul-claro: #E8F0FE;
-        --cm-azul-muito-claro: #F4F8FF;
-        /* 🔥 Laranja ação */
-        --cm-laranja: #FF9944;
-        --cm-laranja-escuro: #D97B3A;
-        /* 🌱 Verde progresso */
-        --cm-verde: #22C55E;
-        --cm-verde-claro: #ECFDF5;
-        --cm-verde-escuro: #059669;
-        /* Bege */
-        --cm-bege: #FFF8F0;
-        /* 🖤 Texto */
-        --cm-texto-escuro: #1F2933;
-    }
-
-    /* Backgrounds principais */
-    .bg-cm-laranja { background-color: var(--cm-laranja); }
-    .bg-cm-laranja-escuro { background-color: var(--cm-laranja-escuro); }
-    .bg-cm-escuro,
-    .bg-cm-azul { background-color: var(--cm-azul-principal); }
-    .bg-cm-azul-claro { background-color: var(--cm-azul-claro); }
-    .bg-cm-azul-muito-claro { background-color: var(--cm-azul-muito-claro); }
-    .bg-cm-verde { background-color: var(--cm-verde); }
-    .bg-cm-verde-claro { background-color: var(--cm-verde-claro); }
-    .bg-cm-verde-escuro { background-color: var(--cm-verde-escuro); }
-    .bg-cm-bege { background-color: var(--cm-bege); }
-
-    /* Textos */
-    .text-cm-laranja { color: var(--cm-laranja); }
-    .text-cm-escuro { color: var(--cm-texto-escuro); }
-    .text-cm-azul { color: var(--cm-azul-principal); }
-    .text-cm-verde { color: var(--cm-verde); }
-    .text-cm-verde-escuro { color: var(--cm-verde-escuro); }
-
-    /* Bordas */
-    .border-cm-laranja { border-color: var(--cm-laranja); }
-    .border-cm-azul { border-color: var(--cm-azul-principal); }
-    .border-cm-verde { border-color: var(--cm-verde); }
-
-    /* Indicadores financeiros */
-    .receita { border-left: 5px solid var(--cm-verde); }
-    .despesa { border-left: 5px solid #EF4444; }
-    .investimento { border-left: 5px solid var(--cm-laranja); }
-
-    /* Modal */
-    .modal { 
-        display: none; 
-        position: fixed; 
-        z-index: 50; 
-        left: 0; 
-        top: 0; 
-        width: 100%; 
-        height: 100%; 
-        background-color: rgba(37, 99, 235, 0.25);
-        overflow-y: auto; 
-    }
-    
-    .modal.active { 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        padding: 20px; 
-    }
-    
-    .modal-content { 
-        background: linear-gradient(135deg, var(--cm-azul-muito-claro), #FFFFFF);
-        border-radius: 16px; 
-        max-width: 600px; 
-        width: 100%; 
-        max-height: 90vh; 
-        overflow-y: auto;
-        border: 2px solid var(--cm-azul-claro);
-        box-shadow: 0 30px 80px rgba(37, 99, 235, 0.25);
-        color: var(--cm-texto-escuro);
-    }
-
-    /* Inputs */
-    .cm-input {
-        background: #F4F8FF;
-        border: 2px solid #BFDBFE;
-        color: #1F2933;
-    }
-    
-    .cm-input:focus {
-        outline: none;
-        border-color: #2563EB;
-        box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-    }
-
-    /* FIX: Remove altura mínima forçada */
-    .min-h-screen {
-        min-height: auto !important;
-    }
-
-    /* FIX: Container principal sem padding excessivo */
-    .max-w-7xl {
-        padding-top: 0 !important;
-    }
-
-    /* Scroll suave */
-    html {
-        scroll-behavior: smooth;
-    }
+    <body>
+<nav class="mv-nav">
+  <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION</a>
+  <div class="mv-nav-links">
+    <a href="index.html">Início</a>
+    <a href="assistente-vendas.html">Assistente Vendas</a>
+    <a href="app-vendas.html">App Vendas</a>
+    <a href="control-vendas.html">Controle</a>
+    <a href="quiz-itaipulandia.html">Quiz</a>
+    <a href="vendas-passaporte.html">Passaporte</a>
+  </div>
+  <div class="mv-nav-status">
+    <div class="mv-dot" id="mvStatusDot"></div>
+    <span id="mvStatusTxt">...</span>
+  </div>
+</nav>
 </style>
 
 </head>
-<body class="bg-gray-50" style="margin:0; padding:0;">
+
 
     <div id="app"></div>
     
