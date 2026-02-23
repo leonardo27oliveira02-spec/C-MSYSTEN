@@ -75,16 +75,19 @@
 const TECNICAS_ALAVANCAGEM={curto_prazo:{titulo:"Alavancagem de Curto Prazo (7-30 dias)",tecnicas:[{nome:"Regra 50/30/20 Turbo",descricao:"50% Essencial | 30% Investimento/Dívidas | 20% Estilo de Vida",acao:"Inverta prioridades: pague dívidas e invista ANTES de gastar",impacto:"Reduz juros e acelera patrimônio em 3-6 meses"},{nome:"Efeito Bola de Neve (Snowball)",descricao:"Pague menor dívida primeiro, depois use esse valor na próxima",acao:"Liste dívidas da menor para maior. Ataque a menor com tudo",impacto:"Motivação psicológica + libertação progressiva"},{nome:"Método Avalanche",descricao:"Pague dívida com MAIOR juros primeiro",acao:"Calcule juros reais. Elimine cartão/cheque especial primeiro",impacto:"Economia máxima de juros (pode ser 40%+ ao ano)"},{nome:"Renda Extra Direcionada",descricao:"100% da renda extra vai para meta específica",acao:"Freela, venda, bico = direto para dívida ou investimento",impacto:"Acelera metas em 2-3x"},{nome:"Desafio Sem Gastos (No Spend Challenge)",descricao:"7-30 dias sem gastos não essenciais",acao:"Congele cartões, use só dinheiro, zero delivery/uber",impacto:"Economiza 20-40% da renda facilmente"},{nome:"Automatização Financeira",descricao:"Automatize investimento/pagamento no dia do salário",acao:"Configure débito automático para poupança/investimento",impacto:"Remove tentação, garante disciplina"}]},medio_prazo:{titulo:"Alavancagem de Médio Prazo (1-6 meses)",tecnicas:[{nome:"Reserva de Emergência Mínima",descricao:"3-6 meses de despesas essenciais",acao:"Calcule despesas fixas × 3. Meta: acumular em 6 meses",impacto:"Segurança para não voltar a se endividar"},{nome:"Renegociação Agressiva",descricao:"Negocie TUDO: dívidas, planos, assinaturas",acao:"Ligue para cada credor. Peça 50-70% desconto à vista",impacto:"Reduz dívida total em 30-60%"},{nome:"Múltiplas Fontes de Renda",descricao:"2-3 fontes de renda paralelas",acao:"Monetize habilidade: aulas, freela, digital",impacto:"Aumenta renda em 30-100%"}]},regras_ouro:["💰 Pague a SI MESMO primeiro - separe investimento antes de gastar","🔥 Juros compostos trabalham a SEU FAVOR ou CONTRA você","📊 Acompanhe DIARIAMENTE - 5min/dia salva seu futuro","🎯 Meta sem prazo = sonho. Prazo sem ação = ilusão","⚡ Ação imperfeita HOJE > plano perfeito amanhã","🚫 Dívida de consumo é VENENO. Dívida de investimento é ALAVANCA","💪 Desconforto temporário = liberdade permanente"]};
 const CATEGORIAS={receitas:['Salário','Freela','Investimentos','Vendas','Bônus','Outros'],despesas:['Moradia','Alimentação','Transporte','Saúde','Educação','Lazer','Dívidas','Outros'],investimentos:['Poupança','Tesouro Direto','CDB','Ações','Fundos','Cripto','Outros']};
 
-class GestaoFinanceira {
-    constructor() {
-        this.paginaAtual = 'dashboard';
-        this.transacoes = [];
-        this.metas = [];
-        this.orcamento = {essencial: 50, investimento: 30, estilo_vida: 20};
-        this.carregarDados();
-        this.render();
-    }
+// DEPOIS
+constructor() {
+    this.paginaAtual = 'dashboard';
+    this.transacoes = [];
+    this.metas = [];
+    this.orcamento = {essencial: 50, investimento: 30, estilo_vida: 20};
+    this.inicializar();
+}
 
+async inicializar() {
+    await this.carregarDados();
+    this.render();
+}
     abrirModalTransacao(tipo = 'receita') {
         document.getElementById('tituloModalTransacao').textContent = tipo === 'receita' ? '💰 Nova Receita' : tipo === 'despesa' ? '💸 Nova Despesa' : '📈 Novo Investimento';
         const categorias = tipo === 'receita' ? CATEGORIAS.receitas : tipo === 'despesa' ? CATEGORIAS.despesas : CATEGORIAS.investimentos;
@@ -100,31 +103,37 @@ class GestaoFinanceira {
         document.getElementById('modalTransacao').classList.add('active');
     }
 
-    salvarTransacao(tipo) {
+  // DEPOIS
+async salvarTransacao(tipo) {
         const transacao = {id: Date.now(), tipo, descricao: document.getElementById('descTransacao').value, valor: parseFloat(document.getElementById('valorTransacao').value), categoria: document.getElementById('categoriaTransacao').value, data: document.getElementById('dataTransacao').value, recorrente: document.getElementById('recorrenteTransacao').value, paga: tipo === 'despesa' ? false : true, criado_em: new Date().toISOString()};
         if (!transacao.descricao || !transacao.valor || transacao.valor <= 0) { alert('❌ Preencha descrição e valor válido!'); return; }
         this.transacoes.push(transacao);
-        this.salvarDados();
-        this.fecharModal('modalTransacao');
+// DEPOIS
+await this.salvarDados();
+this.fecharModal('modalTransacao');
         alert('✅ Transação registrada!');
         this.render();
     }
 
-    marcarComoPaga(id) {
+    // DEPOIS
+async marcarComoPaga(id) {
         const transacao = this.transacoes.find(t => t.id === id);
         if (transacao && transacao.tipo === 'despesa') {
             transacao.paga = !transacao.paga;
             transacao.dataPagamento = transacao.paga ? new Date().toISOString() : null;
-            this.salvarDados();
-            this.render();
+            // DEPOIS
+await this.salvarDados();
+this.render();
         }
     }
 
-    excluirTransacao(id) {
+    // DEPOIS
+async excluirTransacao(id) {
         if (confirm('Excluir esta transação?')) {
             this.transacoes = this.transacoes.filter(t => t.id !== id);
-            this.salvarDados();
-            this.render();
+            // DEPOIS
+await this.salvarDados();
+this.render();
         }
     }
 
@@ -141,35 +150,41 @@ abrirModalMeta() {
     document.getElementById('modalMeta').classList.add('active');
 }
 
-    salvarMeta() {
+    // DEPOIS
+async salvarMeta() {
         const meta = {id: Date.now(), objetivo: document.getElementById('objetivoMeta').value, valorTotal: parseFloat(document.getElementById('valorMeta').value), valorAtual: 0, prazo: parseInt(document.getElementById('prazoMeta').value), tipo: document.getElementById('tipoMeta').value, estrategia: document.getElementById('estrategiaMeta').value, dataInicio: new Date().toISOString(), status: 'ativa'};
         if (!meta.objetivo || !meta.valorTotal || meta.valorTotal <= 0) { alert('❌ Preencha objetivo e valor válido!'); return; }
         meta.dataFim = new Date(Date.now() + meta.prazo * 24 * 60 * 60 * 1000).toISOString();
         meta.valorDiario = meta.valorTotal / meta.prazo;
         this.metas.push(meta);
-        this.salvarDados();
-        this.fecharModal('modalMeta');
+       // DEPOIS
+await this.salvarDados();
+this.fecharModal('modalMeta');
         alert(`✅ Meta criada! R$ ${meta.valorDiario.toFixed(2)}/dia`);
         this.render();
     }
 
-    atualizarProgressoMeta(metaId) {
+    // DEPOIS
+async atualizarProgressoMeta(metaId) {
         const valor = parseFloat(prompt('Quanto você progrediu? (R$)'));
         if (!valor || valor <= 0) return;
         const meta = this.metas.find(m => m.id === metaId);
         if (meta) {
             meta.valorAtual += valor;
             if (meta.valorAtual >= meta.valorTotal) { meta.status = 'concluida'; alert('🎉 PARABÉNS! Meta concluída!'); }
-            this.salvarDados();
-            this.render();
+           // DEPOIS
+await this.salvarDados();
+this.render();
         }
     }
 
-    excluirMeta(id) {
+ // DEPOIS
+async excluirMeta(id) {
         if (confirm('Excluir esta meta?')) {
             this.metas = this.metas.filter(m => m.id !== id);
-            this.salvarDados();
-            this.render();
+           // DEPOIS
+await this.salvarDados();
+this.render();
         }
     }
 
@@ -205,14 +220,16 @@ abrirModalMeta() {
         return Object.entries(porCategoria).sort((a, b) => b[1].total - a[1].total).slice(0, 10);
     }
 
-    lancamentoRapido() {
+// DEPOIS
+async lancamentoRapido() {
         const desc = document.getElementById('quickDesc').value;
         const valor = parseFloat(document.getElementById('quickValor').value);
         const tipo = document.getElementById('quickTipo').value;
         if (!desc || !valor || valor <= 0) { alert('❌ Preencha descrição e valor!'); return; }
         this.transacoes.push({id: Date.now(), tipo, descricao: desc, valor, categoria: 'Outros', data: new Date().toISOString().split('T')[0], recorrente: 'false', paga: tipo === 'despesa' ? false : true, criado_em: new Date().toISOString()});
-        this.salvarDados();
-        document.getElementById('quickDesc').value = '';
+      // DEPOIS
+await this.salvarDados();
+document.getElementById('quickDesc').value = '';
         document.getElementById('quickValor').value = '';
         alert('✅ Lançado!');
         this.render();
@@ -256,31 +273,51 @@ abrirModalMeta() {
         alert('✅ Backup exportado!');
     }
 
-    salvarDados() {
-        localStorage.setItem('financeiro_transacoes', JSON.stringify(this.transacoes));
-        localStorage.setItem('financeiro_metas', JSON.stringify(this.metas));
-        localStorage.setItem('financeiro_orcamento', JSON.stringify(this.orcamento));
-    }
+  async salvarDados() {
+    await MVData.salvar('financeiro', {
+        tipo: 'transacoes',
+        dados: this.transacoes
+    });
+    await MVData.salvar('financeiro', {
+        tipo: 'metas',
+        dados: this.metas
+    });
+    await MVData.salvar('financeiro', {
+        tipo: 'orcamento',
+        dados: this.orcamento
+    });
+}
 
-    carregarDados() {
-        const t = localStorage.getItem('financeiro_transacoes');
-        if (t) this.transacoes = JSON.parse(t);
-        const m = localStorage.getItem('financeiro_metas');
-        if (m) this.metas = JSON.parse(m);
-        const o = localStorage.getItem('financeiro_orcamento');
-        if (o) this.orcamento = JSON.parse(o);
-    }
+ // DEPOIS
+async carregarDados() {
+    const transacoes = await MVData.buscar('financeiro', { tipo: 'transacoes' });
+    if (transacoes.length) this.transacoes = transacoes[0].dados || [];
 
-    limparDados() {
-        if (confirm('⚠️ Apagar TODOS os dados?') && confirm('Tem certeza?')) {
-            localStorage.clear();
-            this.transacoes = [];
-            this.metas = [];
-            alert('✅ Dados limpos!');
-            this.render();
+    const metas = await MVData.buscar('financeiro', { tipo: 'metas' });
+    if (metas.length) this.metas = metas[0].dados || [];
+
+    const orcamento = await MVData.buscar('financeiro', { tipo: 'orcamento' });
+    if (orcamento.length) this.orcamento = orcamento[0].dados || {};
+}
+
+  
+   // DEPOIS
+async limparDados() {
+    if (confirm('⚠️ Apagar TODOS os dados?') && confirm('Tem certeza?')) {
+        const registros = await MVData.buscar('financeiro');
+        for (const r of registros) {
+            await MVData.deletar('financeiro', r.id);
         }
+        localStorage.removeItem('mv_financeiro');
+        this.transacoes = [];
+        this.metas = [];
+        this.orcamento = {};
+        alert('✅ Dados limpos!');
+        this.render();
     }
+}
 
+  
     fecharModal(id) {
         document.getElementById(id).classList.remove('active');
     }
@@ -635,6 +672,9 @@ abrirModalMeta() {
 }
 
 const app = new GestaoFinanceira();
-    </script>
+    </script
+      <footer class="mv-footer">
+  <span>MEGAVISION ECOSYSTEM</span> © 2026 — Todos os direitos reservados
+</footer>
 </body>
 </html>
