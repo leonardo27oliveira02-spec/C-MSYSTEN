@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEGAVISION — [NOME DA FERRAMENTA]</title>
+
+  <!-- ✅ Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- ✅ Módulo de Dados Central -->
+  <script src="megavision-data.js"></script>
+
+  <!-- ✅ Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════════
+       MEGAVISION ECOSYSTEM — CSS BASE
+       Copie este bloco inteiro para qualquer página.
+       Altere apenas as variáveis abaixo se precisar.
+    ══════════════════════════════════════════════ */
+    :root {
+      --mv-bg:        #0a0a0f;
+      --mv-surface:   #111118;
+      --mv-border:    #1e1e2e;
+      --mv-accent:    #7c3aed;
+      --mv-accent2:   #06b6d4;
+      --mv-gold:      #f59e0b;
+      --mv-text:      #e2e8f0;
+      --mv-muted:     #64748b;
+      --mv-success:   #10b981;
+      --mv-danger:    #ef4444;
+      --mv-radius:    12px;
+      --mv-font-head: 'Syne', sans-serif;
+      --mv-font-body: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--mv-bg);
+      color: var(--mv-text);
+      font-family: var(--mv-font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ───────────────────────────────── */
+    .mv-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--mv-border);
+      padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .mv-nav-logo {
+      font-family: var(--mv-font-head);
+      font-weight: 800; font-size: 18px;
+      background: linear-gradient(135deg, var(--mv-accent), var(--mv-accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .mv-nav-links {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .mv-nav-links a {
+      color: var(--mv-muted);
+      text-decoration: none;
+      font-size: 13px; font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all .2s;
+    }
+    .mv-nav-links a:hover,
+    .mv-nav-links a.ativo {
+      color: var(--mv-text);
+      background: var(--mv-border);
+    }
+    .mv-nav-status {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--mv-muted);
+    }
+    .mv-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--mv-success);
+      animation: pulse 2s infinite;
+    }
+    .mv-dot.offline { background: var(--mv-danger); animation: none; }
+
+    @keyframes pulse {
+      0%,100% { opacity:1; } 50% { opacity:.4; }
+    }
+
+    /* ── HEADER DA PÁGINA ────────────────────── */
+    .mv-page-header {
+      padding: 40px 28px 28px;
+      border-bottom: 1px solid var(--mv-border);
+    }
+    .mv-breadcrumb {
+      font-size: 12px; color: var(--mv-muted);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mv-breadcrumb a { color: var(--mv-accent); text-decoration: none; }
+    .mv-breadcrumb a:hover { text-decoration: underline; }
+    .mv-page-title {
+      font-family: var(--mv-font-head);
+      font-size: 28px; font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .mv-page-desc { color: var(--mv-muted); font-size: 14px; }
+    .mv-badge {
+      display: inline-block;
+      background: rgba(124,58,237,.15);
+      color: var(--mv-accent);
+      border: 1px solid rgba(124,58,237,.3);
+      border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px;
+      margin-left: 10px;
+      vertical-align: middle;
+      text-transform: uppercase; letter-spacing: .5px;
+    }
+
+    /* ── LAYOUT PRINCIPAL ────────────────────── */
+    .mv-main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 28px 60px;
+    }
+
+    /* ── CARDS ───────────────────────────────── */
+    .mv-card {
+      background: var(--mv-surface);
+      border: 1px solid var(--mv-border);
+      border-radius: var(--mv-radius);
+      padding: 24px;
+      transition: border-color .2s;
+    }
+    .mv-card:hover { border-color: rgba(124,58,237,.4); }
+    .mv-card-title {
+      font-family: var(--mv-font-head);
+      font-size: 15px; font-weight: 700;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── GRID ────────────────────────────────── */
+    .mv-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+    .mv-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .mv-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+    /* ── KPI CARDS ───────────────────────────── */
+    .mv-kpi {
+      background: var(--mv-surface);
+      border: 1px solid var(--mv-border);
+      border-radius: var(--mv-radius);
+      padding: 20px 24px;
+      position: relative; overflow: hidden;
+    }
+    .mv-kpi::before {
+      content: '';
+      position: absolute; top:0; left:0;
+      width: 3px; height: 100%;
+      background: var(--mv-accent);
+    }
+    .mv-kpi.verde::before  { background: var(--mv-success); }
+    .mv-kpi.azul::before   { background: var(--mv-accent2); }
+    .mv-kpi.dourado::before{ background: var(--mv-gold); }
+    .mv-kpi-label { font-size: 12px; color: var(--mv-muted); text-transform: uppercase; letter-spacing:.8px; margin-bottom:6px; }
+    .mv-kpi-valor { font-family: var(--mv-font-head); font-size: 26px; font-weight: 800; }
+    .mv-kpi-sub   { font-size: 12px; color: var(--mv-muted); margin-top: 4px; }
+
+    /* ── BOTÕES ──────────────────────────────── */
+    .mv-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px; border: none;
+      font-family: var(--mv-font-body); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+      text-decoration: none;
+    }
+    .mv-btn-primary {
+      background: var(--mv-accent);
+      color: #fff;
+    }
+    .mv-btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+    .mv-btn-outline {
+      background: transparent;
+      border: 1px solid var(--mv-border);
+      color: var(--mv-text);
+    }
+    .mv-btn-outline:hover { border-color: var(--mv-accent); color: var(--mv-accent); }
+    .mv-btn-danger { background: var(--mv-danger); color: #fff; }
+    .mv-btn-danger:hover { background: #dc2626; }
+
+    /* ── INPUTS ──────────────────────────────── */
+    .mv-input, .mv-select, .mv-textarea {
+      width: 100%;
+      background: var(--mv-bg);
+      border: 1px solid var(--mv-border);
+      border-radius: 8px;
+      color: var(--mv-text);
+      font-family: var(--mv-font-body); font-size: 14px;
+      padding: 10px 14px;
+      transition: border-color .2s;
+      outline: none;
+    }
+    .mv-input:focus, .mv-select:focus, .mv-textarea:focus {
+      border-color: var(--mv-accent);
+    }
+    .mv-label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--mv-muted); text-transform: uppercase; letter-spacing: .6px;
+      margin-bottom: 6px;
+    }
+    .mv-field { margin-bottom: 16px; }
+
+    /* ── TABELA ──────────────────────────────── */
+    .mv-table-wrap { overflow-x: auto; border-radius: var(--mv-radius); }
+    .mv-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 14px;
+    }
+    .mv-table th {
+      background: var(--mv-border);
+      color: var(--mv-muted);
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing:.8px;
+      padding: 12px 16px; text-align: left;
+    }
+    .mv-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(30,30,46,.8);
+      color: var(--mv-text);
+    }
+    .mv-table tr:hover td { background: rgba(124,58,237,.04); }
+
+    /* ── ALERTS ──────────────────────────────── */
+    .mv-alert {
+      padding: 12px 16px; border-radius: 8px; font-size: 14px;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+    }
+    .mv-alert-success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2); color: #6ee7b7; }
+    .mv-alert-error   { background: rgba(239,68,68,.1);  border: 1px solid rgba(239,68,68,.2);  color: #fca5a5; }
+    .mv-alert-info    { background: rgba(6,182,212,.1);  border: 1px solid rgba(6,182,212,.2);  color: #67e8f9; }
+
+    /* ── FOOTER ──────────────────────────────── */
+    .mv-footer {
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--mv-border);
+      color: var(--mv-muted); font-size: 12px;
+    }
+    .mv-footer span {
+      background: linear-gradient(135deg, var(--mv-accent), var(--mv-accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+
+    /* ── RESPONSIVO ──────────────────────────── */
+    @media (max-width: 768px) {
+      .mv-grid-2, .mv-grid-3, .mv-grid-4 { grid-template-columns: 1fr; }
+      .mv-nav-links { display: none; }
+      .mv-main { padding: 20px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     NAVBAR — igual em TODAS as páginas
+     Adicione um link para cada ferramenta
+══════════════════════════════════════════ -->
+<nav class="mv-nav">
+  <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION</a>
+
+  <div class="mv-nav-links">
+    <a href="index.html">Início</a>
+    <a href="assistente-vendas.html">Assistente Vendas</a>
+    <a href="app-vendas.html">App Vendas</a>
+    <a href="control-vendas.html">Controle</a>
+    <a href="quiz-itaipulandia.html">Quiz</a>
+    <a href="vendas-passaporte.html">Passaporte</a>
+    <!-- ✏️ Adicione mais ferramentas aqui -->
+  </div>
+
+  <div class="mv-nav-status">
+    <div class="mv-dot" id="mvStatusDot"></div>
+    <span id="mvStatusTxt">Conectando...</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     HEADER — troque título e descrição
+══════════════════════════════════════════ -->
+<div class="mv-page-header">
+  <div class="mv-breadcrumb">
+    <a href="index.html">MEGAVISION</a> › [NOME DA FERRAMENTA]
+  </div>
+  <div class="mv-page-title">
+    🔧 Nome da Ferramenta
+    <span class="mv-badge">Comercial</span>
+  </div>
+  <p class="mv-page-desc">Descrição curta do que esta ferramenta faz.</p>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CONTEÚDO PRINCIPAL — coloque aqui
+══════════════════════════════════════════ -->
+<main class="mv-main">
+
+  <!-- Exemplo: KPIs -->
+  <div class="mv-grid-4" style="margin-bottom:28px;">
+    <div class="mv-kpi">
+      <div class="mv-kpi-label">Total</div>
+      <div class="mv-kpi-valor" id="kpiTotal">0</div>
+      <div class="mv-kpi-sub">registros</div>
+    </div>
+    <div class="mv-kpi verde">
+      <div class="mv-kpi-label">Valor</div>
+      <div class="mv-kpi-valor" id="kpiValor">R$ 0</div>
+      <div class="mv-kpi-sub">acumulado</div>
+    </div>
+    <div class="mv-kpi azul">
+      <div class="mv-kpi-label">Meta</div>
+      <div class="mv-kpi-valor">0%</div>
+      <div class="mv-kpi-sub">atingida</div>
+    </div>
+    <div class="mv-kpi dourado">
+      <div class="mv-kpi-label">Status</div>
+      <div class="mv-kpi-valor">—</div>
+      <div class="mv-kpi-sub">atualizado agora</div>
+    </div>
+  </div>
+
+  <!-- Exemplo: Formulário + Tabela -->
+  <div class="mv-grid-2">
+    <div class="mv-card">
+      <div class="mv-card-title">➕ Novo Registro</div>
+      <div id="mvAlert"></div>
+
+      <div class="mv-field">
+        <label class="mv-label">Nome / Produto</label>
+        <input class="mv-input" id="inpNome" placeholder="Digite aqui..." />
+      </div>
+      <div class="mv-field">
+        <label class="mv-label">Valor (R$)</label>
+        <input class="mv-input" id="inpValor" type="number" placeholder="0,00" />
+      </div>
+      <div class="mv-field">
+        <label class="mv-label">Status</label>
+        <select class="mv-select" id="inpStatus">
+          <option value="aberto">Aberto</option>
+          <option value="fechado">Fechado</option>
+        </select>
+      </div>
+
+      <button class="mv-btn mv-btn-primary" onclick="salvarRegistro()">
+        💾 Salvar Registro
+      </button>
+    </div>
+
+    <div class="mv-card">
+      <div class="mv-card-title">📋 Registros Recentes</div>
+      <div class="mv-table-wrap">
+        <table class="mv-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="mvTabela">
+            <tr><td colspan="4" style="text-align:center;color:var(--mv-muted)">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════════════
+     FOOTER — igual em TODAS as páginas
+══════════════════════════════════════════ -->
+<footer class="mv-footer">
+  <span>MEGAVISION ECOSYSTEM</span> © 2026 — Todos os direitos reservados
+</footer>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT DA FERRAMENTA
+     Troque "minha_tabela" pelo nome real
+     da tabela no Supabase para cada página
+══════════════════════════════════════════ -->
+<script>
+  // ── Nome da tabela no Supabase ───────────
+  // ✏️ Troque pelo nome da sua tabela:
+  const TABELA = 'minha_tabela';
+
+  // ── Inicialização ────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    atualizarStatus();
+    await carregarDados();
+  });
+
+  // ── Status de conexão ────────────────────
+  function atualizarStatus() {
+    const s = MVData.status();
+    const dot = document.getElementById('mvStatusDot');
+    const txt = document.getElementById('mvStatusTxt');
+    if (s.online && s.supabase) {
+      dot.className = 'mv-dot';
+      txt.textContent = 'Online';
+    } else {
+      dot.className = 'mv-dot offline';
+      txt.textContent = s.supabase ? 'Offline' : 'Config. Supabase';
+    }
+  }
+
+  // ── Salvar ───────────────────────────────
+  async function salvarRegistro() {
+    const nome  = document.getElementById('inpNome').value.trim();
+    const valor = parseFloat(document.getElementById('inpValor').value) || 0;
+    const status = document.getElementById('inpStatus').value;
+
+    if (!nome) return mostrarAlerta('Preencha o nome!', 'error');
+
+    const res = await MVData.salvar(TABELA, { nome, valor, status });
+
+    if (res.ok) {
+      mostrarAlerta('Salvo com sucesso! ' + (res.origem === 'local' ? '(offline)' : ''), 'success');
+      document.getElementById('inpNome').value = '';
+      document.getElementById('inpValor').value = '';
+      await carregarDados();
+    } else {
+      mostrarAlerta('Erro ao salvar.', 'error');
+    }
+  }
+
+  // ── Carregar tabela ──────────────────────
+  async function carregarDados() {
+    const dados = await MVData.buscar(TABELA);
+    const tbody = document.getElementById('mvTabela');
+
+    if (!dados.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--mv-muted)">Nenhum registro ainda</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = dados.map(r => `
+      <tr>
+        <td>${r.nome || '—'}</td>
+        <td>R$ ${(r.valor || 0).toFixed(2)}</td>
+        <td><span style="color:${r.status==='fechado'?'var(--mv-success)':'var(--mv-accent2)'}">
+          ${r.status || '—'}
+        </span></td>
+        <td>
+          <button class="mv-btn mv-btn-outline" style="padding:4px 10px;font-size:12px"
+            onclick="deletar('${r.id}')">✕</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // Atualiza KPIs
+    document.getElementById('kpiTotal').textContent = dados.length;
+    const total = dados.reduce((a, r) => a + (parseFloat(r.valor)||0), 0);
+    document.getElementById('kpiValor').textContent = 'R$ ' + total.toFixed(2);
+  }
+
+  // ── Deletar ──────────────────────────────
+  async function deletar(id) {
+    if (!confirm('Remover este registro?')) return;
+    await MVData.deletar(TABELA, id);
+    await carregarDados();
+  }
+
+  // ── Alert helper ─────────────────────────
+  function mostrarAlerta(msg, tipo = 'info') {
+    const el = document.getElementById('mvAlert');
+    el.innerHTML = `<div class="mv-alert mv-alert-${tipo}">${msg}</div>`;
+    setTimeout(() => { el.innerHTML = ''; }, 3000);
+  }
+</script>
+
+</body>
+</html>
