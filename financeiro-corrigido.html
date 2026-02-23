@@ -161,6 +161,35 @@ body {
 [class*="bg-cm-"] { background: var(--mv-surface) !important; }
 [class*="text-cm-"] { color: var(--mv-text) !important; }
 [class*="border-cm-"] { border-color: var(--mv-border) !important; }
+
+
+    /* Cards de técnicas — fundo claro do Tailwind → MEGAVISION escuro */
+.bg-blue-50, .bg-green-50, .bg-yellow-50,
+.bg-red-50, .bg-gray-50, .bg-white {
+  background: var(--mv-surface) !important;
+  color: var(--mv-text) !important;
+}
+
+/* Bordas coloridas dos cards */
+.border-blue-400  { border-color: var(--mv-accent2) !important; }
+.border-green-400 { border-color: var(--mv-success) !important; }
+.border-yellow-400{ border-color: var(--mv-gold) !important; }
+.border-red-400   { border-color: var(--mv-danger) !important; }
+
+/* Textos coloridos dentro dos cards */
+.text-blue-700, .text-blue-600, .text-blue-800 { color: var(--mv-accent2) !important; }
+.text-green-700, .text-green-600 { color: var(--mv-success) !important; }
+.text-yellow-700, .text-yellow-600 { color: var(--mv-gold) !important; }
+.text-red-700, .text-red-600 { color: var(--mv-danger) !important; }
+.text-gray-600, .text-gray-700, .text-gray-800 { color: var(--mv-muted) !important; }
+.text-gray-900 { color: var(--mv-text) !important; }
+
+/* Gradientes claros → escuro */
+.from-blue-50, .to-blue-50,
+.from-green-50, .to-green-50 { 
+  --tw-gradient-from: var(--mv-surface) !important;
+  --tw-gradient-to: var(--mv-bg) !important;
+}
   </style>
 </head>
     <body>
