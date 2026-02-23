@@ -241,7 +241,7 @@ async inicializar() {
                 <div><label class="block text-sm font-semibold mb-2">🔁 Recorrente?</label><select id="recorrenteTransacao" class="w-full px-4 py-2 rounded-lg cm-input"><option value="false">Não</option><option value="mensal">Mensal</option><option value="semanal">Semanal</option></select></div>
                 <button onclick="app.salvarTransacao('${tipo}')" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg hover:opacity-90">💾 Salvar</button>
             </div>`;
-        document.getElementById('modalTransacao').classList.add('active');
+        document.getElementById('modalTransacao').classList.add('ativo');
     }
 
   // DEPOIS
@@ -288,7 +288,7 @@ abrirModalMeta() {
             <div><label class="block text-sm font-semibold mb-2">📝 Estratégia</label><textarea id="estrategiaMeta" class="w-full px-4 py-2 rounded-lg cm-input" rows="3"></textarea></div>
             <button onclick="app.salvarMeta()" class="w-full bg-cm-laranja text-white py-3 rounded-lg font-bold text-lg">🎯 Criar Meta</button>
         </div>`;
-    document.getElementById('modalMeta').classList.add('active');
+    document.getElementById('modalMeta').classList.add('ativo');
 }
 
     // DEPOIS
