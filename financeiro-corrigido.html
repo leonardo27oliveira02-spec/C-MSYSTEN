@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  
-    <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Dados centrais MEGAVISION -->
-<script src="megavision-data.js"></script>
-<!-- CSS do ecossistema (opcional se já tem estilo próprio) -->
-<link rel="stylesheet" href="megavision-style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEGAVISION — Financial Pro</title>
 
+  <!-- 1. Supabase PRIMEIRO -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. Módulo central -->
+  <script src="megavision-data.js"></script>
+  <!-- 3. Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C&M Financial Pro - Gestão Financeira Inteligente</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-<style>
+  <style>
+    /* só CSS aqui, nada de HTML */
+  </style>
+</head>
     <body>
 <nav class="mv-nav">
   <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION</a>
@@ -33,11 +32,6 @@
     <span id="mvStatusTxt">...</span>
   </div>
 </nav>
-</style>
-
-</head>
-
-
     <div id="app"></div>
     
     <button onclick="app.paginaAtual='dashboard';app.render();" 
