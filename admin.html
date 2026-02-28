@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEGAVISION — Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="megavision-data.js"></script>
+  <script src="megavision-auth.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0a0a0f;color:#e2e8f0;font-family:'DM Sans',sans-serif;min-height:100vh;}
+    .mv-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.97);backdrop-filter:blur(16px);border-bottom:1px solid #1e1e2e;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+    .mv-nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+    .main{max-width:1100px;margin:0 auto;padding:32px 24px;}
+    .page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:28px;display:flex;align-items:center;gap:10px;}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    .kpi{background:#111118;border:1px solid #1e1e2e;border-left:4px solid #7c3aed;border-radius:12px;padding:18px;}
+    .kpi-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+    .kpi-valor{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;}
+    .card{background:#111118;border:1px solid #1e1e2e;border-radius:12px;padding:22px;margin-bottom:20px;}
+    .card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:#1e1e2e;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:10px 14px;text-align:left;font-weight:700;}
+    td{padding:12px 14px;border-bottom:1px solid #1e1e2e;font-size:13px;color:#e2e8f0;}
+    tr:hover td{background:rgba(124,58,237,.04);}
+    .badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-gratuito{background:rgba(148,163,184,.15);color:#94a3b8;}
+    .badge-basico{background:rgba(6,182,212,.15);color:#22d3ee;}
+    .badge-premium{background:rgba(124,58,237,.15);color:#a78bfa;}
+    .badge-admin{background:rgba(245,158,11,.15);color:#fbbf24;}
+    .badge-pendente{background:rgba(245,158,11,.15);color:#fbbf24;}
+    .badge-aprovado{background:rgba(16,185,129,.15);color:#34d399;}
+    .badge-recusado{background:rgba(239,68,68,.15);color:#f87171;}
+    .btn-sm{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;border:none;cursor:pointer;}
+    .btn-aprovar{background:#10b981;color:#fff;}
+    .btn-recusar{background:#ef4444;color:#fff;margin-left:4px;}
+    select.plano-select{background:#0a0a0f;border:1px solid #1e1e2e;color:#e2e8f0;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;}
+  </style>
+</head>
+<body>
+<nav class="mv-nav">
+  <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION Admin</a>
+  <a href="#" onclick="MVAuth.logout()" style="color:#94a3b8;font-size:13px;text-decoration:none;">Sair</a>
+</nav>
+
+<div class="main">
+  <div class="page-title">🛡️ Painel Admin <span style="font-size:13px;color:#94a3b8;font-weight:400;font-family:'DM Sans',sans-serif;" id="adminEmail"></span></div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-label">Total Usuários</div><div class="kpi-valor" id="kpiTotal">—</div></div>
+    <div class="kpi" style="border-left-color:#10b981;"><div class="kpi-label">Assinantes Ativos</div><div class="kpi-valor" id="kpiAtivos">—</div></div>
+    <div class="kpi" style="border-left-color:#f59e0b;"><div class="kpi-label">Pedidos Pendentes</div><div class="kpi-valor" id="kpiPendentes">—</div></div>
+    <div class="kpi" style="border-left-color:#06b6d4;"><div class="kpi-label">Premium</div><div class="kpi-valor" id="kpiPremium">—</div></div>
+  </div>
+
+  <!-- PEDIDOS PENDENTES -->
+  <div class="card">
+    <div class="card-title">
+      ⏳ Pedidos de Upgrade Pendentes
+      <button onclick="carregarDados()" style="background:#1e1e2e;color:#94a3b8;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;">🔄 Atualizar</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr>
+          <th>Data</th><th>Nome</th><th>Email</th><th>Plano</th><th>Comprovante</th><th>Ações</th>
+        </tr></thead>
+        <tbody id="tabelaPedidos">
+          <tr><td colspan="6" style="text-align:center;color:#475569;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TODOS OS USUÁRIOS -->
+  <div class="card">
+    <div class="card-title">👥 Todos os Usuários</div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr>
+          <th>Nome</th><th>Email</th><th>Plano Atual</th><th>Desde</th><th>Alterar Plano</th>
+        </tr></thead>
+        <tbody id="tabelaUsuarios">
+          <tr><td colspan="5" style="text-align:center;color:#475569;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function init() {
+    const usuario = await MVAuth.getUsuario();
+    if (!usuario || usuario.plano !== 'admin') {
+      alert('Acesso restrito a admins.');
+      window.location.href = 'index.html';
+      return;
+    }
+    document.getElementById('adminEmail').textContent = usuario.email;
+    await carregarDados();
+  }
+
+  async function carregarDados() {
+    await carregarPedidos();
+    await carregarUsuarios();
+  }
+
+  async function carregarPedidos() {
+    const { data } = await _mvClient.from('mv_pedidos').select('*').order('criado_em', { ascending: false });
+    const pendentes = (data||[]).filter(p => p.status === 'pendente');
+    document.getElementById('kpiPendentes').textContent = pendentes.length;
+
+    const tbody = document.getElementById('tabelaPedidos');
+    if (!pendentes.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#475569;">Nenhum pedido pendente ✅</td></tr>';
+      return;
+    }
+    tbody.innerHTML = pendentes.map(p => `
+      <tr>
+        <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+        <td>${p.nome||'—'}</td>
+        <td style="color:#94a3b8;">${p.email}</td>
+        <td><span class="badge badge-${p.plano_solicitado}">${p.plano_solicitado}</span></td>
+        <td><span style="color:#94a3b8;font-size:11px;word-break:break-all;">${(p.comprovante_url||'').substring(0,40)}...</span></td>
+        <td>
+          <button class="btn-sm btn-aprovar" onclick="aprovarPedido('${p.id}','${p.user_id}','${p.plano_solicitado}')">✅ Aprovar</button>
+          <button class="btn-sm btn-recusar" onclick="recusarPedido('${p.id}')">✗ Recusar</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function carregarUsuarios() {
+    const { data } = await _mvClient.from('mv_usuarios').select('*').order('criado_em', { ascending: false });
+    const todos = data || [];
+    document.getElementById('kpiTotal').textContent = todos.length;
+    document.getElementById('kpiAtivos').textContent = todos.filter(u => u.plano !== 'gratuito').length;
+    document.getElementById('kpiPremium').textContent = todos.filter(u => u.plano === 'premium').length;
+
+    const tbody = document.getElementById('tabelaUsuarios');
+    tbody.innerHTML = todos.map(u => `
+      <tr>
+        <td style="font-weight:600;">${u.nome||'—'}</td>
+        <td style="color:#94a3b8;">${u.email}</td>
+        <td><span class="badge badge-${u.plano}">${u.plano}</span></td>
+        <td style="color:#64748b;">${new Date(u.criado_em).toLocaleDateString('pt-BR')}</td>
+        <td>
+          <select class="plano-select" onchange="alterarPlano('${u.user_id}', this.value)">
+            <option value="gratuito" ${u.plano==='gratuito'?'selected':''}>Gratuito</option>
+            <option value="basico"   ${u.plano==='basico'?'selected':''}>Básico</option>
+            <option value="premium"  ${u.plano==='premium'?'selected':''}>Premium</option>
+            <option value="admin"    ${u.plano==='admin'?'selected':''}>Admin</option>
+          </select>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function aprovarPedido(pedidoId, userId, plano) {
+    if (!confirm(`Ativar plano "${plano}" para este usuário?`)) return;
+    await _mvClient.from('mv_pedidos').update({ status: 'aprovado', atualizado_em: new Date().toISOString() }).eq('id', pedidoId);
+    await MVAuth.atualizarPlano(userId, plano);
+    alert('✅ Plano ativado!');
+    await carregarDados();
+  }
+
+  async function recusarPedido(pedidoId) {
+    if (!confirm('Recusar este pedido?')) return;
+    await _mvClient.from('mv_pedidos').update({ status: 'recusado', atualizado_em: new Date().toISOString() }).eq('id', pedidoId);
+    await carregarDados();
+  }
+
+  async function alterarPlano(userId, plano) {
+    await MVAuth.atualizarPlano(userId, plano);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
