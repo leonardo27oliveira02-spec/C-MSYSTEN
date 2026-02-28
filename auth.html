@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEGAVISION — Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="megavision-data.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0a0a0f;color:#e2e8f0;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .auth-wrap{width:100%;max-width:440px;padding:24px;}
+
+    .auth-logo{text-align:center;margin-bottom:32px;}
+    .auth-logo-letras{display:flex;justify-content:center;gap:10px;margin-bottom:14px;}
+    .auth-letra{width:52px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:#fff;}
+    .auth-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .auth-sub{color:#64748b;font-size:13px;margin-top:4px;}
+
+    .auth-card{background:#111118;border:1px solid #1e1e2e;border-radius:16px;padding:32px;}
+
+    .tabs{display:flex;gap:0;margin-bottom:28px;background:#0a0a0f;border-radius:10px;padding:4px;}
+    .tab{flex:1;padding:10px;text-align:center;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;color:#64748b;border:none;background:none;transition:all .2s;}
+    .tab.ativo{background:#7c3aed;color:#fff;}
+
+    .field{margin-bottom:16px;}
+    .field label{display:block;font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+    .field input{width:100%;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;color:#e2e8f0;padding:12px 14px;font-size:14px;outline:none;transition:border-color .2s;font-family:'DM Sans',sans-serif;}
+    .field input:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15);}
+    .field input::placeholder{color:#475569;}
+
+    .btn-primary{width:100%;background:#7c3aed;color:#fff;padding:14px;border-radius:10px;font-weight:700;font-size:15px;border:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+    .btn-primary:hover{background:#6d28d9;transform:translateY(-1px);}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+    .divider{text-align:center;color:#475569;font-size:12px;margin:20px 0;position:relative;}
+    .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#1e1e2e;}
+    .divider::before{left:0;} .divider::after{right:0;}
+
+    .planos-preview{margin-top:24px;}
+    .plano-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;margin-bottom:8px;}
+    .plano-icon{font-size:20px;}
+    .plano-info{flex:1;}
+    .plano-nome{font-weight:700;font-size:13px;color:#e2e8f0;}
+    .plano-desc{font-size:11px;color:#64748b;margin-top:2px;}
+    .plano-preco{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;}
+
+    .alert{padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+    .alert.erro{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;display:flex;align-items:center;gap:8px;}
+    .alert.sucesso{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#6ee7b7;display:flex;align-items:center;gap:8px;}
+
+    .forgot{text-align:center;margin-top:14px;}
+    .forgot a{color:#64748b;font-size:12px;text-decoration:none;}
+    .forgot a:hover{color:#a78bfa;}
+  </style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-logo">
+    <div class="auth-logo-letras">
+      <div class="auth-letra" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">M</div>
+      <div class="auth-letra" style="background:linear-gradient(135deg,#06b6d4,#0284c7);">V</div>
+    </div>
+    <div class="auth-title">MEGAVISION</div>
+    <div class="auth-sub">Business Ecosystem</div>
+  </div>
+
+  <div class="auth-card">
+    <div class="tabs">
+      <button class="tab ativo" onclick="trocarAba('login')">Entrar</button>
+      <button class="tab" onclick="trocarAba('cadastro')">Criar Conta</button>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <!-- LOGIN -->
+    <div id="abaLogin">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="seu@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="loginSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
+      </div>
+      <button class="btn-primary" id="btnLogin" onclick="fazerLogin()">⚡ Entrar no Ecosystem</button>
+      <div class="forgot"><a href="#" onclick="recuperarSenha()">Esqueci minha senha</a></div>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="abaCadastro" style="display:none;">
+      <div class="field">
+        <label>Seu Nome</label>
+        <input type="text" id="cadNome" placeholder="Como quer ser chamado?">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="cadEmail" placeholder="seu@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="field">
+        <label>Confirmar Senha</label>
+        <input type="password" id="cadSenha2" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')fazerCadastro()">
+      </div>
+      <button class="btn-primary" id="btnCadastro" onclick="fazerCadastro()">🚀 Criar Conta Grátis</button>
+
+      <div class="divider">planos disponíveis</div>
+
+      <div class="planos-preview">
+        <div class="plano-item">
+          <div class="plano-icon">🆓</div>
+          <div class="plano-info">
+            <div class="plano-nome">Gratuito</div>
+            <div class="plano-desc">Financial Pro, Assistente Vendas, Control Vendas (limitado)</div>
+          </div>
+          <div class="plano-preco" style="color:#94a3b8;">R$ 0</div>
+        </div>
+        <div class="plano-item">
+          <div class="plano-icon">⭐</div>
+          <div class="plano-info">
+            <div class="plano-nome">Básico</div>
+            <div class="plano-desc">+ App Vendas e Quiz Itaipu sem limites</div>
+          </div>
+          <div class="plano-preco" style="color:#06b6d4;">Ver planos →</div>
+        </div>
+        <div class="plano-item">
+          <div class="plano-icon">💎</div>
+          <div class="plano-info">
+            <div class="plano-nome">Premium</div>
+            <div class="plano-desc">Todas as ferramentas sem limites</div>
+          </div>
+          <div class="plano-preco" style="color:#a78bfa;">Ver planos →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const redirect = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+
+  function trocarAba(aba) {
+    document.getElementById('abaLogin').style.display   = aba==='login'   ? 'block' : 'none';
+    document.getElementById('abaCadastro').style.display = aba==='cadastro' ? 'block' : 'none';
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('ativo', (i===0&&aba==='login')||(i===1&&aba==='cadastro')));
+    limparAlerta();
+  }
+
+  function mostrarAlerta(msg, tipo='erro') {
+    const el = document.getElementById('alertBox');
+    el.className = `alert ${tipo}`;
+    el.innerHTML = `<span>${tipo==='erro'?'❌':'✅'}</span> ${msg}`;
+  }
+
+  function limparAlerta() {
+    const el = document.getElementById('alertBox');
+    el.className = 'alert';
+    el.innerHTML = '';
+  }
+
+  async function fazerLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const senha = document.getElementById('loginSenha').value;
+    if (!email || !senha) return mostrarAlerta('Preencha email e senha.');
+
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true; btn.textContent = 'Entrando...';
+
+    const { data, error } = await _mvClient.auth.signInWithPassword({ email, password: senha });
+
+    if (error) {
+      mostrarAlerta('Email ou senha incorretos.');
+      btn.disabled = false; btn.textContent = '⚡ Entrar no Ecosystem';
+      return;
+    }
+
+    btn.textContent = '✅ Bem-vindo!';
+    setTimeout(() => window.location.href = redirect, 800);
+  }
+
+  async function fazerCadastro() {
+    const nome  = document.getElementById('cadNome').value.trim();
+    const email = document.getElementById('cadEmail').value.trim();
+    const senha = document.getElementById('cadSenha').value;
+    const senha2 = document.getElementById('cadSenha2').value;
+
+    if (!nome || !email || !senha) return mostrarAlerta('Preencha todos os campos.');
+    if (senha.length < 6) return mostrarAlerta('Senha deve ter ao menos 6 caracteres.');
+    if (senha !== senha2) return mostrarAlerta('As senhas não coincidem.');
+
+    const btn = document.getElementById('btnCadastro');
+    btn.disabled = true; btn.textContent = 'Criando conta...';
+
+    const { data, error } = await _mvClient.auth.signUp({ email, password: senha });
+
+    if (error) {
+      mostrarAlerta(error.message.includes('already') ? 'Este email já está cadastrado.' : 'Erro ao criar conta.');
+      btn.disabled = false; btn.textContent = '🚀 Criar Conta Grátis';
+      return;
+    }
+
+    // Cria perfil
+    await _mvClient.from('mv_usuarios').insert([{
+      user_id: data.user.id, email, nome,
+      plano: 'gratuito', plano_ativo: true,
+      criado_em: new Date().toISOString()
+    }]);
+
+    mostrarAlerta('Conta criada! Verifique seu email para confirmar.', 'sucesso');
+    btn.textContent = '✅ Conta criada!';
+    setTimeout(() => trocarAba('login'), 2500);
+  }
+
+  async function recuperarSenha() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) return mostrarAlerta('Digite seu email primeiro.');
+    await _mvClient.auth.resetPasswordForEmail(email);
+    mostrarAlerta('Email de recuperação enviado!', 'sucesso');
+  }
+
+  // Se já logado, redireciona
+  document.addEventListener('DOMContentLoaded', async () => {
+    const { data: { session } } = await _mvClient.auth.getSession();
+    if (session) window.location.href = redirect;
+  });
+</script>
+</body>
+</html>
