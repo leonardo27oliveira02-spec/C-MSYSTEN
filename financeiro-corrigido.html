@@ -9,787 +9,957 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#0a0a0f; --surface:#111118; --border:#1e1e2e;
-      --accent:#7c3aed; --cyan:#06b6d4; --gold:#f59e0b;
-      --text:#e2e8f0; --muted:#94a3b8; --success:#10b981;
-      --danger:#ef4444; --warn:#f59e0b;
-    }
+    :root{--bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#7c3aed;--cyan:#06b6d4;--gold:#f59e0b;--text:#e2e8f0;--muted:#94a3b8;--success:#10b981;--danger:#ef4444;}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
-
-    /* NAV */
     .mv-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;}
     .mv-nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
-    .mv-nav-right{display:flex;align-items:center;gap:8px;}
-    .mv-nav-right a{color:var(--muted);font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s;}
-    .mv-nav-right a:hover{background:var(--border);color:var(--text);}
     .mv-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-    /* MENU TABS */
     .menu-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto;position:sticky;top:60px;z-index:99;}
     .menu-tab{padding:14px 18px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
-    .menu-tab:hover{color:var(--text);}
     .menu-tab.ativo{color:var(--accent);border-bottom-color:var(--accent);}
-
-    /* MAIN */
     .main{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
-
-    /* CARDS */
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
-    .card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-
-    /* GRID */
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
-    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-
-    /* KPI */
-    .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+    .card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
     .kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
     .kpi-valor{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
-    .kpi-sub{font-size:11px;color:var(--muted);margin-top:4px;}
-
-    /* DÍVIDA CARD COMPACTO */
-    .divida-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all .2s;}
-    .divida-item:hover{border-color:var(--accent);background:rgba(124,58,237,.04);}
-    .divida-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-    .divida-info{flex:1;min-width:0;}
-    .divida-nome{font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .divida-detalhe{font-size:11px;color:var(--muted);margin-top:2px;}
-    .divida-valores{text-align:right;flex-shrink:0;}
-    .divida-parcela{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--danger);}
-    .divida-total{font-size:11px;color:var(--muted);margin-top:2px;}
-    .divida-progress{height:4px;background:var(--border);border-radius:4px;margin-top:8px;}
-    .divida-progress-bar{height:4px;border-radius:4px;transition:width .5s;}
-    .divida-acoes{display:flex;gap:6px;flex-shrink:0;}
-    .btn-pagar{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
-    .btn-pagar:hover{background:rgba(16,185,129,.25);}
-    .btn-pagar.pago{background:rgba(16,185,129,.25);color:#34d399;}
-    .btn-del{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
-
-    /* BOTÕES */
-    .btn{padding:10px 20px;border-radius:8px;font-weight:600;font-size:13px;border:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+    .kpi-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+    .btn{padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;border:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
     .btn-primary{background:var(--accent);color:#fff;}
-    .btn-primary:hover{background:#6d28d9;}
     .btn-success{background:var(--success);color:#fff;}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
     .btn-outline:hover{border-color:var(--accent);color:var(--text);}
-    .btn-sm{padding:7px 14px;font-size:12px;}
-    .btn-lg{padding:14px 28px;font-size:15px;font-weight:700;}
-
-    /* INPUTS */
-    .field{margin-bottom:14px;}
+    .btn-danger{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+    .btn-sm{padding:6px 12px;font-size:12px;}
+    .btn-lg{padding:14px 24px;font-size:15px;font-weight:700;}
+    .field{margin-bottom:12px;}
     .field label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
     .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
     .field input:focus,.field select:focus{border-color:var(--accent);}
     .field input::placeholder{color:#475569;}
     .field select option{background:var(--surface);}
-
-    /* MODAL */
-    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:20px;}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:16px;}
     .modal.ativo{display:flex;}
-    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
-    .modal-header{background:linear-gradient(135deg,var(--accent),#4f46e5);padding:20px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;}
+    .modal-header{background:linear-gradient(135deg,var(--accent),#4f46e5);padding:18px 22px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
     .modal-header h3{font-family:'Syne',sans-serif;font-weight:800;color:#fff;font-size:17px;}
-    .modal-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:24px;cursor:pointer;line-height:1;}
-    .modal-body{padding:24px;}
-
-    /* SIMULADOR */
-    .sim-opcao{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all .3s;}
-    .sim-opcao:hover,.sim-opcao.melhor{border-color:var(--success);}
-    .sim-opcao.neutro{border-color:var(--warn);}
-    .sim-opcao.pior{border-color:var(--danger);}
-    .sim-tag{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;display:inline-block;margin-bottom:10px;}
-
-    /* PLANO MÊS */
-    .mes-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
-    .mes-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .2s;}
-    .mes-header:hover{background:rgba(124,58,237,.06);}
-    .mes-body{padding:0 16px 14px;display:none;}
-    .mes-body.aberto{display:block;}
-    .mes-pagamento{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
-    .mes-pagamento:last-child{border-bottom:none;}
-
-    /* BADGE */
-    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-
-    /* ALERTA */
-    .alerta{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px;}
+    .modal-close{background:none;border:none;color:rgba(255,255,255,.8);font-size:26px;cursor:pointer;line-height:1;}
+    .modal-body{padding:22px;}
+    /* DIVIDA ITEM */
+    .divida-wrap{background:var(--bg);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+    .divida-header{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+    .divida-header:hover{background:rgba(124,58,237,.05);}
+    .divida-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .divida-body{padding:0 16px 14px;border-top:1px solid var(--border);display:none;}
+    .divida-body.aberto{display:block;}
+    .compra-item{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface);border-radius:8px;margin-bottom:6px;font-size:13px;}
+    .progress-bar{height:5px;background:var(--border);border-radius:5px;margin-top:6px;}
+    .progress-fill{height:5px;border-radius:5px;}
+    .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+    .alerta{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:12px;}
     .alerta-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fbbf24;}
     .alerta-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#34d399;}
     .alerta-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;}
-
-    /* CHART CONTAINER */
-    .chart-wrap{position:relative;height:200px;display:flex;align-items:center;justify-content:center;}
-
-    /* EMPTY STATE */
-    .empty{text-align:center;padding:40px 20px;color:var(--muted);}
-    .empty-icon{font-size:48px;margin-bottom:12px;}
-    .empty h3{font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px;}
-
-    /* RENDA BANNER */
-    .renda-banner{background:linear-gradient(135deg,#1a0533,#0d1f3c);border:1px solid var(--accent);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-    .renda-info label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;}
-    .renda-valor{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-top:2px;}
-    .renda-livre{font-size:13px;margin-top:4px;}
-
-    @media(max-width:700px){
-      .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
-      .mv-nav-right a:not(:last-child){display:none;}
-    }
+    .alerta-info{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);color:#22d3ee;}
+    .renda-banner{background:linear-gradient(135deg,#1a0533,#0d1f3c);border:1px solid var(--accent);border-radius:12px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .sim-opcao{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+    .sim-opcao.melhor{border-color:var(--success);}
+    .sim-opcao.neutro{border-color:var(--gold);}
+    .sim-opcao.pior{border-color:var(--danger);}
+    .mes-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+    .mes-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+    .mes-header:hover{background:rgba(124,58,237,.05);}
+    .mes-body{padding:0 16px 12px;display:none;}
+    .mes-body.aberto{display:block;}
+    .mes-linha{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+    .mes-linha:last-child{border:none;}
+    .chart-wrap{position:relative;height:200px;}
+    .tipo-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+    .tipo-btn{padding:10px 6px;border-radius:10px;border:2px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;}
+    .tipo-btn:hover,.tipo-btn.ativo{border-color:var(--accent);color:var(--text);background:rgba(124,58,237,.1);}
+    .tipo-btn span{display:block;font-size:22px;margin-bottom:4px;}
+    .campo-extra{display:none;}
+    .campo-extra.visivel{display:block;}
+    @media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}.tipo-selector{grid-template-columns:repeat(2,1fr);}}
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="mv-nav">
   <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION</a>
-  <div class="mv-nav-right">
+  <div style="display:flex;align-items:center;gap:12px;">
     <span><span class="mv-dot" id="mvDot"></span><span id="mvStatus" style="font-size:12px;color:var(--muted);">...</span></span>
-    <a href="index.html">← Início</a>
+    <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--border);">← Início</a>
   </div>
 </nav>
 
-<!-- MENU -->
 <div class="menu-tabs">
   <button class="menu-tab ativo" onclick="trocarAba('dashboard')">📊 Dashboard</button>
-  <button class="menu-tab" onclick="trocarAba('dividas')">💳 Minhas Dívidas</button>
+  <button class="menu-tab" onclick="trocarAba('dividas')">💳 Dívidas</button>
   <button class="menu-tab" onclick="trocarAba('simulador')">🧮 Simulador</button>
   <button class="menu-tab" onclick="trocarAba('plano')">📅 Plano de Ação</button>
 </div>
 
-<!-- MODAIS -->
+<!-- MODAL NOVA DÍVIDA -->
 <div id="modalDivida" class="modal">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>➕ Nova Dívida</h3>
+      <h3 id="modalDividaTitulo">➕ Nova Dívida</h3>
       <button class="modal-close" onclick="fecharModal('modalDivida')">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="field"><label>Nome da Dívida</label><input id="dNome" placeholder="Ex: Cartão Nubank"></div>
-      <div class="grid-2">
-        <div class="field"><label>Valor Total (R$)</label><input id="dTotal" type="number" placeholder="5000"></div>
-        <div class="field"><label>Valor Pago até hoje (R$)</label><input id="dPago" type="number" placeholder="0" value="0"></div>
+      <!-- SELETOR TIPO -->
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Tipo de Dívida</label>
+        <div class="tipo-selector">
+          <div class="tipo-btn ativo" onclick="selecionarTipo('cartao')" id="tipo_cartao"><span>💳</span>Cartão</div>
+          <div class="tipo-btn" onclick="selecionarTipo('financiamento')" id="tipo_financiamento"><span>🏍️</span>Financiamento</div>
+          <div class="tipo-btn" onclick="selecionarTipo('parcelado')" id="tipo_parcelado"><span>📦</span>Parcelado</div>
+          <div class="tipo-btn" onclick="selecionarTipo('fixo')" id="tipo_fixo"><span>📌</span>Custo Fixo</div>
+        </div>
       </div>
-      <div class="grid-2">
-        <div class="field"><label>Parcela Mensal (R$)</label><input id="dParcela" type="number" placeholder="350"></div>
-        <div class="field"><label>Juros ao mês (%)</label><input id="dJuros" type="number" placeholder="2.5" step="0.1"></div>
+      <div class="field"><label>Nome</label><input id="dNome" placeholder="Ex: Nubank, Moto Honda, Geladeira..."></div>
+
+      <!-- CAMPOS CARTÃO -->
+      <div id="campos_cartao" class="campo-extra visivel">
+        <div class="alerta alerta-info" style="margin-bottom:12px;">💳 Você poderá adicionar cada compra individualmente depois de salvar o cartão.</div>
+        <div class="grid-2">
+          <div class="field"><label>Limite do Cartão (R$)</label><input id="dLimite" type="number" placeholder="5000"></div>
+          <div class="field"><label>Dia do Vencimento</label><input id="dDiaCartao" type="number" placeholder="10" min="1" max="31"></div>
+        </div>
+        <div class="field"><label>Juros Rotativo ao mês (%)</label><input id="dJurosCartao" type="number" placeholder="12.5" step="0.1"></div>
       </div>
-      <div class="grid-2">
-        <div class="field"><label>Dia do Vencimento</label><input id="dDia" type="number" placeholder="10" min="1" max="31"></div>
-        <div class="field"><label>Tipo</label>
-          <select id="dTipo">
-            <option value="cartao">💳 Cartão de Crédito</option>
-            <option value="financiamento">🏍️ Financiamento</option>
-            <option value="emprestimo">💰 Empréstimo</option>
-            <option value="cheque">📋 Cheque Especial</option>
+
+      <!-- CAMPOS FINANCIAMENTO -->
+      <div id="campos_financiamento" class="campo-extra">
+        <div class="grid-2">
+          <div class="field"><label>Valor Total (R$)</label><input id="fTotal" type="number" placeholder="15000"></div>
+          <div class="field"><label>Valor Já Pago (R$)</label><input id="fPago" type="number" placeholder="0" value="0"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Parcela Mensal (R$)</label><input id="fParcela" type="number" placeholder="450"></div>
+          <div class="field"><label>Taxa de Juros ao mês (%)</label><input id="fJuros" type="number" placeholder="1.5" step="0.1"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Dia do Vencimento</label><input id="fDia" type="number" placeholder="15" min="1" max="31"></div>
+          <div class="field"><label>Total de Parcelas</label><input id="fTotalParc" type="number" placeholder="36"></div>
+        </div>
+        <div class="field"><label>Parcelas Já Pagas</label><input id="fParcPagas" type="number" placeholder="0" value="0"></div>
+      </div>
+
+      <!-- CAMPOS PARCELADO -->
+      <div id="campos_parcelado" class="campo-extra">
+        <div class="field"><label>Descrição do Item</label><input id="pDesc" placeholder="Ex: Geladeira Brastemp 410L"></div>
+        <div class="grid-2">
+          <div class="field"><label>Valor Total (R$)</label><input id="pTotal" type="number" placeholder="2500"></div>
+          <div class="field"><label>Número de Parcelas</label><input id="pNParc" type="number" placeholder="12"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Parcelas Já Pagas</label><input id="pParcPagas" type="number" placeholder="0" value="0"></div>
+          <div class="field"><label>Dia do Vencimento</label><input id="pDia" type="number" placeholder="10" min="1" max="31"></div>
+        </div>
+      </div>
+
+      <!-- CAMPOS FIXO -->
+      <div id="campos_fixo" class="campo-extra">
+        <div class="alerta alerta-info" style="margin-bottom:12px;">📌 Custos fixos mensais: aluguel, escola, plano de saúde, etc.</div>
+        <div class="grid-2">
+          <div class="field"><label>Valor Mensal (R$)</label><input id="xValor" type="number" placeholder="800"></div>
+          <div class="field"><label>Dia do Vencimento</label><input id="xDia" type="number" placeholder="5" min="1" max="31"></div>
+        </div>
+        <div class="field"><label>Categoria</label>
+          <select id="xCategoria">
+            <option value="moradia">🏠 Moradia (aluguel/condomínio)</option>
+            <option value="educacao">📚 Educação (escola/curso)</option>
+            <option value="saude">❤️ Saúde (plano/academia)</option>
+            <option value="transporte">🚗 Transporte (seguro/IPVA)</option>
+            <option value="servicos">📡 Serviços (internet/streaming)</option>
             <option value="outros">📌 Outros</option>
           </select>
         </div>
       </div>
-      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:6px;" onclick="salvarDivida()">💾 Salvar Dívida</button>
+
+      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px;" onclick="salvarDivida()">💾 Salvar</button>
     </div>
   </div>
 </div>
 
+<!-- MODAL NOVA COMPRA NO CARTÃO -->
+<div id="modalCompra" class="modal">
+  <div class="modal-box">
+    <div class="modal-header" style="background:linear-gradient(135deg,#dc2626,#ef4444);">
+      <h3>🛒 Adicionar Compra no Cartão</h3>
+      <button class="modal-close" onclick="fecharModal('modalCompra')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;">
+        <span style="font-size:13px;color:#fca5a5;">Cartão: <strong id="compraNomeCartao">—</strong></span>
+      </div>
+      <div class="field"><label>Descrição da Compra</label><input id="cDesc" placeholder="Ex: Tênis Nike, Netflix, Mercado..."></div>
+      <div class="grid-2">
+        <div class="field"><label>Valor Total (R$)</label><input id="cValor" type="number" placeholder="350" oninput="calcParcCompra()"></div>
+        <div class="field"><label>Número de Parcelas</label><input id="cNParc" type="number" placeholder="1" value="1" oninput="calcParcCompra()"></div>
+      </div>
+      <div class="field">
+        <label>Valor da Parcela</label>
+        <input id="cParcCalc" type="number" placeholder="Calculado automaticamente" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:#34d399;padding:10px 12px;font-size:14px;outline:none;width:100%;" readonly>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Parcelas Já Pagas</label><input id="cParcPagas" type="number" placeholder="0" value="0"></div>
+        <div class="field"><label>Mês da Compra</label><input id="cMesCompra" type="month" value=""></div>
+      </div>
+      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px;" onclick="salvarCompraCartao()">🛒 Adicionar Compra</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RENDA -->
 <div id="modalRenda" class="modal">
   <div class="modal-box">
-    <div class="modal-header">
-      <h3>💰 Minha Renda</h3>
+    <div class="modal-header" style="background:linear-gradient(135deg,#059669,#10b981);">
+      <h3>💰 Minha Renda Mensal</h3>
       <button class="modal-close" onclick="fecharModal('modalRenda')">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="field"><label>Renda Mensal Líquida (R$)</label><input id="rRendaMensal" type="number" placeholder="3000"></div>
+      <div class="field"><label>Salário / Renda Principal (R$)</label><input id="rSalario" type="number" placeholder="3000"></div>
       <div class="field"><label>Outras Receitas (R$)</label><input id="rOutras" type="number" placeholder="0" value="0"></div>
-      <div class="field"><label>Gastos Fixos essenciais (R$)</label><input id="rGastos" type="number" placeholder="1200"><small style="color:var(--muted);font-size:11px;">Aluguel, alimentação, transporte, etc.</small></div>
-      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:10px;" onclick="salvarRenda()">💾 Salvar</button>
+      <div class="field"><label>Gastos Essenciais Fixos (R$)</label><input id="rGastos" type="number" placeholder="1200"><small style="color:var(--muted);font-size:11px;">Alimentação, transporte, higiene — SEM incluir parcelas de dívidas</small></div>
+      <button class="btn btn-success btn-lg" style="width:100%;margin-top:10px;" onclick="salvarRenda()">💾 Salvar Renda</button>
     </div>
   </div>
 </div>
 
-<div id="modalSimQuitacao" class="modal">
-  <div class="modal-box" style="max-width:600px;">
-    <div class="modal-header">
-      <h3>🧮 Simular Quitação</h3>
-      <button class="modal-close" onclick="fecharModal('modalSimQuitacao')">&times;</button>
+<!-- MODAL ANTECIPAR FINANCIAMENTO -->
+<div id="modalAntecipar" class="modal">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="modal-header" style="background:linear-gradient(135deg,#92400e,#f59e0b);">
+      <h3>⚡ Simular Antecipação de Parcelas</h3>
+      <button class="modal-close" onclick="fecharModal('modalAntecipar')">&times;</button>
     </div>
-    <div class="modal-body">
-      <div class="field"><label>Quanto você tem disponível agora (R$)</label><input id="simGrana" type="number" placeholder="2000" oninput="calcularSimulacao()"></div>
-      <div id="simResultados" style="margin-top:16px;"></div>
-    </div>
+    <div class="modal-body" id="conteudoAntecipar"></div>
   </div>
 </div>
 
-<!-- CONTEÚDO PRINCIPAL -->
 <div class="main" id="mainContent"></div>
 
 <script>
-// ─── ESTADO GLOBAL ────────────────────────────────────────────
-let estado = {
+// ─── ESTADO ───────────────────────────────────────────────────
+let E = {
   aba: 'dashboard',
   dividas: [],
-  renda: { mensal: 0, outras: 0, gastos: 0 },
-  mesAberto: null
+  renda: { salario:0, outras:0, gastos:0 },
+  tipoSelecionado: 'cartao',
+  cartaoAtivo: null,
+  estrategia: 'avalanche'
 };
 
-const CORES_TIPO = {
-  cartao:       { bg:'rgba(239,68,68,.15)',  cor:'#f87171',  icon:'💳' },
-  financiamento:{ bg:'rgba(245,158,11,.15)', cor:'#fbbf24',  icon:'🏍️' },
-  emprestimo:   { bg:'rgba(124,58,237,.15)', cor:'#a78bfa',  icon:'💰' },
-  cheque:       { bg:'rgba(6,182,212,.15)',  cor:'#22d3ee',  icon:'📋' },
-  outros:       { bg:'rgba(148,163,184,.15)',cor:'#94a3b8',  icon:'📌' }
+const TIPOS = {
+  cartao:        { icon:'💳', cor:'#f87171',  bg:'rgba(239,68,68,.15)',  label:'Cartão'        },
+  financiamento: { icon:'🏍️', cor:'#fbbf24',  bg:'rgba(245,158,11,.15)', label:'Financiamento' },
+  parcelado:     { icon:'📦', cor:'#a78bfa',  bg:'rgba(124,58,237,.15)', label:'Parcelado'     },
+  fixo:          { icon:'📌', cor:'#94a3b8',  bg:'rgba(148,163,184,.1)', label:'Custo Fixo'    }
 };
+
+const CAT_FIXO = { moradia:'🏠', educacao:'📚', saude:'❤️', transporte:'🚗', servicos:'📡', outros:'📌' };
 
 // ─── INIT ─────────────────────────────────────────────────────
 async function init() {
   await carregarDados();
   render();
-  atualizarStatus();
-}
-
-function atualizarStatus() {
-  const s = MVData.status();
-  document.getElementById('mvDot').style.background = s.online ? '#10b981' : '#ef4444';
-  document.getElementById('mvStatus').textContent = s.online ? 'Online' : 'Offline';
+  setTimeout(() => {
+    const s = MVData.status();
+    document.getElementById('mvDot').style.background = s.online ? '#10b981' : '#ef4444';
+    document.getElementById('mvStatus').textContent = s.online ? 'Online' : 'Offline';
+  }, 800);
 }
 
 // ─── DADOS ────────────────────────────────────────────────────
 async function carregarDados() {
   try {
-    const d = await MVData.buscar('financeiro', { tipo: 'dividas_v2' });
-    if (d.length) estado.dividas = d[0].dados || [];
-    const r = await MVData.buscar('financeiro', { tipo: 'renda_v2' });
-    if (r.length) estado.renda = r[0].dados || { mensal:0, outras:0, gastos:0 };
-  } catch(e) {
-    const d = localStorage.getItem('mv_dividas');
-    const r = localStorage.getItem('mv_renda');
-    if (d) estado.dividas = JSON.parse(d);
-    if (r) estado.renda = JSON.parse(r);
-  }
+    const d = await MVData.buscar('financeiro', { tipo: 'dividas_v3' });
+    if (d.length) E.dividas = d[0].dados || [];
+    const r = await MVData.buscar('financeiro', { tipo: 'renda_v3' });
+    if (r.length) E.renda = r[0].dados || { salario:0, outras:0, gastos:0 };
+  } catch(e) {}
+  // fallback localStorage
+  const ld = localStorage.getItem('mv_fin_dividas');
+  const lr = localStorage.getItem('mv_fin_renda');
+  if (!E.dividas.length && ld) E.dividas = JSON.parse(ld);
+  if (!E.renda.salario && lr) E.renda = JSON.parse(lr);
 }
 
 async function salvarDados() {
+  localStorage.setItem('mv_fin_dividas', JSON.stringify(E.dividas));
+  localStorage.setItem('mv_fin_renda',   JSON.stringify(E.renda));
   try {
-    await MVData.salvar('financeiro', { tipo:'dividas_v2', dados: estado.dividas });
-    await MVData.salvar('financeiro', { tipo:'renda_v2',   dados: estado.renda   });
+    await MVData.salvar('financeiro', { tipo:'dividas_v3', dados: E.dividas });
+    await MVData.salvar('financeiro', { tipo:'renda_v3',   dados: E.renda   });
   } catch(e) {}
-  localStorage.setItem('mv_dividas', JSON.stringify(estado.dividas));
-  localStorage.setItem('mv_renda',   JSON.stringify(estado.renda));
 }
 
 // ─── MODAIS ───────────────────────────────────────────────────
-function abrirModal(id)  { document.getElementById(id).classList.add('ativo'); }
-function fecharModal(id) { document.getElementById(id).classList.remove('ativo'); }
+function abrirModal(id) { document.getElementById(id).classList.add('ativo'); }
+function fecharModal(id){ document.getElementById(id).classList.remove('ativo'); }
+
+function selecionarTipo(tipo) {
+  E.tipoSelecionado = tipo;
+  ['cartao','financiamento','parcelado','fixo'].forEach(t => {
+    document.getElementById(`tipo_${t}`).classList.toggle('ativo', t === tipo);
+    const c = document.getElementById(`campos_${t}`);
+    c.classList.toggle('visivel', t === tipo);
+  });
+}
+
+function calcParcCompra() {
+  const v = parseFloat(document.getElementById('cValor').value) || 0;
+  const n = parseInt(document.getElementById('cNParc').value) || 1;
+  document.getElementById('cParcCalc').value = n > 0 ? (v/n).toFixed(2) : '';
+}
 
 async function salvarDivida() {
-  const nome    = document.getElementById('dNome').value.trim();
-  const total   = parseFloat(document.getElementById('dTotal').value)   || 0;
-  const pago    = parseFloat(document.getElementById('dPago').value)    || 0;
-  const parcela = parseFloat(document.getElementById('dParcela').value) || 0;
-  const juros   = parseFloat(document.getElementById('dJuros').value)   || 0;
-  const dia     = parseInt(document.getElementById('dDia').value)       || 1;
-  const tipo    = document.getElementById('dTipo').value;
-  if (!nome || !total || !parcela) { alert('Preencha nome, valor total e parcela!'); return; }
-  const restante = Math.max(total - pago, 0);
-  const mesesRestantes = parcela > 0 ? Math.ceil(restante / parcela) : 0;
-  estado.dividas.push({ id: Date.now(), nome, total, pago, parcela, juros, dia, tipo, restante, mesesRestantes, pagamentos: [], criado_em: new Date().toISOString() });
+  const nome = document.getElementById('dNome').value.trim();
+  if (!nome) { alert('Digite o nome!'); return; }
+  const tipo = E.tipoSelecionado;
+  let divida = { id: Date.now(), nome, tipo, pagamentos: [], criado_em: new Date().toISOString() };
+
+  if (tipo === 'cartao') {
+    divida.limite     = parseFloat(document.getElementById('dLimite').value) || 0;
+    divida.dia        = parseInt(document.getElementById('dDiaCartao').value) || 10;
+    divida.juros      = parseFloat(document.getElementById('dJurosCartao').value) || 0;
+    divida.compras    = [];
+  } else if (tipo === 'financiamento') {
+    divida.total      = parseFloat(document.getElementById('fTotal').value) || 0;
+    divida.pago       = parseFloat(document.getElementById('fPago').value) || 0;
+    divida.parcela    = parseFloat(document.getElementById('fParcela').value) || 0;
+    divida.juros      = parseFloat(document.getElementById('fJuros').value) || 0;
+    divida.dia        = parseInt(document.getElementById('fDia').value) || 15;
+    divida.totalParc  = parseInt(document.getElementById('fTotalParc').value) || 0;
+    divida.parcPagas  = parseInt(document.getElementById('fParcPagas').value) || 0;
+    divida.restante   = Math.max(divida.total - divida.pago, 0);
+    divida.mesesRestantes = divida.totalParc - divida.parcPagas;
+  } else if (tipo === 'parcelado') {
+    divida.descricao  = document.getElementById('pDesc').value;
+    divida.total      = parseFloat(document.getElementById('pTotal').value) || 0;
+    divida.nParc      = parseInt(document.getElementById('pNParc').value) || 1;
+    divida.parcPagas  = parseInt(document.getElementById('pParcPagas').value) || 0;
+    divida.dia        = parseInt(document.getElementById('pDia').value) || 10;
+    divida.parcela    = divida.nParc > 0 ? divida.total / divida.nParc : 0;
+    divida.mesesRestantes = divida.nParc - divida.parcPagas;
+    divida.restante   = divida.parcela * divida.mesesRestantes;
+    divida.pago       = divida.parcela * divida.parcPagas;
+  } else if (tipo === 'fixo') {
+    divida.valorMensal = parseFloat(document.getElementById('xValor').value) || 0;
+    divida.dia         = parseInt(document.getElementById('xDia').value) || 5;
+    divida.categoria   = document.getElementById('xCategoria').value;
+    divida.parcela     = divida.valorMensal;
+    divida.total       = 0; divida.restante = 0; divida.mesesRestantes = 999;
+  }
+
+  E.dividas.push(divida);
   await salvarDados();
   fecharModal('modalDivida');
-  ['dNome','dTotal','dPago','dParcela','dJuros','dDia'].forEach(id => document.getElementById(id).value = '');
   render();
 }
 
+function abrirNovaCompra(cartaoId) {
+  E.cartaoAtivo = cartaoId;
+  const cartao = E.dividas.find(d => d.id === cartaoId);
+  document.getElementById('compraNomeCartao').textContent = cartao?.nome || '—';
+  document.getElementById('cMesCompra').value = new Date().toISOString().slice(0,7);
+  document.getElementById('cDesc').value = '';
+  document.getElementById('cValor').value = '';
+  document.getElementById('cNParc').value = '1';
+  document.getElementById('cParcCalc').value = '';
+  document.getElementById('cParcPagas').value = '0';
+  abrirModal('modalCompra');
+}
+
+async function salvarCompraCartao() {
+  const cartao = E.dividas.find(d => d.id === E.cartaoAtivo);
+  if (!cartao) return;
+  const desc    = document.getElementById('cDesc').value.trim();
+  const valor   = parseFloat(document.getElementById('cValor').value) || 0;
+  const nParc   = parseInt(document.getElementById('cNParc').value) || 1;
+  const pagas   = parseInt(document.getElementById('cParcPagas').value) || 0;
+  const mes     = document.getElementById('cMesCompra').value;
+  if (!desc || !valor) { alert('Preencha descrição e valor!'); return; }
+  const parcela = valor / nParc;
+  cartao.compras = cartao.compras || [];
+  cartao.compras.push({ id: Date.now(), desc, valor, nParc, parcPagas: pagas, parcela: parseFloat(parcela.toFixed(2)), mes, criado_em: new Date().toISOString() });
+  await salvarDados();
+  fecharModal('modalCompra');
+  render();
+}
+
+async function excluirCompra(cartaoId, compraId) {
+  if (!confirm('Excluir esta compra?')) return;
+  const cartao = E.dividas.find(d => d.id === cartaoId);
+  if (cartao) { cartao.compras = cartao.compras.filter(c => c.id !== compraId); await salvarDados(); render(); }
+}
+
+async function pagarParcelaCompra(cartaoId, compraId) {
+  const cartao = E.dividas.find(d => d.id === cartaoId);
+  const compra = cartao?.compras?.find(c => c.id === compraId);
+  if (!compra) return;
+  const mes = new Date().toISOString().slice(0,7);
+  if (!compra.mesesPagos) compra.mesesPagos = [];
+  if (compra.mesesPagos.includes(mes)) {
+    compra.mesesPagos = compra.mesesPagos.filter(m => m !== mes);
+    compra.parcPagas = Math.max((compra.parcPagas||0) - 1, 0);
+  } else {
+    compra.mesesPagos.push(mes);
+    compra.parcPagas = Math.min((compra.parcPagas||0) + 1, compra.nParc);
+  }
+  await salvarDados(); render();
+}
+
+async function togglePagamento(id) {
+  const d = E.dividas.find(d => d.id === id);
+  if (!d || d.tipo === 'cartao') return;
+  const mes = new Date().toISOString().slice(0,7);
+  if (!d.pagamentos) d.pagamentos = [];
+  const idx = d.pagamentos.indexOf(mes);
+  if (idx === -1) {
+    d.pagamentos.push(mes);
+    if (d.tipo !== 'fixo') {
+      d.parcPagas = (d.parcPagas||0) + 1;
+      d.pago = (d.pago||0) + d.parcela;
+      d.restante = Math.max((d.restante||0) - d.parcela, 0);
+      d.mesesRestantes = Math.max((d.mesesRestantes||0) - 1, 0);
+    }
+  } else {
+    d.pagamentos.splice(idx, 1);
+    if (d.tipo !== 'fixo') {
+      d.parcPagas = Math.max((d.parcPagas||0) - 1, 0);
+      d.pago = Math.max((d.pago||0) - d.parcela, 0);
+      d.restante = (d.restante||0) + d.parcela;
+      d.mesesRestantes = (d.mesesRestantes||0) + 1;
+    }
+  }
+  await salvarDados(); render();
+}
+
+async function excluirDivida(id) {
+  if (!confirm('Excluir esta dívida?')) return;
+  E.dividas = E.dividas.filter(d => d.id !== id);
+  await salvarDados(); render();
+}
+
 async function salvarRenda() {
-  estado.renda = {
-    mensal:  parseFloat(document.getElementById('rRendaMensal').value) || 0,
-    outras:  parseFloat(document.getElementById('rOutras').value)      || 0,
-    gastos:  parseFloat(document.getElementById('rGastos').value)      || 0
+  E.renda = {
+    salario: parseFloat(document.getElementById('rSalario').value) || 0,
+    outras:  parseFloat(document.getElementById('rOutras').value)  || 0,
+    gastos:  parseFloat(document.getElementById('rGastos').value)  || 0
   };
   await salvarDados();
   fecharModal('modalRenda');
   render();
 }
 
-async function excluirDivida(id) {
-  if (!confirm('Excluir esta dívida?')) return;
-  estado.dividas = estado.dividas.filter(d => d.id !== id);
-  await salvarDados();
-  render();
-}
-
-async function togglePagamento(id) {
-  const d = estado.dividas.find(d => d.id === id);
-  if (!d) return;
-  const mesAtual = new Date().toISOString().slice(0,7);
-  const idx = d.pagamentos.indexOf(mesAtual);
-  if (idx === -1) {
-    d.pagamentos.push(mesAtual);
-    d.pago = Math.min(d.pago + d.parcela, d.total);
-    d.restante = Math.max(d.total - d.pago, 0);
-    d.mesesRestantes = d.parcela > 0 ? Math.ceil(d.restante / d.parcela) : 0;
-  } else {
-    d.pagamentos.splice(idx, 1);
-    d.pago = Math.max(d.pago - d.parcela, 0);
-    d.restante = Math.max(d.total - d.pago, 0);
-    d.mesesRestantes = d.parcela > 0 ? Math.ceil(d.restante / d.parcela) : 0;
-  }
-  await salvarDados();
-  render();
-}
-
 // ─── CÁLCULOS ─────────────────────────────────────────────────
-function calcTotais() {
-  const totalDividas  = estado.dividas.reduce((s,d) => s + d.total, 0);
-  const totalRestante = estado.dividas.reduce((s,d) => s + d.restante, 0);
-  const totalPago     = estado.dividas.reduce((s,d) => s + d.pago, 0);
-  const parcMensal    = estado.dividas.reduce((s,d) => s + d.parcela, 0);
-  const rendaTotal    = estado.renda.mensal + estado.renda.outras;
-  const rendaLivre    = rendaTotal - estado.renda.gastos - parcMensal;
-  const pctComprometido = rendaTotal > 0 ? ((parcMensal + estado.renda.gastos) / rendaTotal * 100) : 0;
-  const mesAtual = new Date().toISOString().slice(0,7);
-  const pagoEsteMes = estado.dividas.filter(d => d.pagamentos.includes(mesAtual)).reduce((s,d) => s + d.parcela, 0);
-  return { totalDividas, totalRestante, totalPago, parcMensal, rendaTotal, rendaLivre, pctComprometido, pagoEsteMes };
+const fmt  = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtk = v => v >= 1000 ? `R$ ${(v/1000).toFixed(1)}k` : `R$ ${fmt(v)}`;
+
+function calcCartao(d) {
+  const compras = d.compras || [];
+  const faturaAtual = compras.reduce((s,c) => {
+    const restantes = c.nParc - (c.parcPagas||0);
+    return restantes > 0 ? s + c.parcela : s;
+  }, 0);
+  const totalRestante = compras.reduce((s,c) => s + (c.parcela * Math.max(c.nParc - (c.parcPagas||0), 0)), 0);
+  const totalCompras  = compras.reduce((s,c) => s + c.valor, 0);
+  const totalPago     = compras.reduce((s,c) => s + (c.parcela * (c.parcPagas||0)), 0);
+  return { faturaAtual, totalRestante, totalCompras, totalPago };
 }
 
-function gerarPlanoAtaque(estrategia = 'avalanche') {
-  if (!estado.dividas.length) return [];
-  let dividas = estado.dividas.filter(d => d.restante > 0).map(d => ({...d}));
-  if (estrategia === 'avalanche') dividas.sort((a,b) => b.juros - a.juros);
-  if (estrategia === 'snowball')  dividas.sort((a,b) => a.restante - b.restante);
+function calcTotais() {
+  const rendaTotal = E.renda.salario + E.renda.outras;
+  let parcMensal = 0, totalRestante = 0, totalDividas = 0;
+  E.dividas.forEach(d => {
+    if (d.tipo === 'cartao') {
+      const c = calcCartao(d);
+      parcMensal    += c.faturaAtual;
+      totalRestante += c.totalRestante;
+      totalDividas  += c.totalCompras;
+    } else if (d.tipo === 'fixo') {
+      parcMensal += d.valorMensal || 0;
+    } else {
+      parcMensal    += d.parcela || 0;
+      totalRestante += d.restante || 0;
+      totalDividas  += d.total || 0;
+    }
+  });
+  const rendaLivre = rendaTotal - E.renda.gastos - parcMensal;
+  const pctComp    = rendaTotal > 0 ? ((parcMensal + E.renda.gastos) / rendaTotal * 100) : 0;
+  const mes = new Date().toISOString().slice(0,7);
+  const pagoMes = E.dividas.filter(d => d.tipo !== 'cartao' && (d.pagamentos||[]).includes(mes)).reduce((s,d)=>s+d.parcela,0);
+  return { rendaTotal, parcMensal, totalRestante, totalDividas, rendaLivre, pctComp, pagoMes };
+}
+
+function gerarPlano(estrategia = 'avalanche') {
+  const divAtivas = E.dividas.filter(d => d.tipo !== 'fixo').map(d => {
+    if (d.tipo === 'cartao') {
+      const c = calcCartao(d);
+      return { id:d.id, nome:d.nome, tipo:d.tipo, restante:c.totalRestante, parcela:c.faturaAtual, juros:d.juros||0, dia:d.dia||10 };
+    }
+    return { id:d.id, nome:d.nome, tipo:d.tipo, restante:d.restante||0, parcela:d.parcela||0, juros:d.juros||0, dia:d.dia||10 };
+  }).filter(d => d.restante > 0).map(d => ({...d}));
+
+  if (estrategia === 'avalanche') divAtivas.sort((a,b) => b.juros - a.juros);
+  if (estrategia === 'snowball')  divAtivas.sort((a,b) => a.restante - b.restante);
+
   const t = calcTotais();
   const extra = Math.max(t.rendaLivre, 0);
   const plano = [];
-  let mes = 1;
-  while (dividas.some(d => d.restante > 0) && mes <= 60) {
+  let mes = 1, divs = divAtivas;
+
+  while (divs.some(d => d.restante > 0) && mes <= 60) {
     const pagamentos = [];
-    let extraDisponivel = extra;
-    dividas.forEach((d, i) => {
+    let extraDisp = extra;
+    divs.forEach((d, i) => {
       if (d.restante <= 0) return;
       let pag = d.parcela;
-      if (i === 0 && extraDisponivel > 0) { pag += extraDisponivel; extraDisponivel = 0; }
+      if (i === 0 && extraDisp > 0) { pag += extraDisp; extraDisp = 0; }
       pag = Math.min(pag, d.restante);
       d.restante = Math.max(d.restante - pag, 0);
-      pagamentos.push({ nome: d.nome, valor: pag, restante: d.restante, dia: d.dia, tipo: d.tipo });
+      pagamentos.push({ nome:d.nome, tipo:d.tipo, valor:pag, restante:d.restante, dia:d.dia });
     });
-    const data = new Date();
-    data.setMonth(data.getMonth() + mes - 1);
-    plano.push({
-      mes,
-      label: data.toLocaleDateString('pt-BR', { month:'long', year:'numeric' }),
-      pagamentos,
-      totalPago: pagamentos.reduce((s,p) => s + p.valor, 0),
-      dividasAtivas: dividas.filter(d => d.restante > 0).length
-    });
+    const data = new Date(); data.setMonth(data.getMonth() + mes - 1);
+    plano.push({ mes, label: data.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}), pagamentos, totalPago: pagamentos.reduce((s,p)=>s+p.valor,0), ativas: divs.filter(d=>d.restante>0).length });
     mes++;
-    dividas = dividas.filter(d => d.restante > 0);
+    divs = divs.filter(d => d.restante > 0);
   }
   return plano;
 }
 
-function calcularSimulacao() {
-  const grana = parseFloat(document.getElementById('simGrana').value) || 0;
-  const div = document.getElementById('simResultados');
-  if (!grana || !estado.dividas.length) { div.innerHTML = ''; return; }
-  const dividas = estado.dividas.filter(d => d.restante > 0).sort((a,b) => b.juros - a.juros);
-  const cenarios = [];
+function simularAntecipacao(d) {
+  const div = document.getElementById('conteudoAntecipar');
+  const parcRestantes = d.mesesRestantes || 0;
+  const juros = d.juros || 0;
 
-  // Cenário 1: Maior juros
-  const c1 = dividas[0];
-  if (c1) {
-    const quitaTotal = grana >= c1.restante;
-    const economiaJuros = quitaTotal ? (c1.mesesRestantes * c1.restante * c1.juros/100) : (grana * c1.juros/100 * 12);
-    cenarios.push({ tag:'🔥 Melhor opção', classe:'melhor', tagCor:'#34d399', tagBg:'rgba(16,185,129,.2)', titulo: quitaTotal ? `Quitar ${c1.nome} (R$ ${fmt(c1.restante)})` : `Abater R$ ${fmt(grana)} em ${c1.nome}`, economia:`Economiza ~R$ ${fmt(economiaJuros)} em juros`, detalhe: quitaTotal ? `✅ Quita totalmente! Parcela de R$ ${fmt(c1.parcela)}/mês liberada` : `Reduz saldo de R$ ${fmt(c1.restante)} → R$ ${fmt(c1.restante-grana)}`, impacto: c1.juros });
-  }
+  div.innerHTML = `
+    <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:14px;margin-bottom:16px;">
+      <div style="font-weight:700;color:#fbbf24;margin-bottom:4px;">🏍️ ${d.nome}</div>
+      <div style="font-size:13px;color:var(--muted);">Parcela: R$ ${fmt(d.parcela)} · Restam ${parcRestantes} parcelas · Juros: ${juros}% a.m.</div>
+    </div>
+    <div class="field"><label>Quantas parcelas quer antecipar?</label>
+      <input type="number" id="antecQtd" placeholder="Ex: 6" min="1" max="${parcRestantes}" oninput="calcAntecipar(${d.id})">
+    </div>
+    <div id="resultAntecipar"></div>`;
+  abrirModal('modalAntecipar');
+  window._antecDivida = d;
+}
 
-  // Cenário 2: Menor saldo
-  const c2 = [...dividas].sort((a,b) => a.restante - b.restante)[0];
-  if (c2 && c2 !== c1) {
-    const quitaTotal = grana >= c2.restante;
-    cenarios.push({ tag: quitaTotal ? '✅ Elimina dívida' : '⚡ Alternativa', classe: quitaTotal ? 'melhor' : 'neutro', tagCor: quitaTotal ? '#34d399':'#fbbf24', tagBg: quitaTotal ? 'rgba(16,185,129,.2)':'rgba(245,158,11,.2)', titulo: quitaTotal ? `Quitar ${c2.nome} (R$ ${fmt(c2.restante)})` : `Abater em ${c2.nome}`, economia: quitaTotal ? `Libera R$ ${fmt(c2.parcela)}/mês` : `Reduz saldo`, detalhe: quitaTotal ? `Parcela de R$ ${fmt(c2.parcela)}/mês fica livre para atacar próxima dívida` : `Saldo de R$ ${fmt(c2.restante)} → R$ ${fmt(c2.restante-grana)}`, impacto: c2.juros });
-  }
+function calcAntecipar(divId) {
+  const d = window._antecDivida;
+  const qtd = parseInt(document.getElementById('antecQtd').value) || 0;
+  const div = document.getElementById('resultAntecipar');
+  if (!qtd || qtd > d.mesesRestantes) { div.innerHTML = ''; return; }
 
-  // Cenário 3: Guardar como reserva
-  cenarios.push({ tag:'⚠️ Menos indicado', classe:'pior', tagCor:'#f87171', tagBg:'rgba(239,68,68,.15)', titulo:'Guardar como reserva', economia:'Sem economia em juros', detalhe:`Suas dívidas continuam gerando juros enquanto o dinheiro rende menos`, impacto: 0 });
+  const valorBruto = d.parcela * qtd;
+  const desconto   = juros => {
+    let total = 0;
+    for (let i = 1; i <= qtd; i++) total += d.parcela / Math.pow(1 + juros/100, i);
+    return total;
+  };
+  const valorComDesconto = desconto(d.juros);
+  const economiaReal     = valorBruto - valorComDesconto;
+  const mesesLivres      = qtd;
 
-  div.innerHTML = cenarios.map(c => `
-    <div class="sim-opcao ${c.classe}" style="margin-bottom:12px;">
-      <div><span class="sim-tag" style="background:${c.tagBg};color:${c.tagCor};">${c.tag}</span></div>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">${c.titulo}</div>
-      <div style="font-size:13px;color:#34d399;margin-bottom:4px;">💰 ${c.economia}</div>
-      <div style="font-size:12px;color:var(--muted);">${c.detalhe}</div>
-    </div>`).join('');
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Valor sem desconto</div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#f87171;">R$ ${fmt(valorBruto)}</div>
+      </div>
+      <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Valor com desconto</div>
+        <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#34d399;">R$ ${fmt(valorComDesconto)}</div>
+      </div>
+    </div>
+    <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:16px;">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;color:#a78bfa;margin-bottom:10px;">📊 Resultado da Antecipação</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">💰 Economia real em juros</span><span style="color:#34d399;font-weight:700;">R$ ${fmt(economiaReal)}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">📅 Meses que ficam livres</span><span style="color:#a78bfa;font-weight:700;">${mesesLivres} meses</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">⚡ Parcela mensal liberada</span><span style="color:#22d3ee;font-weight:700;">R$ ${fmt(d.parcela)}/mês</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">🎯 Retorno mensal equivalente</span><span style="color:#fbbf24;font-weight:700;">${d.juros}% a.m.</span></div>
+      </div>
+    </div>
+    <div class="alerta alerta-${economiaReal > 0 ? 'success' : 'warn'}" style="margin-top:12px;">
+      ${economiaReal > 0
+        ? `✅ Vale a pena! Você economiza R$ ${fmt(economiaReal)} e libera R$ ${fmt(d.parcela)}/mês por ${mesesLivres} meses.`
+        : `⚠️ Verifique com a financeira — a economia pode variar.`}
+    </div>`;
 }
 
 // ─── RENDER ───────────────────────────────────────────────────
 function trocarAba(aba) {
-  estado.aba = aba;
+  E.aba = aba;
   document.querySelectorAll('.menu-tab').forEach((t,i) => {
-    const abas = ['dashboard','dividas','simulador','plano'];
-    t.classList.toggle('ativo', abas[i] === aba);
+    t.classList.toggle('ativo', ['dashboard','dividas','simulador','plano'][i] === aba);
   });
   render();
 }
 
 function render() {
-  const c = document.getElementById('mainContent');
-  const renders = { dashboard: renderDashboard, dividas: renderDividas, simulador: renderSimulador, plano: renderPlano };
-  c.innerHTML = renders[estado.aba]();
-  if (estado.aba === 'dashboard') renderGraficos();
+  const renders = { dashboard:renderDashboard, dividas:renderDividas, simulador:renderSimulador, plano:renderPlano };
+  document.getElementById('mainContent').innerHTML = renders[E.aba]();
+  if (E.aba === 'dashboard') setTimeout(renderGraficos, 50);
 }
-
-const fmt = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtk = v => v >= 1000 ? `R$ ${(v/1000).toFixed(1)}k` : `R$ ${fmt(v)}`;
 
 function renderDashboard() {
   const t = calcTotais();
-  const mesAtual = new Date().toISOString().slice(0,7);
-  const dividasPendentes = estado.dividas.filter(d => d.restante > 0 && !d.pagamentos.includes(mesAtual));
-  const dividasPagas = estado.dividas.filter(d => d.pagamentos.includes(mesAtual));
-  const progGeral = t.totalDividas > 0 ? (t.totalPago / t.totalDividas * 100) : 0;
+  const mes = new Date().toISOString().slice(0,7);
+  const divPendentes = E.dividas.filter(d => {
+    if (d.tipo === 'fixo') return !(d.pagamentos||[]).includes(mes);
+    if (d.tipo === 'cartao') return calcCartao(d).faturaAtual > 0 && !(d.pagamentos||[]).includes(mes);
+    return d.restante > 0 && !(d.pagamentos||[]).includes(mes);
+  });
+  const progGeral = t.totalDividas > 0 ? ((t.totalDividas - t.totalRestante) / t.totalDividas * 100) : 0;
 
   return `
-  ${!estado.renda.mensal ? `
-    <div class="alerta alerta-warn" style="margin-bottom:20px;">
-      ⚠️ Configure sua renda para ativar todas as funcionalidades
-      <button class="btn btn-sm btn-outline" style="margin-left:12px;" onclick="abrirModal('modalRenda')">Configurar →</button>
-    </div>` : ''}
+  ${!E.renda.salario ? `<div class="alerta alerta-warn">⚠️ Configure sua renda para ativar simulações <button class="btn btn-sm btn-outline" style="margin-left:10px;" onclick="abrirModal('modalRenda')">Configurar →</button></div>` : ''}
 
-  <!-- RENDA BANNER -->
   <div class="renda-banner">
-    <div class="renda-info">
-      <label>Renda Total</label>
-      <div class="renda-valor">R$ ${fmt(estado.renda.mensal + estado.renda.outras)}</div>
-    </div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;">Renda Total</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;">R$ ${fmt(t.rendaTotal)}</div></div>
     <div style="text-align:center;">
       <div style="font-size:11px;color:var(--muted);">Comprometido</div>
-      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${t.pctComprometido>80?'#f87171':t.pctComprometido>60?'#fbbf24':'#34d399'};">${t.pctComprometido.toFixed(0)}%</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:${t.pctComp>80?'#f87171':t.pctComp>60?'#fbbf24':'#34d399'};">${t.pctComp.toFixed(0)}%</div>
     </div>
     <div style="text-align:right;">
       <div style="font-size:11px;color:var(--muted);">Livre por mês</div>
-      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${t.rendaLivre>=0?'#34d399':'#f87171'};">R$ ${fmt(t.rendaLivre)}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:${t.rendaLivre>=0?'#34d399':'#f87171'};">R$ ${fmt(t.rendaLivre)}</div>
     </div>
     <button class="btn btn-sm btn-outline" onclick="abrirModal('modalRenda')">✏️ Editar</button>
   </div>
 
-  <!-- KPIs -->
-  <div class="grid-4" style="margin-bottom:20px;">
+  <div class="grid-4" style="margin-bottom:16px;">
     <div class="kpi" style="border-left:4px solid #ef4444;">
-      <div class="kpi-label">Total em Dívidas</div>
+      <div class="kpi-label">Total Dívidas</div>
       <div class="kpi-valor" style="color:#f87171;">${fmtk(t.totalRestante)}</div>
-      <div class="kpi-sub">${t.totalPago > 0 ? `R$ ${fmt(t.totalPago)} já pago` : `${estado.dividas.length} dívidas`}</div>
+      <div class="kpi-sub">${progGeral.toFixed(0)}% quitado</div>
     </div>
     <div class="kpi" style="border-left:4px solid #f59e0b;">
-      <div class="kpi-label">Parcelas este mês</div>
+      <div class="kpi-label">Parcelas/mês</div>
       <div class="kpi-valor" style="color:#fbbf24;">R$ ${fmt(t.parcMensal)}</div>
-      <div class="kpi-sub">${dividasPagas.length}/${estado.dividas.filter(d=>d.restante>0).length} pagas</div>
+      <div class="kpi-sub">${divPendentes.length} pendente(s)</div>
     </div>
     <div class="kpi" style="border-left:4px solid #10b981;">
-      <div class="kpi-label">Progresso Geral</div>
+      <div class="kpi-label">Progresso</div>
       <div class="kpi-valor" style="color:#34d399;">${progGeral.toFixed(0)}%</div>
       <div class="kpi-sub">do total quitado</div>
     </div>
     <div class="kpi" style="border-left:4px solid #7c3aed;">
-      <div class="kpi-label">Previsão Quitação</div>
-      <div class="kpi-valor" style="color:#a78bfa;">${gerarPlanoAtaque().length || '—'} meses</div>
-      <div class="kpi-sub">pelo método Avalanche</div>
+      <div class="kpi-label">Quitação em</div>
+      <div class="kpi-valor" style="color:#a78bfa;">${gerarPlano().length || '—'} meses</div>
+      <div class="kpi-sub">método Avalanche</div>
     </div>
   </div>
 
-  <!-- GRÁFICOS -->
-  <div class="grid-2" style="margin-bottom:20px;">
-    <div class="card">
-      <div class="card-title">📊 Distribuição das Dívidas</div>
-      <div class="chart-wrap"><canvas id="chartPizza"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">📈 Progresso de Quitação</div>
-      <div class="chart-wrap"><canvas id="chartLinha"></canvas></div>
-    </div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card"><div class="card-title">📊 Distribuição das Dívidas</div><div class="chart-wrap"><canvas id="chartPizza"></canvas></div></div>
+    <div class="card"><div class="card-title">📈 Projeção de Quitação</div><div class="chart-wrap"><canvas id="chartLinha"></canvas></div></div>
   </div>
 
-  <!-- PROGRESSO GERAL -->
-  <div class="card" style="margin-bottom:20px;">
-    <div class="card-title">💳 Situação das Dívidas este Mês</div>
-    ${estado.dividas.filter(d=>d.restante>0).length === 0 ? `<div class="empty"><div class="empty-icon">🎉</div><h3>Nenhuma dívida ativa!</h3></div>` :
-    estado.dividas.filter(d=>d.restante>0).map(d => {
-      const pago = d.pagamentos.includes(mesAtual);
-      const prog = d.total > 0 ? (d.pago/d.total*100) : 0;
-      const c = CORES_TIPO[d.tipo] || CORES_TIPO.outros;
+  <div class="card">
+    <div class="card-title">💳 Situação Atual
+      <button class="btn btn-sm btn-primary" onclick="abrirModal('modalDivida')">➕ Nova Dívida</button>
+    </div>
+    ${E.dividas.length === 0 ? `<div style="text-align:center;padding:32px;color:var(--muted);">Nenhuma dívida cadastrada ainda</div>` :
+    E.dividas.map(d => {
+      const T = TIPOS[d.tipo]||TIPOS.fixo;
+      const pago = (d.pagamentos||[]).includes(mes);
+      let parcMes = 0, restante = 0, prog = 0, extra = '';
+      if (d.tipo === 'cartao') {
+        const c = calcCartao(d);
+        parcMes = c.faturaAtual; restante = c.totalRestante;
+        prog = c.totalCompras > 0 ? (c.totalPago/c.totalCompras*100) : 0;
+        extra = `<span style="font-size:11px;color:var(--muted);">${(d.compras||[]).length} compras · limite R$ ${fmt(d.limite)}</span>`;
+      } else if (d.tipo === 'fixo') {
+        parcMes = d.valorMensal; extra = `<span style="font-size:11px;color:var(--muted);">${CAT_FIXO[d.categoria]||'📌'} ${d.categoria}</span>`;
+      } else {
+        parcMes = d.parcela; restante = d.restante||0;
+        prog = d.total > 0 ? ((d.pago||0)/d.total*100) : 0;
+        extra = `<span style="font-size:11px;color:var(--muted);">${d.mesesRestantes||0} meses · ${d.juros||0}% a.m.</span>`;
+      }
       return `
-      <div class="divida-item" style="margin-bottom:8px;">
-        <div class="divida-icon" style="background:${c.bg};">${c.icon}</div>
-        <div class="divida-info">
-          <div class="divida-nome">${d.nome}</div>
-          <div class="divida-detalhe">Vence dia ${d.dia} · ${d.mesesRestantes} meses restantes · ${d.juros}% a.m.</div>
-          <div class="divida-progress"><div class="divida-progress-bar" style="width:${prog}%;background:${c.cor};"></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;border-radius:9px;background:${T.bg};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${T.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:14px;">${d.nome}</div>
+          ${extra}
+          ${d.tipo !== 'fixo' ? `<div class="progress-bar" style="margin-top:5px;"><div class="progress-fill" style="width:${prog.toFixed(0)}%;background:${T.cor};"></div></div>` : ''}
         </div>
-        <div class="divida-valores">
-          <div class="divida-parcela">R$ ${fmt(d.parcela)}</div>
-          <div class="divida-total">Restam R$ ${fmt(d.restante)}</div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'Syne',sans-serif;font-weight:800;color:${T.cor};">R$ ${fmt(parcMes)}<span style="font-size:11px;font-weight:400;color:var(--muted);">/mês</span></div>
+          ${restante > 0 ? `<div style="font-size:11px;color:var(--muted);">Restam R$ ${fmt(restante)}</div>` : ''}
         </div>
-        <div class="divida-acoes">
-          <button class="btn-pagar ${pago?'pago':''}" onclick="togglePagamento(${d.id})">
-            ${pago ? '✅ Pago' : '○ Pagar'}
-          </button>
-        </div>
+        <button onclick="togglePagamento(${d.id})" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid ${pago?'rgba(16,185,129,.3)':'var(--border)'};background:${pago?'rgba(16,185,129,.15)':'transparent'};color:${pago?'#34d399':'var(--muted)'};">
+          ${pago ? '✅ Pago' : '○ Pagar'}
+        </button>
       </div>`}).join('')}
-    ${dividasPendentes.length > 0 ? `
-      <div class="alerta alerta-warn" style="margin-top:12px;">
-        ⚠️ ${dividasPendentes.length} dívida(s) pendente(s) este mês — total de R$ ${fmt(dividasPendentes.reduce((s,d)=>s+d.parcela,0))}
-      </div>` : dividasPagas.length > 0 ? `
-      <div class="alerta alerta-success" style="margin-top:12px;">
-        ✅ Todas as parcelas deste mês foram pagas!
-      </div>` : ''}
+    ${divPendentes.length > 0 ? `<div class="alerta alerta-warn" style="margin-top:8px;">⚠️ ${divPendentes.length} pendente(s) — R$ ${fmt(divPendentes.reduce((s,d)=>s+(d.tipo==='cartao'?calcCartao(d).faturaAtual:d.tipo==='fixo'?d.valorMensal:d.parcela),0))} este mês</div>` : ''}
   </div>
 
-  <!-- AÇÕES RÁPIDAS -->
   <div class="grid-2">
     <button class="btn btn-primary btn-lg" style="width:100%;" onclick="abrirModal('modalDivida')">➕ Adicionar Dívida</button>
-    <button class="btn btn-outline btn-lg" style="width:100%;" onclick="abrirModal('modalSimQuitacao')">🧮 Simular Quitação</button>
+    <button class="btn btn-outline btn-lg" style="width:100%;" onclick="trocarAba('simulador')">🧮 Ver Simulações</button>
   </div>`;
 }
 
 function renderGraficos() {
-  if (!estado.dividas.length) return;
-
   // Pizza
   const ctx1 = document.getElementById('chartPizza');
-  if (ctx1) {
-    const labels = estado.dividas.map(d => d.nome);
-    const valores = estado.dividas.map(d => d.restante);
-    const cores = estado.dividas.map(d => (CORES_TIPO[d.tipo]||CORES_TIPO.outros).cor);
-    new Chart(ctx1, {
-      type: 'doughnut',
-      data: { labels, datasets: [{ data: valores, backgroundColor: cores, borderWidth: 2, borderColor: '#111118' }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins: { legend:{ position:'right', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12 } } } }
-    });
+  if (ctx1 && E.dividas.length) {
+    const labels = E.dividas.map(d => d.nome);
+    const valores = E.dividas.map(d => d.tipo==='cartao' ? calcCartao(d).totalRestante : d.tipo==='fixo' ? d.valorMensal*12 : (d.restante||0));
+    const cores = E.dividas.map(d => (TIPOS[d.tipo]||TIPOS.fixo).cor);
+    new Chart(ctx1, { type:'doughnut', data:{ labels, datasets:[{ data:valores, backgroundColor:cores, borderWidth:2, borderColor:'#111118' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ color:'#94a3b8', font:{size:10}, boxWidth:10 } } } } });
   }
-
-  // Linha — projeção
+  // Linha
   const ctx2 = document.getElementById('chartLinha');
   if (ctx2) {
-    const plano = gerarPlanoAtaque();
-    const labels = plano.slice(0,12).map(p => p.label.split(' ')[0].substring(0,3));
-    const valores = plano.slice(0,12).map((p,i,arr) => {
-      const t = calcTotais();
-      const pago = arr.slice(0,i+1).reduce((s,x)=>s+x.totalPago,0);
-      return Math.max(t.totalRestante - pago, 0);
-    });
-    new Chart(ctx2, {
-      type: 'line',
-      data: { labels, datasets: [{ label:'Dívida Restante', data: valores, borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,.1)', fill:true, tension:.4, pointBackgroundColor:'#7c3aed', pointRadius:4 }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{color:'#94a3b8',font:{size:10}}, grid:{color:'#1e1e2e'} }, y:{ ticks:{color:'#94a3b8',font:{size:10},callback:v=>`R$${(v/1000).toFixed(0)}k`}, grid:{color:'#1e1e2e'} } } }
-    });
+    const plano = gerarPlano();
+    const t = calcTotais();
+    let acum = 0;
+    const labels = ['Hoje', ...plano.slice(0,11).map(p => p.label.split(' ')[0].substring(0,3))];
+    const valores = [t.totalRestante, ...plano.slice(0,11).map(p => { acum += p.totalPago; return Math.max(t.totalRestante - acum, 0); })];
+    new Chart(ctx2, { type:'line', data:{ labels, datasets:[{ label:'Dívida Restante', data:valores, borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,.1)', fill:true, tension:.4, pointBackgroundColor:'#7c3aed', pointRadius:3 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{ ticks:{color:'#94a3b8',font:{size:9}}, grid:{color:'#1e1e2e'} }, y:{ ticks:{color:'#94a3b8',font:{size:9}, callback:v=>`R$${(v/1000).toFixed(0)}k`}, grid:{color:'#1e1e2e'} } } } });
   }
 }
 
-
 function renderDividas() {
+  const mes = new Date().toISOString().slice(0,7);
   return `
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
     <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">💳 Minhas Dívidas</h2>
     <button class="btn btn-primary" onclick="abrirModal('modalDivida')">➕ Nova Dívida</button>
   </div>
-  ${estado.dividas.length === 0 ? `
-    <div class="empty">
-      <div class="empty-icon">💳</div>
-      <h3>Nenhuma dívida cadastrada</h3>
-      <p style="margin-bottom:20px;">Cadastre suas dívidas para começar o plano de quitação</p>
-      <button class="btn btn-primary btn-lg" onclick="abrirModal('modalDivida')">➕ Adicionar Primeira Dívida</button>
-    </div>` :
-  estado.dividas.map(d => {
-    const mesAtual = new Date().toISOString().slice(0,7);
-    const pago = d.pagamentos.includes(mesAtual);
-    const prog = d.total > 0 ? (d.pago/d.total*100) : 0;
-    const c = CORES_TIPO[d.tipo] || CORES_TIPO.outros;
+  ${E.dividas.length === 0 ? `<div style="text-align:center;padding:48px 20px;color:var(--muted);"><div style="font-size:48px;margin-bottom:12px;">💳</div><h3 style="font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px;">Nenhuma dívida cadastrada</h3><button class="btn btn-primary btn-lg" onclick="abrirModal('modalDivida')">➕ Adicionar Dívida</button></div>` :
+  E.dividas.map(d => {
+    const T = TIPOS[d.tipo]||TIPOS.fixo;
+    const pago = (d.pagamentos||[]).includes(mes);
+    let corpo = '';
+
+    if (d.tipo === 'cartao') {
+      const c = calcCartao(d);
+      const compras = d.compras||[];
+      corpo = `
+      <div style="padding:12px 16px;background:rgba(239,68,68,.06);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div><span style="font-size:12px;color:var(--muted);">Fatura este mês</span><div style="font-family:'Syne',sans-serif;font-weight:800;color:#f87171;font-size:20px;">R$ ${fmt(c.faturaAtual)}</div></div>
+        <div><span style="font-size:12px;color:var(--muted);">Total restante</span><div style="font-family:'Syne',sans-serif;font-weight:700;color:#f87171;font-size:16px;">R$ ${fmt(c.totalRestante)}</div></div>
+        <div><span style="font-size:12px;color:var(--muted);">Limite</span><div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);font-size:16px;">R$ ${fmt(d.limite)}</div></div>
+        <button class="btn btn-sm" style="background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3);" onclick="abrirNovaCompra(${d.id})">🛒 + Compra</button>
+      </div>
+      <div class="divida-body aberto" id="corpo_${d.id}">
+        ${compras.length === 0 ? `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Nenhuma compra adicionada ainda</div>` :
+        compras.map(c => {
+          const restParc = c.nParc - (c.parcPagas||0);
+          const pagoMes  = (c.mesesPagos||[]).includes(mes);
+          const prog = c.nParc > 0 ? ((c.parcPagas||0)/c.nParc*100) : 0;
+          return `
+          <div class="compra-item" style="flex-wrap:wrap;gap:6px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;color:var(--text);">${c.desc}</div>
+              <div style="font-size:11px;color:var(--muted);">${c.parcPagas||0}/${c.nParc} parcelas · R$ ${fmt(c.parcela)}/mês</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${prog.toFixed(0)}%;background:#f87171;"></div></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:700;color:${restParc>0?'#f87171':'#34d399'};">${restParc > 0 ? `R$ ${fmt(c.parcela * restParc)} restam` : '✅ Quitado'}</div>
+              <div style="font-size:11px;color:var(--muted);">${restParc} parcelas</div>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <button onclick="pagarParcelaCompra(${d.id},${c.id})" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid ${pagoMes?'rgba(16,185,129,.3)':'var(--border)'};background:${pagoMes?'rgba(16,185,129,.15)':'transparent'};color:${pagoMes?'#34d399':'var(--muted)'};">${pagoMes?'✅ Pago':'○ Pagar'}</button>
+              <button onclick="excluirCompra(${d.id},${c.id})" style="padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);">🗑</button>
+            </div>
+          </div>`}).join('')}
+      </div>`;
+    } else if (d.tipo === 'financiamento') {
+      const prog = d.totalParc > 0 ? (d.parcPagas/d.totalParc*100) : 0;
+      corpo = `
+      <div style="padding:12px 16px;background:rgba(245,158,11,.06);">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div><span style="font-size:11px;color:var(--muted);">Parcela</span><div style="font-family:'Syne',sans-serif;font-weight:800;color:#fbbf24;">R$ ${fmt(d.parcela)}/mês</div></div>
+          <div><span style="font-size:11px;color:var(--muted);">Restante</span><div style="font-family:'Syne',sans-serif;font-weight:700;color:#fbbf24;">R$ ${fmt(d.restante)}</div></div>
+          <div><span style="font-size:11px;color:var(--muted);">Parcelas</span><div style="font-weight:700;color:var(--text);">${d.parcPagas}/${d.totalParc}</div></div>
+          <div style="display:flex;gap:6px;">
+            <button onclick="togglePagamento(${d.id})" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid ${pago?'rgba(16,185,129,.3)':'var(--border)'};background:${pago?'rgba(16,185,129,.15)':'transparent'};color:${pago?'#34d399':'var(--muted)'};">${pago?'✅ Pago':'○ Pagar'}</button>
+            <button onclick="simularAntecipacao(E.dividas.find(x=>x.id===${d.id}))" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3);">⚡ Antecipar</button>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${prog.toFixed(0)}%;background:#fbbf24;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted);"><span>${prog.toFixed(0)}% pago</span><span>${d.mesesRestantes} meses restantes · ${d.juros}% a.m.</span></div>
+      </div>`;
+    } else if (d.tipo === 'parcelado') {
+      const prog = d.nParc > 0 ? (d.parcPagas/d.nParc*100) : 0;
+      corpo = `
+      <div style="padding:12px 16px;background:rgba(124,58,237,.06);">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${d.descricao||''}</div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <div><span style="font-size:11px;color:var(--muted);">Parcela</span><div style="font-family:'Syne',sans-serif;font-weight:800;color:#a78bfa;">R$ ${fmt(d.parcela)}/mês</div></div>
+          <div><span style="font-size:11px;color:var(--muted);">Progresso</span><div style="font-weight:700;color:var(--text);">${d.parcPagas}/${d.nParc}</div></div>
+          <button onclick="togglePagamento(${d.id})" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid ${pago?'rgba(16,185,129,.3)':'var(--border)'};background:${pago?'rgba(16,185,129,.15)':'transparent'};color:${pago?'#34d399':'var(--muted)'};">${pago?'✅ Pago':'○ Pagar'}</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${prog.toFixed(0)}%;background:#a78bfa;"></div></div>
+      </div>`;
+    } else if (d.tipo === 'fixo') {
+      corpo = `
+      <div style="padding:12px 16px;background:rgba(148,163,184,.06);display:flex;justify-content:space-between;align-items:center;">
+        <div><span style="font-size:11px;color:var(--muted);">${CAT_FIXO[d.categoria]||'📌'} Vence dia ${d.dia}</span><div style="font-family:'Syne',sans-serif;font-weight:800;color:#94a3b8;">R$ ${fmt(d.valorMensal)}/mês</div></div>
+        <button onclick="togglePagamento(${d.id})" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid ${pago?'rgba(16,185,129,.3)':'var(--border)'};background:${pago?'rgba(16,185,129,.15)':'transparent'};color:${pago?'#34d399':'var(--muted)'};">${pago?'✅ Pago':'○ Pagar'}</button>
+      </div>`;
+    }
+
     return `
-    <div class="divida-item" style="margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-      <div class="divida-icon" style="background:${c.bg};">${c.icon}</div>
-      <div class="divida-info">
-        <div class="divida-nome" style="font-size:15px;">${d.nome}</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
-          <span style="font-size:12px;color:var(--muted);">📅 Vence dia ${d.dia}</span>
-          <span style="font-size:12px;color:var(--muted);">📊 ${d.juros}% a.m.</span>
-          <span style="font-size:12px;color:var(--muted);">⏳ ${d.mesesRestantes} meses</span>
-          <span style="font-size:12px;color:#34d399;">✓ ${d.pagamentos.length} parcelas pagas</span>
-        </div>
-        <div class="divida-progress" style="margin-top:8px;">
-          <div class="divida-progress-bar" style="width:${prog.toFixed(0)}%;background:${c.cor};"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;">
-          <span style="font-size:11px;color:var(--muted);">Pago: R$ ${fmt(d.pago)}</span>
-          <span style="font-size:11px;color:var(--muted);">${prog.toFixed(0)}% · Restam R$ ${fmt(d.restante)}</span>
+    <div class="divida-wrap">
+      <div class="divida-header" onclick="toggleDivida(${d.id})">
+        <div class="divida-icon" style="background:${T.bg};">${T.icon}</div>
+        <div style="flex:1;"><div style="font-weight:700;font-size:15px;">${d.nome}</div><div style="font-size:11px;color:var(--muted);">${T.label} · dia ${d.dia||'—'}</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${pago ? `<span class="badge" style="background:rgba(16,185,129,.15);color:#34d399;">✅ Pago</span>` : `<span class="badge" style="background:rgba(239,68,68,.12);color:#f87171;">Pendente</span>`}
+          <button onclick="event.stopPropagation();excluirDivida(${d.id})" class="btn btn-sm btn-danger">🗑</button>
+          <span style="color:var(--muted);font-size:18px;" id="arrow_${d.id}">▼</span>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-        <div class="divida-parcela" style="font-size:18px;">R$ ${fmt(d.parcela)}<span style="font-size:11px;font-weight:400;color:var(--muted);">/mês</span></div>
-        <div class="divida-total">Total: R$ ${fmt(d.total)}</div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn-pagar ${pago?'pago':''}" onclick="togglePagamento(${d.id})">${pago?'✅ Pago este mês':'○ Marcar como pago'}</button>
-          <button class="btn-del" onclick="excluirDivida(${d.id})">🗑</button>
-        </div>
-      </div>
+      <div class="divida-body aberto" id="body_${d.id}">${corpo}</div>
     </div>`}).join('')}`;
+}
+
+function toggleDivida(id) {
+  const b = document.getElementById(`body_${id}`);
+  const a = document.getElementById(`arrow_${id}`);
+  if (b) { b.classList.toggle('aberto'); if(a) a.textContent = b.classList.contains('aberto') ? '▲' : '▼'; }
 }
 
 function renderSimulador() {
   const t = calcTotais();
-  const planoAvalanche = gerarPlanoAtaque('avalanche');
-  const planoSnowball  = gerarPlanoAtaque('snowball');
+  const pA = gerarPlano('avalanche');
+  const pS = gerarPlano('snowball');
   return `
-  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:20px;">🧮 Simulador de Estratégias</h2>
+  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:18px;">🧮 Simulador</h2>
 
-  ${estado.renda.mensal === 0 ? `<div class="alerta alerta-warn">⚠️ Configure sua renda para simulações mais precisas <button class="btn btn-sm btn-outline" style="margin-left:12px;" onclick="abrirModal('modalRenda')">Configurar →</button></div>` : ''}
-
-  <!-- SIMULADOR DE QUITAÇÃO COM GRANA DISPONÍVEL -->
-  <div class="card" style="margin-bottom:20px;">
-    <div class="card-title">💰 Simular Quitação com Grana Disponível</div>
-    <div style="display:flex;gap:12px;align-items:flex-end;margin-bottom:16px;">
-      <div class="field" style="flex:1;margin-bottom:0;">
-        <label>Quanto você tem disponível agora (R$)</label>
-        <input id="simGrana2" type="number" placeholder="Ex: 2000" oninput="calcularSim2()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px;outline:none;width:100%;">
+  <div class="card">
+    <div class="card-title">💰 Quanto tenho disponível agora?</div>
+    <div style="display:flex;gap:12px;align-items:flex-end;margin-bottom:14px;">
+      <div style="flex:1;" class="field" style="margin:0;">
+        <label>Valor disponível (R$)</label>
+        <input id="simVal" type="number" placeholder="Ex: 2000" oninput="calcSim()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px;outline:none;">
       </div>
     </div>
-    <div id="simResultados2"></div>
+    <div id="simRes"></div>
   </div>
 
-  <!-- COMPARATIVO DE ESTRATÉGIAS -->
-  <div class="card" style="margin-bottom:20px;">
-    <div class="card-title">⚔️ Comparativo de Estratégias</div>
+  <div class="card">
+    <div class="card-title">⚔️ Avalanche vs Snowball</div>
     <div class="grid-2">
       <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:18px;">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#a78bfa;margin-bottom:6px;">🔥 Método Avalanche</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Paga maior juros primeiro — economiza mais dinheiro</div>
-        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#a78bfa;">${planoAvalanche.length} meses</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">para quitar tudo</div>
-        ${planoAvalanche.length > 0 ? `<div style="margin-top:10px;font-size:12px;color:#a78bfa;">Primeira dívida a atacar: <strong>${estado.dividas.filter(d=>d.restante>0).sort((a,b)=>b.juros-a.juros)[0]?.nome||'—'}</strong></div>` : ''}
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#a78bfa;margin-bottom:6px;">🔥 Avalanche</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Maior juros primeiro — economiza mais</div>
+        <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#a78bfa;">${pA.length}</div>
+        <div style="font-size:12px;color:var(--muted);">meses para quitar tudo</div>
+        ${E.dividas.filter(d=>d.tipo!=='fixo'&&(d.restante||calcCartao(d).totalRestante)>0).sort((a,b)=>(b.juros||0)-(a.juros||0))[0] ? `<div style="margin-top:8px;font-size:12px;color:#a78bfa;">Atacar: <strong>${E.dividas.filter(d=>d.tipo!=='fixo'&&(d.restante||calcCartao(d).totalRestante)>0).sort((a,b)=>(b.juros||0)-(a.juros||0))[0]?.nome}</strong></div>` : ''}
       </div>
       <div style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:12px;padding:18px;">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#22d3ee;margin-bottom:6px;">❄️ Método Snowball</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Quita menor dívida primeiro — motivação progressiva</div>
-        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#22d3ee;">${planoSnowball.length} meses</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;">para quitar tudo</div>
-        ${planoSnowball.length > 0 ? `<div style="margin-top:10px;font-size:12px;color:#22d3ee;">Primeira dívida a atacar: <strong>${estado.dividas.filter(d=>d.restante>0).sort((a,b)=>a.restante-b.restante)[0]?.nome||'—'}</strong></div>` : ''}
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#22d3ee;margin-bottom:6px;">❄️ Snowball</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Menor dívida primeiro — motivação</div>
+        <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:#22d3ee;">${pS.length}</div>
+        <div style="font-size:12px;color:var(--muted);">meses para quitar tudo</div>
       </div>
     </div>
-    ${t.rendaLivre > 0 ? `
-      <div class="alerta alerta-success" style="margin-top:14px;">
-        ✅ Você tem R$ ${fmt(t.rendaLivre)}/mês livre para acelerar o pagamento!
-      </div>` : t.rendaLivre < 0 ? `
-      <div class="alerta alerta-danger" style="margin-top:14px;">
-        ⚠️ Atenção! Sua renda não cobre todas as parcelas. Déficit de R$ ${fmt(Math.abs(t.rendaLivre))}/mês
-      </div>` : ''}
+    ${t.rendaLivre > 0 ? `<div class="alerta alerta-success" style="margin-top:12px;">✅ R$ ${fmt(t.rendaLivre)}/mês livre para acelerar pagamentos!</div>` : t.rendaLivre < 0 ? `<div class="alerta alerta-danger" style="margin-top:12px;">⚠️ Déficit de R$ ${fmt(Math.abs(t.rendaLivre))}/mês — suas parcelas superam a renda disponível</div>` : ''}
   </div>`;
 }
 
-function calcularSim2() {
-  const grana = parseFloat(document.getElementById('simGrana2')?.value) || 0;
-  const div = document.getElementById('simResultados2');
-  if (!div) return;
-  if (!grana || !estado.dividas.length) { div.innerHTML = ''; return; }
-  const dividas = estado.dividas.filter(d => d.restante > 0).sort((a,b) => b.juros - a.juros);
-  const cenarios = [];
-  dividas.forEach(d => {
-    const quitaTotal = grana >= d.restante;
-    const economiaJuros = quitaTotal
-      ? (d.mesesRestantes * d.restante * d.juros / 100).toFixed(2)
-      : (grana * d.juros / 100 * 12).toFixed(2);
-    cenarios.push({ d, quitaTotal, economiaJuros: parseFloat(economiaJuros) });
-  });
-  cenarios.sort((a,b) => b.economiaJuros - a.economiaJuros);
-  div.innerHTML = cenarios.slice(0,3).map((c,i) => {
-    const cor = i===0?'melhor':i===1?'neutro':'pior';
-    const tag = i===0?'🏆 Melhor opção':i===1?'⚡ Alternativa':'📌 Outra opção';
-    const tagCor = i===0?'#34d399':i===1?'#fbbf24':'#94a3b8';
-    const tagBg  = i===0?'rgba(16,185,129,.15)':i===1?'rgba(245,158,11,.15)':'rgba(148,163,184,.1)';
+function calcSim() {
+  const grana = parseFloat(document.getElementById('simVal')?.value) || 0;
+  const div = document.getElementById('simRes');
+  if (!div || !grana) { if(div) div.innerHTML=''; return; }
+  const dividas = E.dividas.filter(d => d.tipo !== 'fixo').map(d => {
+    const r = d.tipo === 'cartao' ? calcCartao(d).totalRestante : (d.restante||0);
+    return { nome:d.nome, tipo:d.tipo, restante:r, parcela:d.tipo==='cartao'?calcCartao(d).faturaAtual:d.parcela||0, juros:d.juros||0 };
+  }).filter(d => d.restante > 0).sort((a,b) => b.juros - a.juros);
+
+  if (!dividas.length) { div.innerHTML = '<div class="alerta alerta-success">🎉 Nenhuma dívida para quitar!</div>'; return; }
+
+  div.innerHTML = dividas.slice(0,4).map((d,i) => {
+    const qTotal = grana >= d.restante;
+    const eco = qTotal ? (d.restante * d.juros/100 * d.restante/d.parcela/2).toFixed(2) : (grana * d.juros/100 * 12).toFixed(2);
+    const classes = ['melhor','neutro','neutro','pior'];
+    const tags = ['🏆 Melhor opção','⚡ Alternativa','📌 Opção','⚠️ Menos indicado'];
+    const cors  = ['#34d399','#fbbf24','#94a3b8','#f87171'];
+    const bgs   = ['rgba(16,185,129,.15)','rgba(245,158,11,.15)','rgba(148,163,184,.1)','rgba(239,68,68,.12)'];
     return `
-    <div class="sim-opcao ${cor}" style="margin-bottom:10px;">
-      <span class="sim-tag" style="background:${tagBg};color:${tagCor};">${tag}</span>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px;">
-        ${c.quitaTotal ? `✅ Quitar ${c.d.nome}` : `Abater R$ ${fmt(grana)} em ${c.d.nome}`}
-      </div>
-      <div style="font-size:13px;color:#34d399;margin-bottom:4px;">💰 Economiza ~R$ ${fmt(c.economiaJuros)} em juros</div>
-      <div style="font-size:12px;color:var(--muted);">
-        ${c.quitaTotal
-          ? `Libera R$ ${fmt(c.d.parcela)}/mês · ${c.d.juros}% a.m. eliminado`
-          : `Saldo: R$ ${fmt(c.d.restante)} → R$ ${fmt(Math.max(c.d.restante-grana,0))} · Juros: ${c.d.juros}% a.m.`}
-      </div>
+    <div class="sim-opcao ${classes[i]}">
+      <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${bgs[i]};color:${cors[i]};margin-bottom:8px;">${tags[i]}</span>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">${qTotal?`✅ Quitar ${d.nome}`:`Abater R$ ${fmt(grana)} em ${d.nome}`}</div>
+      <div style="font-size:13px;color:#34d399;margin-bottom:4px;">💰 Economiza ~R$ ${fmt(parseFloat(eco))} em juros</div>
+      <div style="font-size:12px;color:var(--muted);">${qTotal ? `Libera R$ ${fmt(d.parcela)}/mês · ${d.juros}% a.m. eliminado` : `Saldo: R$ ${fmt(d.restante)} → R$ ${fmt(Math.max(d.restante-grana,0))}`}</div>
     </div>`}).join('');
 }
 
 function renderPlano() {
-  const [estrategia, setEstrategia] = [window._estrategiaPlano||'avalanche', v => window._estrategiaPlano=v];
-  const plano = gerarPlanoAtaque(estrategia);
-  if (!estado.dividas.filter(d=>d.restante>0).length) return `
-    <div class="empty">
-      <div class="empty-icon">🎉</div>
-      <h3>Sem dívidas ativas!</h3>
-      <p>Adicione suas dívidas para ver o plano de ação.</p>
-    </div>`;
+  const plano = gerarPlano(E.estrategia);
+  if (!E.dividas.filter(d=>d.tipo!=='fixo').length) return `<div style="text-align:center;padding:48px;color:var(--muted);"><div style="font-size:48px;margin-bottom:12px;">📅</div><h3 style="font-family:'Syne',sans-serif;color:var(--text);">Adicione dívidas para ver o plano</h3></div>`;
   return `
-  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
-    <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">📅 Plano de Ação Mês a Mês</h2>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+    <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">📅 Plano Mês a Mês</h2>
     <div style="display:flex;gap:8px;">
-      <button class="btn btn-sm ${estrategia==='avalanche'?'btn-primary':'btn-outline'}" onclick="window._estrategiaPlano='avalanche';render();">🔥 Avalanche</button>
-      <button class="btn btn-sm ${estrategia==='snowball'?'btn-primary':'btn-outline'}" onclick="window._estrategiaPlano='snowball';render();">❄️ Snowball</button>
+      <button class="btn btn-sm ${E.estrategia==='avalanche'?'btn-primary':'btn-outline'}" onclick="E.estrategia='avalanche';render();">🔥 Avalanche</button>
+      <button class="btn btn-sm ${E.estrategia==='snowball'?'btn-primary':'btn-outline'}" onclick="E.estrategia='snowball';render();">❄️ Snowball</button>
     </div>
   </div>
-
-  <div class="alerta alerta-${estrategia==='avalanche'?'warn':'success'}" style="margin-bottom:16px;">
-    ${estrategia==='avalanche'
-      ? '🔥 <strong>Avalanche:</strong> Atacando maior juros primeiro. Economiza o máximo em juros.'
-      : '❄️ <strong>Snowball:</strong> Quitando menor dívida primeiro. Gera motivação progressiva.'}
+  <div class="alerta alerta-${E.estrategia==='avalanche'?'warn':'info'}" style="margin-bottom:14px;">
+    ${E.estrategia==='avalanche' ? '🔥 <strong>Avalanche:</strong> Maior juros primeiro — máxima economia.' : '❄️ <strong>Snowball:</strong> Menor dívida primeiro — motivação progressiva.'}
   </div>
-
   ${plano.map((m,i) => `
-    <div class="mes-card">
-      <div class="mes-header" onclick="toggleMes(${i})">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="background:${m.dividasAtivas===0?'rgba(16,185,129,.15)':'rgba(124,58,237,.15)'};color:${m.dividasAtivas===0?'#34d399':'#a78bfa'};width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;">${m.mes}</div>
-          <div>
-            <div style="font-weight:700;font-size:14px;color:var(--text);text-transform:capitalize;">${m.label}</div>
-            <div style="font-size:12px;color:var(--muted);">${m.pagamentos.length} pagamento(s) · ${m.dividasAtivas} dívida(s) restante(s)</div>
+  <div class="mes-card">
+    <div class="mes-header" onclick="toggleMes(${i})">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:38px;height:38px;border-radius:8px;background:${m.ativas===0?'rgba(16,185,129,.15)':'rgba(124,58,237,.12)'};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:${m.ativas===0?'#34d399':'#a78bfa'};">${m.mes}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;text-transform:capitalize;">${m.label}</div>
+          <div style="font-size:12px;color:var(--muted);">${m.pagamentos.length} pagamento(s) · ${m.ativas} dívida(s) restante(s)</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#f87171;">R$ ${fmt(m.totalPago)}</div>
+        <div style="font-size:11px;color:var(--muted);">a pagar</div>
+      </div>
+    </div>
+    <div class="mes-body ${i===0?'aberto':''}" id="mesb_${i}">
+      ${m.pagamentos.map(p => {
+        const T = TIPOS[p.tipo]||TIPOS.fixo;
+        return `
+        <div class="mes-linha">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span>${T.icon}</span>
+            <div><div style="font-weight:600;">${p.nome}</div><div style="font-size:11px;color:var(--muted);">📅 Pagar até dia ${p.dia}</div></div>
           </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-family:'Syne',sans-serif;font-weight:800;color:#f87171;">R$ ${fmt(m.totalPago)}</div>
-          <div style="font-size:11px;color:var(--muted);">a pagar</div>
-        </div>
-      </div>
-      <div class="mes-body ${i===0?'aberto':''}" id="mes_${i}">
-        ${m.pagamentos.map(p => {
-          const c = CORES_TIPO[p.tipo]||CORES_TIPO.outros;
-          return `
-          <div class="mes-pagamento">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:16px;">${c.icon}</span>
-              <div>
-                <div style="font-weight:600;color:var(--text);">${p.nome}</div>
-                <div style="font-size:11px;color:var(--muted);">📅 Pagar até dia ${p.dia}</div>
-              </div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-weight:700;color:#f87171;">R$ ${fmt(p.valor)}</div>
-              ${p.restante > 0 ? `<div style="font-size:11px;color:var(--muted);">Restam R$ ${fmt(p.restante)}</div>` : `<div style="font-size:11px;color:#34d399;">✅ Quitado!</div>`}
-            </div>
-          </div>`}).join('')}
-        ${m.dividasAtivas === 0 ? `<div style="text-align:center;padding:12px;color:#34d399;font-weight:600;">🎉 Todas as dívidas quitadas!</div>` : ''}
-      </div>
-    </div>`).join('')}`;
+          <div style="text-align:right;">
+            <div style="font-weight:700;color:#f87171;">R$ ${fmt(p.valor)}</div>
+            ${p.restante > 0 ? `<div style="font-size:11px;color:var(--muted);">Restam R$ ${fmt(p.restante)}</div>` : `<div style="font-size:11px;color:#34d399;">✅ Quitado!</div>`}
+          </div>
+        </div>`}).join('')}
+      ${m.ativas === 0 ? `<div style="text-align:center;padding:10px;color:#34d399;font-weight:600;">🎉 Todas as dívidas quitadas!</div>` : ''}
+    </div>
+  </div>`).join('')}`;
 }
 
 function toggleMes(i) {
-  const el = document.getElementById(`mes_${i}`);
+  const el = document.getElementById(`mesb_${i}`);
   if (el) el.classList.toggle('aberto');
 }
 
-// ─── START ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);
 </script>
-
-<footer style="background:var(--surface);border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--muted);">
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:20px;text-align:center;font-size:12px;color:var(--muted);margin-top:40px;">
   <span style="background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;">MEGAVISION ECOSYSTEM</span> © 2026
 </footer>
 </body>
