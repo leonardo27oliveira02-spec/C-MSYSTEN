@@ -1,20 +1,11 @@
 // ============================================================
-//  MEGAVISION ECOSYSTEM — MÓDULO CENTRAL DE DADOS
-//  Arquivo: megavision-data.js  |  Versão 1.0
-//
-//  📌 COMO USAR EM QUALQUER PÁGINA:
-//  1. Adicione no <head>:
-//     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-//     <script src="megavision-data.js"></script>
-//  2. Use as funções MVData.salvar(), MVData.buscar(), etc.
+//  MEGAVISION ECOSYSTEM — MÓDULO CENTRAL DE DADOS v2.0
 // ============================================================
 
-// ── CONFIGURAÇÃO — troque pelos seus dados do Supabase ───────
-// Acesse: https://app.supabase.com → Seu Projeto → Settings → API
 const MV_CONFIG = {
-  url: 'https://eguvqvcvutrkwyyxfyye.supabase.co',   // ← troque aqui
-  key: 'sb_publishable_TR0VygZfARzGUHiMgctDSQ_GQXelDk4',                 // ← troque aqui
-  versao: '1.0',
+  url: 'https://eguvqvcvutrkwyyxfyye.supabase.co',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVndXZxdmN2dXRya3d5eXhmeXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MTA2MzgsImV4cCI6MjA4NzM4NjYzOH0.xg2QY_EO8ZhZylmAdG7lx0vLFS6mpn2Bjm3-OksFpK8',  // ← chave anon que começa com eyJ...
+  versao: '2.0',
   ecosistema: 'MEGAVISION'
 };
 
@@ -23,166 +14,134 @@ let _mvClient = null;
 
 function _initMV() {
   if (_mvClient) return _mvClient;
-  if (typeof window !== 'undefined' && window.supabase) {
-    _mvClient = window.supabase.createClient(MV_CONFIG.url, MV_CONFIG.key);
+  try {
+    _mvClient = supabase.createClient(MV_CONFIG.url, MV_CONFIG.key);
     console.log('%c[MEGAVISION] Supabase conectado ✅', 'color:#6366f1;font-weight:bold');
-  } else {
-    console.warn('[MEGAVISION] SDK não encontrado — modo offline (localStorage)');
+  } catch(e) {
+    console.warn('[MEGAVISION] Erro ao conectar Supabase:', e.message);
   }
   return _mvClient;
+}
+
+// ── PEGAR USER_ID DO USUÁRIO LOGADO ──────────────────────────
+async function _getUserId() {
+  if (!_mvClient) return null;
+  try {
+    const { data: { session } } = await _mvClient.auth.getSession();
+    return session?.user?.id || null;
+  } catch(e) { return null; }
 }
 
 // ── API PÚBLICA: MVData ───────────────────────────────────────
 const MVData = {
 
-  /**
-   * SALVAR registro
-   * @example await MVData.salvar('vendas', { produto: 'X', valor: 100 })
-   */
+  // SALVAR — sempre inclui user_id
   async salvar(tabela, dados) {
     _initMV();
+    const userId = await _getUserId();
+
+    // Verifica se já existe registro com mesmo tipo para atualizar
+    if (dados.tipo && userId) {
+      const existe = await this.buscar(tabela, { tipo: dados.tipo });
+      if (existe.length > 0) {
+        // ATUALIZA em vez de inserir duplicado
+        const { error } = await _mvClient
+          .from(tabela)
+          .update({ dados: dados.dados, criado_em: new Date().toISOString() })
+          .eq('id', existe[0].id)
+          .eq('user_id', userId);
+        if (!error) {
+          // Atualiza localStorage também
+          _localSet(`${tabela}_${dados.tipo}`, dados.dados);
+          return { ok: true, origem: 'supabase_update' };
+        }
+      }
+    }
+
     const registro = {
       ...dados,
+      user_id:    userId,
       ferramenta: dados.ferramenta || tabela,
-      criado_em:  dados.criado_em  || new Date().toISOString(),
+      criado_em:  new Date().toISOString(),
       ecosistema: MV_CONFIG.ecosistema
     };
 
-    if (_mvClient) {
+    if (_mvClient && userId) {
       const { data, error } = await _mvClient.from(tabela).insert([registro]).select();
-      if (!error) return { ok: true, data: data?.[0], origem: 'supabase' };
+      if (!error) {
+        // Salva no localStorage como cache
+        if (dados.tipo) _localSet(`${tabela}_${dados.tipo}`, dados.dados);
+        return { ok: true, data: data?.[0], origem: 'supabase' };
+      }
       console.warn('[MEGAVISION] Erro Supabase, salvando local:', error.message);
     }
 
-    // fallback offline
-    const lista = _localGet(tabela);
-    registro.id = registro.id || `local_${Date.now()}`;
-    lista.push(registro);
-    _localSet(tabela, lista);
+    // Fallback offline
+    if (dados.tipo) _localSet(`${tabela}_${dados.tipo}`, dados.dados);
     _marcarPendente(tabela);
-    return { ok: true, data: registro, origem: 'local' };
+    return { ok: true, origem: 'local' };
   },
 
-  /**
-   * BUSCAR registros
-   * @example await MVData.buscar('vendas')
-   * @example await MVData.buscar('vendas', { status: 'aberto' })
-   */
+  // BUSCAR — filtra por user_id automaticamente
   async buscar(tabela, filtros = {}) {
     _initMV();
-    if (_mvClient) {
-      let q = _mvClient.from(tabela).select('*');
+    const userId = await _getUserId();
+
+    if (_mvClient && userId) {
+      let q = _mvClient.from(tabela).select('*').eq('user_id', userId);
       Object.entries(filtros).forEach(([col, val]) => { q = q.eq(col, val); });
       const { data, error } = await q.order('criado_em', { ascending: false });
-      if (!error) return data || [];
-      console.warn('[MEGAVISION] Erro Supabase, buscando local:', error.message);
+      if (!error && data) return data;
+      console.warn('[MEGAVISION] Erro Supabase, buscando local:', error?.message);
     }
-    let lista = _localGet(tabela);
-    if (Object.keys(filtros).length) {
-      lista = lista.filter(i => Object.entries(filtros).every(([k, v]) => i[k] == v));
+
+    // Fallback: tenta buscar do localStorage
+    if (filtros.tipo) {
+      const cached = _localGet(`${tabela}_${filtros.tipo}`);
+      if (cached) return [{ dados: cached, tipo: filtros.tipo }];
     }
-    return [...lista].reverse();
+    return [];
   },
 
-  /**
-   * ATUALIZAR registro por id
-   * @example await MVData.atualizar('vendas', 'abc123', { valor: 200 })
-   */
-  async atualizar(tabela, id, dados) {
-    _initMV();
-    if (_mvClient) {
-      const { data, error } = await _mvClient.from(tabela).update(dados).eq('id', id).select();
-      if (!error) return { ok: true, data: data?.[0] };
-      console.warn('[MEGAVISION] Erro ao atualizar:', error.message);
-    }
-    const lista = _localGet(tabela);
-    const i = lista.findIndex(r => r.id == id);
-    if (i !== -1) lista[i] = { ...lista[i], ...dados };
-    _localSet(tabela, lista);
-    return { ok: true, origem: 'local' };
-  },
-
-  /**
-   * DELETAR registro por id
-   * @example await MVData.deletar('vendas', 'abc123')
-   */
+  // DELETAR
   async deletar(tabela, id) {
     _initMV();
-    if (_mvClient) {
-      const { error } = await _mvClient.from(tabela).delete().eq('id', id);
+    const userId = await _getUserId();
+    if (_mvClient && userId) {
+      const { error } = await _mvClient.from(tabela).delete().eq('id', id).eq('user_id', userId);
       if (!error) return { ok: true };
     }
-    _localSet(tabela, _localGet(tabela).filter(r => r.id != id));
     return { ok: true, origem: 'local' };
   },
 
-  /**
-   * CONTAR registros
-   * @example const total = await MVData.contar('vendas')
-   */
+  // CONTAR
   async contar(tabela, filtros = {}) {
     const lista = await this.buscar(tabela, filtros);
     return lista.length;
   },
 
-  /**
-   * SOMAR campo numérico
-   * @example const total = await MVData.somar('vendas', 'valor')
-   */
-  async somar(tabela, campo, filtros = {}) {
-    const lista = await this.buscar(tabela, filtros);
-    return lista.reduce((acc, r) => acc + (parseFloat(r[campo]) || 0), 0);
-  },
-
-  /**
-   * SINCRONIZAR dados locais → Supabase
-   * @example await MVData.sincronizar('vendas')
-   */
-  async sincronizar(tabela) {
-    _initMV();
-    if (!_mvClient) return { ok: false, msg: 'Supabase não conectado' };
-    const pendentes = _localGet(tabela);
-    if (!pendentes.length) return { ok: true, sincronizados: 0 };
-
-    const { error } = await _mvClient.from(tabela).upsert(pendentes);
-    if (!error) {
-      _localSet(tabela, []);
-      _removerPendente(tabela);
-      console.log(`[MEGAVISION] ${pendentes.length} registros sincronizados ✅`);
-      return { ok: true, sincronizados: pendentes.length };
-    }
-    return { ok: false, error };
-  },
-
-  /**
-   * STATUS da conexão
-   * @example MVData.status() → { online: true, pendentes: ['vendas'] }
-   */
+  // STATUS
   status() {
+    const chaveOk = MV_CONFIG.key.startsWith('eyJ');
     return {
-      online:    !!_mvClient,
-      supabase:  MV_CONFIG.url !== 'https://SEU_PROJETO.supabase.co',
+      online:   !!_mvClient,
+      supabase: chaveOk,
       pendentes: JSON.parse(localStorage.getItem('mv_pendentes') || '[]'),
-      versao:    MV_CONFIG.versao
+      versao:   MV_CONFIG.versao
     };
   }
 };
 
-// ── HELPERS INTERNOS ──────────────────────────────────────────
-function _localGet(tabela) {
-  return JSON.parse(localStorage.getItem('mv_' + tabela) || '[]');
+// ── HELPERS LOCALSTORAGE ──────────────────────────────────────
+function _localGet(chave) {
+  try { return JSON.parse(localStorage.getItem('mv_' + chave) || 'null'); } catch(e) { return null; }
 }
-function _localSet(tabela, dados) {
-  localStorage.setItem('mv_' + tabela, JSON.stringify(dados));
+function _localSet(chave, dados) {
+  try { localStorage.setItem('mv_' + chave, JSON.stringify(dados)); } catch(e) {}
 }
 function _marcarPendente(tabela) {
   const p = JSON.parse(localStorage.getItem('mv_pendentes') || '[]');
   if (!p.includes(tabela)) { p.push(tabela); localStorage.setItem('mv_pendentes', JSON.stringify(p)); }
 }
-function _removerPendente(tabela) {
-  const p = JSON.parse(localStorage.getItem('mv_pendentes') || '[]');
-  localStorage.setItem('mv_pendentes', JSON.stringify(p.filter(t => t !== tabela)));
-}
 
-// Auto-init ao carregar
 document.addEventListener('DOMContentLoaded', _initMV);
