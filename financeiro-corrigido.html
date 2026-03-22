@@ -17,1031 +17,664 @@
       --gold:    #f59e0b;
       --text:    #e2e8f0;
       --muted:   #94a3b8;
-      --success: #10b981;
-      --danger:  #ef4444;
+      --green:   #10b981;
+      --red:     #ef4444;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
     /* NAV */
-    .mv-nav { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,.97); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 58px; }
-    .mv-nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-    .mv-nav-right { display: flex; align-items: center; gap: 10px; }
-    .mv-nav-right a { color: var(--muted); font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: all .2s; }
-    .mv-nav-right a:hover { background: var(--border); color: var(--text); }
-    .mv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .nav { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,.97); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-back { color: var(--muted); font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); transition: all .2s; }
+    .nav-back:hover { color: var(--text); background: var(--border); }
 
-    /* MAIN */
-    .main { max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; }
+    /* MENU */
+    .menu { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; position: sticky; top: 58px; z-index: 90; }
+    .menu-btn { padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--muted); transition: all .2s; font-family: 'DM Sans', sans-serif; }
+    .menu-btn.ativo { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* WIZARD STEPS */
-    .steps { display: flex; gap: 0; margin-bottom: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 6px; overflow-x: auto; }
-    .step { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 8px; border-radius: 10px; cursor: pointer; transition: all .25s; min-width: 120px; }
-    .step:hover { background: var(--border); }
-    .step.ativo { background: var(--accent); }
-    .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--border); color: var(--muted); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .step.ativo .step-num { background: rgba(255,255,255,.2); color: #fff; }
-    .step.done .step-num { background: var(--success); color: #fff; }
-    .step-label { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
-    .step.ativo .step-label { color: #fff; }
-    .step.done .step-label { color: var(--success); }
+    /* CONTEÚDO */
+    .page { max-width: 900px; margin: 0 auto; padding: 28px 20px 80px; }
 
     /* CARDS */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
-    .card-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
-    .card-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 16px; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
-    /* FIELDS */
+    /* INPUTS */
     .field { margin-bottom: 14px; }
     .field label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
-    .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 11px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .2s; }
-    .field input:focus, .field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
+    .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px 14px; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color .2s; }
+    .field input:focus, .field select:focus { border-color: var(--accent); }
     .field input::placeholder { color: #475569; }
     .field select option { background: var(--surface); color: var(--text); }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-    /* BUTTONS */
-    .btn { padding: 12px 22px; border-radius: 9px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; }
+    /* BOTÕES */
+    .btn { padding: 12px 22px; border-radius: 9px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-success:hover { background: #059669; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-gold { background: var(--gold); color: #000; }
-    .btn-full { width: 100%; padding: 14px; font-size: 15px; }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-danger { background: transparent; border: 1px solid rgba(239,68,68,.4); color: #f87171; padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+    .btn-full { width: 100%; }
 
-    /* DIVIDA CARD */
-    .divida-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .divida-info { flex: 1; }
-    .divida-nome { font-weight: 700; font-size: 14px; color: var(--text); }
-    .divida-detalhes { font-size: 12px; color: var(--muted); margin-top: 3px; }
-    .divida-valor { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--danger); }
-    .divida-juros { font-size: 11px; color: var(--gold); font-weight: 700; }
-    .tipo-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    /* DIVIDA ITEM */
+    .divida-item { background: var(--bg); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 16px; margin-bottom: 10px; }
+    .divida-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .divida-nome { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); }
+    .divida-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+    .divida-stat { text-align: center; }
+    .divida-stat-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+    .divida-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-    /* KPI MINI */
-    .kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
-    .kpi { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-    .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 4px; }
-    .kpi-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+    /* KPIs */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; border-left: 4px solid var(--accent); }
+    .kpi-val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-top: 6px; }
+    .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; }
 
     /* SIMULADOR */
-    .sim-opcao { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; transition: all .25s; }
-    .sim-opcao:hover { border-color: var(--accent); }
-    .sim-opcao.vencedor { border-color: var(--success); background: rgba(16,185,129,.06); }
-    .sim-opcao.perdedor { border-color: var(--danger); background: rgba(239,68,68,.04); opacity: .7; }
-    .sim-opcao-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 8px; }
-    .sim-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border); }
-    .sim-row:last-child { border: none; }
-    .sim-row-label { color: var(--muted); }
-    .sim-row-val { font-weight: 700; }
-    .veredicto { background: linear-gradient(135deg, rgba(16,185,129,.15), rgba(6,182,212,.1)); border: 1px solid rgba(16,185,129,.3); border-radius: 12px; padding: 20px; margin-top: 16px; }
-    .veredicto-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; color: var(--success); margin-bottom: 8px; }
+    .sim-opcao { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 12px; transition: all .3s; }
+    .sim-opcao.melhor { border-color: var(--green); background: rgba(16,185,129,.06); }
+    .sim-opcao.pior { border-color: var(--border); opacity: .7; }
+    .sim-titulo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .sim-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .sim-row:last-child { border-bottom: none; }
+    .sim-destaque { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; }
+    .badge-melhor { background: rgba(16,185,129,.2); color: #34d399; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-pior { background: rgba(239,68,68,.15); color: #f87171; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
 
-    /* PLANO ATAQUE */
-    .metodo-card { border: 2px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; transition: all .25s; }
-    .metodo-card:hover { border-color: var(--accent); }
-    .metodo-card.selecionado { border-color: var(--accent); background: rgba(124,58,237,.06); }
-    .metodo-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; margin-bottom: 6px; }
-    .metodo-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
-    .ordem-item { background: var(--bg); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
-    .ordem-num { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); width: 32px; flex-shrink: 0; }
-    .ordem-info { flex: 1; }
-    .ordem-nome { font-weight: 700; font-size: 14px; }
-    .ordem-detalhe { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .ordem-livre { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: var(--success); }
+    /* PLANO MÊS A MÊS */
+    .mes-bloco { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+    .mes-header { background: linear-gradient(135deg, #1a0533, #0d1f3c); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .mes-titulo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: #fff; }
+    .mes-saldo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; }
+    .pagamento-item { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .pagamento-item:last-child { border-bottom: none; }
+    .pagamento-dia { background: var(--accent); color: #fff; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 6px; min-width: 40px; text-align: center; }
+    .pagamento-info { flex: 1; margin: 0 14px; }
+    .pagamento-nome { font-weight: 600; font-size: 14px; color: var(--text); }
+    .pagamento-detalhe { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .pagamento-valor { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: #f87171; }
+    .mes-footer { background: rgba(16,185,129,.08); border-top: 1px solid rgba(16,185,129,.2); padding: 12px 18px; display: flex; justify-content: space-between; font-size: 13px; }
 
-    /* PROGRESSO */
-    .progress-bar-wrap { background: var(--border); border-radius: 20px; height: 12px; margin: 8px 0; overflow: hidden; }
-    .progress-bar-fill { height: 100%; border-radius: 20px; transition: width .6s ease; }
-    .timeline { margin-top: 16px; }
-    .timeline-item { display: flex; gap: 14px; margin-bottom: 0; }
-    .timeline-line { display: flex; flex-direction: column; align-items: center; }
-    .timeline-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 3px; }
-    .timeline-track { width: 2px; background: var(--border); flex: 1; min-height: 40px; }
-    .timeline-content { padding-bottom: 20px; flex: 1; }
-    .timeline-mes { font-weight: 700; font-size: 13px; color: var(--text); }
-    .timeline-detalhe { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    /* PAINEL */
+    .progresso-bar { background: var(--border); border-radius: 20px; height: 12px; margin: 8px 0; overflow: hidden; }
+    .progresso-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width .5s; }
+    .livre-banner { background: linear-gradient(135deg, #7c3aed, #06b6d4); border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 20px; }
+    .livre-banner h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .livre-banner p { color: rgba(255,255,255,.8); font-size: 14px; }
+    .livre-data { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: #fff; margin: 10px 0; }
 
     /* ALERTA */
-    .alerta { padding: 14px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
-    .alerta-info { background: rgba(6,182,212,.1); border: 1px solid rgba(6,182,212,.25); color: #67e8f9; }
-    .alerta-success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #6ee7b7; }
-    .alerta-warn { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25); color: #fcd34d; }
-    .alerta-danger { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); color: #fca5a5; }
+    .alerta { padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
+    .alerta-info { background: rgba(6,182,212,.1); border: 1px solid rgba(6,182,212,.3); color: #22d3ee; }
+    .alerta-warn { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); color: #fbbf24; }
+    .alerta-ok { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.3); color: #34d399; }
 
-    /* MODAL */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-    .modal.ativo { display: flex; }
-    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
-    .modal-header { background: linear-gradient(135deg, var(--accent), #4f46e5); padding: 20px 24px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center; }
-    .modal-header h3 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: #fff; }
-    .modal-close { background: none; border: none; color: rgba(255,255,255,.7); font-size: 24px; cursor: pointer; line-height: 1; }
-    .modal-body { padding: 24px; }
-
-    /* NAV BOTTOM */
-    .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,15,.97); border-top: 1px solid var(--border); padding: 10px 20px; display: flex; justify-content: center; gap: 8px; z-index: 50; }
-
-    /* FOOTER */
-    .mv-footer { text-align: center; padding: 20px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; }
-    .mv-footer span { background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+    /* VAZIO */
+    .vazio { text-align: center; padding: 48px 20px; color: var(--muted); }
+    .vazio-icon { font-size: 48px; margin-bottom: 12px; }
+    .vazio h3 { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--text); margin-bottom: 8px; }
 
     @media(max-width:600px) {
       .grid2, .grid3 { grid-template-columns: 1fr; }
-      .kpis { grid-template-columns: 1fr 1fr; }
-      .steps { gap: 4px; }
-      .step-label { display: none; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .divida-stats { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-<nav class="mv-nav">
-  <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION</a>
-  <div class="mv-nav-right">
-    <span class="mv-dot"></span>
-    <span id="mvStatus" style="font-size:12px;color:#94a3b8;">Online</span>
-    <a href="index.html">← Início</a>
-  </div>
+<nav class="nav">
+  <a href="index.html" class="nav-logo">⚡ MEGAVISION</a>
+  <a href="index.html" class="nav-back">← Início</a>
 </nav>
 
-<div class="main">
-
-  <!-- WIZARD STEPS -->
-  <div class="steps" id="wizardSteps">
-    <div class="step ativo" onclick="app.irPara('diagnostico')" data-step="diagnostico">
-      <div class="step-num">1</div>
-      <div class="step-label">Diagnóstico</div>
-    </div>
-    <div class="step" onclick="app.irPara('simulador')" data-step="simulador">
-      <div class="step-num">2</div>
-      <div class="step-label">Simulador</div>
-    </div>
-    <div class="step" onclick="app.irPara('plano')" data-step="plano">
-      <div class="step-num">3</div>
-      <div class="step-label">Plano de Ataque</div>
-    </div>
-    <div class="step" onclick="app.irPara('progresso')" data-step="progresso">
-      <div class="step-num">4</div>
-      <div class="step-label">Progresso</div>
-    </div>
-    <div class="step" onclick="app.irPara('dashboard')" data-step="dashboard">
-      <div class="step-num">5</div>
-      <div class="step-label">Dashboard</div>
-    </div>
-  </div>
-
-  <!-- CONTEÚDO DINÂMICO -->
-  <div id="conteudo"></div>
-
+<div class="menu">
+  <button class="menu-btn ativo" onclick="ir('painel')">📊 Painel</button>
+  <button class="menu-btn" onclick="ir('situacao')">💳 Minhas Dívidas</button>
+  <button class="menu-btn" onclick="ir('simulador')">⚖️ Simulador</button>
+  <button class="menu-btn" onclick="ir('plano')">📅 Plano Mês a Mês</button>
 </div>
 
-<!-- NAV BOTTOM -->
-<div class="nav-bottom">
-  <button class="btn btn-outline" id="btnAnterior" onclick="app.anterior()" style="display:none;">← Anterior</button>
-  <button class="btn btn-primary" id="btnProximo" onclick="app.proximo()">Próximo →</button>
-</div>
+<div id="conteudo" class="page"></div>
 
-<!-- MODAL DÍVIDA -->
-<div id="modalDivida" class="modal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3 id="modalDividaTitulo">➕ Adicionar Dívida</h3>
-      <button class="modal-close" onclick="app.fecharModal('modalDivida')">&times;</button>
+<!-- MODAL NOVA DÍVIDA -->
+<div id="modalDivida" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:#111118;border:1px solid #1e1e2e;border-radius:16px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div style="background:linear-gradient(135deg,#7c3aed,#4f46e5);padding:20px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="font-family:'Syne',sans-serif;font-weight:800;color:#fff;font-size:17px;" id="modalDividaTitulo">➕ Nova Dívida</h3>
+      <button onclick="fecharModal()" style="color:#fff;background:none;border:none;font-size:24px;cursor:pointer;">×</button>
     </div>
-    <div class="modal-body">
-      <div class="field">
-        <label>Nome da Dívida</label>
-        <input type="text" id="dNome" placeholder="Ex: Cartão Nubank, Financiamento Moto...">
-      </div>
+    <div style="padding:24px;">
+      <div class="field"><label>Nome da Dívida</label><input type="text" id="dNome" placeholder="Ex: Cartão Nubank"></div>
       <div class="grid2">
-        <div class="field">
-          <label>Tipo</label>
+        <div class="field"><label>Tipo</label>
           <select id="dTipo">
             <option value="cartao">💳 Cartão de Crédito</option>
             <option value="financiamento">🏍️ Financiamento</option>
             <option value="emprestimo">💰 Empréstimo</option>
-            <option value="cheque">📋 Cheque Especial</option>
-            <option value="boleto">📄 Boleto/Conta</option>
-            <option value="outro">📌 Outro</option>
+            <option value="cheque">📄 Cheque Especial</option>
+            <option value="outro">📋 Outro</option>
           </select>
         </div>
-        <div class="field">
-          <label>Valor Total Devedor (R$)</label>
-          <input type="number" id="dValor" placeholder="5000.00" step="0.01">
-        </div>
+        <div class="field"><label>Dia Vencimento</label><input type="number" id="dDia" placeholder="Ex: 10" min="1" max="31"></div>
       </div>
       <div class="grid2">
-        <div class="field">
-          <label>Taxa de Juros (% ao mês)</label>
-          <input type="number" id="dJuros" placeholder="Ex: 3.5" step="0.01">
-        </div>
-        <div class="field">
-          <label>Parcela Mensal (R$)</label>
-          <input type="number" id="dParcela" placeholder="300.00" step="0.01">
-        </div>
+        <div class="field"><label>Valor Total Devido (R$)</label><input type="number" id="dTotal" placeholder="0,00" step="0.01"></div>
+        <div class="field"><label>Parcela Mensal (R$)</label><input type="number" id="dParcela" placeholder="0,00" step="0.01"></div>
       </div>
       <div class="grid2">
-        <div class="field">
-          <label>Parcelas Restantes</label>
-          <input type="number" id="dParcelas" placeholder="12">
-        </div>
-        <div class="field">
-          <label>Desconto p/ Antecipação (%)</label>
-          <input type="number" id="dDesconto" placeholder="Ex: 15" step="0.01">
-          <div style="font-size:11px;color:#64748b;margin-top:4px;">Se houver desconto ao quitar antecipado</div>
-        </div>
+        <div class="field"><label>Juros ao Mês (%)</label><input type="number" id="dJuros" placeholder="Ex: 3.5" step="0.1" value="0"></div>
+        <div class="field"><label>Parcelas Restantes</label><input type="number" id="dParcelas" placeholder="Ex: 12" min="1"></div>
       </div>
-      <button class="btn btn-primary btn-full" onclick="app.salvarDivida()" style="margin-top:8px;">💾 Salvar Dívida</button>
+      <div class="field"><label>Observação (opcional)</label><input type="text" id="dObs" placeholder="Ex: Pode antecipar com 20% desconto"></div>
+      <div id="alertModal" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;"></div>
+      <button class="btn btn-primary btn-full" onclick="salvarDivida()">💾 Salvar Dívida</button>
     </div>
   </div>
 </div>
-
-<!-- MODAL RENDA -->
-<div id="modalRenda" class="modal">
-  <div class="modal-box">
-    <div class="modal-header">
-      <h3>💰 Sua Situação Financeira</h3>
-      <button class="modal-close" onclick="app.fecharModal('modalRenda')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="alerta alerta-info">💡 Essas informações ajudam o app a calcular seu plano de ataque personalizado.</div>
-      <div class="field">
-        <label>Renda Mensal Líquida (R$)</label>
-        <input type="number" id="rRenda" placeholder="3000.00" step="0.01">
-      </div>
-      <div class="field">
-        <label>Gastos Fixos Mensais (R$)</label>
-        <input type="number" id="rGastos" placeholder="1500.00" step="0.01">
-        <div style="font-size:11px;color:#64748b;margin-top:4px;">Aluguel, alimentação, transporte... (sem contar dívidas)</div>
-      </div>
-      <div class="field">
-        <label>Dinheiro Disponível para Quitar Agora (R$)</label>
-        <input type="number" id="rDisponivel" placeholder="2000.00" step="0.01">
-        <div style="font-size:11px;color:#64748b;margin-top:4px;">Quanto você tem disponível hoje para usar</div>
-      </div>
-      <button class="btn btn-primary btn-full" onclick="app.salvarRenda()" style="margin-top:8px;">✅ Salvar</button>
-    </div>
-  </div>
-</div>
-
-<footer class="mv-footer">
-  <span>MEGAVISION</span> Financial Pro © 2026
-</footer>
 
 <script>
-// ─────────────────────────────────────────────
-//  MEGAVISION FINANCIAL PRO — CONSELHEIRO
-// ─────────────────────────────────────────────
-class FinancialPro {
-  constructor() {
-    this.pagina = 'diagnostico';
-    this.dividas = [];
-    this.renda = { renda: 0, gastos: 0, disponivel: 0 };
-    this.metodoAtaque = 'avalanche';
-    this.editandoIdx = null;
-    this.inicializar();
-  }
-
-  async inicializar() {
-    await this.carregar();
-    this.render();
-  }
-
-  async carregar() {
-    try {
-      const d = await MVData.buscar('financeiro', { tipo: 'dividas' });
-      if (d && d.length) this.dividas = d[0].dados || [];
-      const r = await MVData.buscar('financeiro', { tipo: 'renda' });
-      if (r && r.length) this.renda = r[0].dados || this.renda;
-      const m = await MVData.buscar('financeiro', { tipo: 'metodo' });
-      if (m && m.length) this.metodoAtaque = m[0].dados || 'avalanche';
-    } catch(e) {
-      const dl = localStorage.getItem('mv_fp_dividas');
-      const rl = localStorage.getItem('mv_fp_renda');
-      if (dl) this.dividas = JSON.parse(dl);
-      if (rl) this.renda = JSON.parse(rl);
-    }
-  }
-
-  async salvar() {
-    try {
-      await MVData.salvar('financeiro', { tipo: 'dividas', dados: this.dividas });
-      await MVData.salvar('financeiro', { tipo: 'renda', dados: this.renda });
-      await MVData.salvar('financeiro', { tipo: 'metodo', dados: this.metodoAtaque });
-    } catch(e) {
-      localStorage.setItem('mv_fp_dividas', JSON.stringify(this.dividas));
-      localStorage.setItem('mv_fp_renda', JSON.stringify(this.renda));
-    }
-  }
-
-  fecharModal(id) { document.getElementById(id).classList.remove('ativo'); }
-
-  abrirModalDivida(idx = null) {
-    this.editandoIdx = idx;
-    if (idx !== null) {
-      const d = this.dividas[idx];
-      document.getElementById('dNome').value     = d.nome;
-      document.getElementById('dTipo').value     = d.tipo;
-      document.getElementById('dValor').value    = d.valor;
-      document.getElementById('dJuros').value    = d.juros;
-      document.getElementById('dParcela').value  = d.parcela;
-      document.getElementById('dParcelas').value = d.parcelas;
-      document.getElementById('dDesconto').value = d.desconto || '';
-      document.getElementById('modalDividaTitulo').textContent = '✏️ Editar Dívida';
-    } else {
-      ['dNome','dValor','dJuros','dParcela','dParcelas','dDesconto'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('dTipo').value = 'cartao';
-      document.getElementById('modalDividaTitulo').textContent = '➕ Adicionar Dívida';
-    }
-    document.getElementById('modalDivida').classList.add('ativo');
-  }
-
-  abrirModalRenda() {
-    document.getElementById('rRenda').value     = this.renda.renda || '';
-    document.getElementById('rGastos').value    = this.renda.gastos || '';
-    document.getElementById('rDisponivel').value = this.renda.disponivel || '';
-    document.getElementById('modalRenda').classList.add('ativo');
-  }
-
-  async salvarDivida() {
-    const nome     = document.getElementById('dNome').value.trim();
-    const tipo     = document.getElementById('dTipo').value;
-    const valor    = parseFloat(document.getElementById('dValor').value);
-    const juros    = parseFloat(document.getElementById('dJuros').value);
-    const parcela  = parseFloat(document.getElementById('dParcela').value);
-    const parcelas = parseInt(document.getElementById('dParcelas').value);
-    const desconto = parseFloat(document.getElementById('dDesconto').value) || 0;
-
-    if (!nome || !valor || valor <= 0) { alert('Preencha nome e valor!'); return; }
-
-    const divida = { id: Date.now(), nome, tipo, valor, juros: juros || 0, parcela: parcela || 0, parcelas: parcelas || 1, desconto, pago: 0 };
-
-    if (this.editandoIdx !== null) {
-      this.dividas[this.editandoIdx] = { ...this.dividas[this.editandoIdx], ...divida };
-    } else {
-      this.dividas.push(divida);
-    }
-
-    await this.salvar();
-    this.fecharModal('modalDivida');
-    this.render();
-  }
-
-  async salvarRenda() {
-    this.renda = {
-      renda:      parseFloat(document.getElementById('rRenda').value) || 0,
-      gastos:     parseFloat(document.getElementById('rGastos').value) || 0,
-      disponivel: parseFloat(document.getElementById('rDisponivel').value) || 0
-    };
-    await this.salvar();
-    this.fecharModal('modalRenda');
-    this.render();
-  }
-
-  async excluirDivida(idx) {
-    if (!confirm('Remover esta dívida?')) return;
-    this.dividas.splice(idx, 1);
-    await this.salvar();
-    this.render();
-  }
-
-  irPara(pagina) {
-    this.pagina = pagina;
-    this.render();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  proximo() {
-    const ordem = ['diagnostico','simulador','plano','progresso','dashboard'];
-    const idx = ordem.indexOf(this.pagina);
-    if (idx < ordem.length - 1) this.irPara(ordem[idx + 1]);
-  }
-
-  anterior() {
-    const ordem = ['diagnostico','simulador','plano','progresso','dashboard'];
-    const idx = ordem.indexOf(this.pagina);
-    if (idx > 0) this.irPara(ordem[idx - 1]);
-  }
-
-  // ── CÁLCULOS ──────────────────────────────
-  get totalDividas() { return this.dividas.reduce((s, d) => s + (d.valor - d.pago), 0); }
-  get totalJurosMes() { return this.dividas.reduce((s, d) => s + ((d.valor - d.pago) * (d.juros / 100)), 0); }
-  get sobraMonsal() { return this.renda.renda - this.renda.gastos - this.dividas.reduce((s,d) => s+d.parcela, 0); }
-
-  calcularSimulador() {
-    if (!this.renda.disponivel || this.dividas.length === 0) return null;
-    const disp = this.renda.disponivel;
-    const resultados = [];
-
-    this.dividas.forEach(d => {
-      const saldo = d.valor - d.pago;
-      // Opção 1: quitar totalmente (se tiver dinheiro suficiente)
-      if (disp >= saldo) {
-        const economiaJuros = saldo * (d.juros / 100) * d.parcelas;
-        const desconto = d.desconto > 0 ? saldo * (d.desconto / 100) : 0;
-        resultados.push({
-          nome: d.nome, tipo: 'quitar_total',
-          label: `Quitar tudo — ${d.nome}`,
-          custo: saldo - desconto,
-          economia: economiaJuros + desconto,
-          descricao: `Elimina R$ ${this.fmt(economiaJuros)} em juros futuros${desconto > 0 ? ` + R$ ${this.fmt(desconto)} de desconto` : ''}`,
-          sobra: disp - (saldo - desconto)
-        });
-      }
-      // Opção 2: antecipar parcelas (financiamento com desconto)
-      if (d.desconto > 0 && d.tipo === 'financiamento') {
-        const parcelasAntecipadas = Math.floor(disp / d.parcela);
-        const valorAntecipado = parcelasAntecipadas * d.parcela;
-        const descontoValor = valorAntecipado * (d.desconto / 100);
-        resultados.push({
-          nome: d.nome, tipo: 'antecipar',
-          label: `Antecipar ${parcelasAntecipadas} parcelas — ${d.nome}`,
-          custo: valorAntecipado - descontoValor,
-          economia: descontoValor,
-          descricao: `${parcelasAntecipadas} parcelas antecipadas com ${d.desconto}% de desconto = R$ ${this.fmt(descontoValor)} economizados`,
-          sobra: disp - (valorAntecipado - descontoValor)
-        });
-      }
-      // Opção 3: abater parte (sempre disponível)
-      if (disp < saldo && disp > 0) {
-        const novoSaldo = saldo - disp;
-        const economiaJuros = disp * (d.juros / 100) * d.parcelas;
-        resultados.push({
-          nome: d.nome, tipo: 'abater',
-          label: `Abater R$ ${this.fmt(disp)} — ${d.nome}`,
-          custo: disp,
-          economia: economiaJuros,
-          descricao: `Reduz saldo de R$ ${this.fmt(saldo)} para R$ ${this.fmt(novoSaldo)}, economizando R$ ${this.fmt(economiaJuros)} em juros`,
-          sobra: 0
-        });
-      }
-    });
-
-    return resultados.sort((a, b) => b.economia - a.economia);
-  }
-
-  calcularPlanoAtaque() {
-    if (this.dividas.length === 0) return [];
-    let lista = this.dividas.map(d => ({ ...d, saldo: d.valor - d.pago })).filter(d => d.saldo > 0);
-    const sobra = Math.max(this.sobraMonsal, 0);
-    const extra = this.renda.disponivel > 0 ? this.renda.disponivel : 0;
-
-    if (this.metodoAtaque === 'avalanche') {
-      lista.sort((a, b) => b.juros - a.juros);
-    } else {
-      lista.sort((a, b) => a.saldo - b.saldo);
-    }
-
-    let meses = 0;
-    let saldos = lista.map(d => d.saldo);
-    let liberadas = 0;
-    const timeline = [];
-
-    // Aplica dinheiro disponível na primeira dívida
-    if (extra > 0 && saldos.length > 0) {
-      saldos[0] = Math.max(0, saldos[0] - extra);
-    }
-
-    while (saldos.some(s => s > 0) && meses < 120) {
-      meses++;
-      let pagamentoExtra = sobra + liberadas;
-      const eventos = [];
-
-      saldos = saldos.map((s, i) => {
-        if (s <= 0) return 0;
-        const juros = s * (lista[i].juros / 100);
-        s = s + juros - lista[i].parcela;
-        return Math.max(0, s);
-      });
-
-      // Aplica extra na primeira dívida com saldo
-      for (let i = 0; i < saldos.length; i++) {
-        if (saldos[i] > 0 && pagamentoExtra > 0) {
-          const aplicado = Math.min(saldos[i], pagamentoExtra);
-          saldos[i] -= aplicado;
-          pagamentoExtra -= aplicado;
-        }
-      }
-
-      // Verifica quitações
-      saldos.forEach((s, i) => {
-        if (s === 0 && lista[i].saldo > 0) {
-          eventos.push(`✅ ${lista[i].nome} QUITADA!`);
-          liberadas += lista[i].parcela;
-          lista[i].saldo = 0;
-        }
-      });
-
-      if (eventos.length > 0 || meses === 1 || meses % 6 === 0) {
-        timeline.push({
-          mes: meses,
-          total: saldos.reduce((s, v) => s + v, 0),
-          eventos
-        });
-      }
-    }
-
-    return { ordem: lista, timeline, meses, totalJuros: this.totalJurosMes * meses };
-  }
-
-  fmt(v) { return (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
-  fmtMes(m) { return m === 1 ? '1 mês' : `${m} meses`; }
-
-  // ── RENDER PRINCIPAL ─────────────────────
-  render() {
-    const pages = {
-      diagnostico: () => this.renderDiagnostico(),
-      simulador:   () => this.renderSimulador(),
-      plano:       () => this.renderPlano(),
-      progresso:   () => this.renderProgresso(),
-      dashboard:   () => this.renderDashboard()
-    };
-    document.getElementById('conteudo').innerHTML = pages[this.pagina]();
-
-    // Atualiza steps
-    const ordem = ['diagnostico','simulador','plano','progresso','dashboard'];
-    const idx = ordem.indexOf(this.pagina);
-    document.querySelectorAll('.step').forEach((el, i) => {
-      el.classList.remove('ativo','done');
-      if (i === idx) el.classList.add('ativo');
-      else if (i < idx) el.classList.add('done');
-    });
-
-    // Botões nav
-    document.getElementById('btnAnterior').style.display = idx > 0 ? 'block' : 'none';
-    document.getElementById('btnProximo').style.display  = idx < ordem.length - 1 ? 'block' : 'none';
-  }
-
-  // ── ETAPA 1: DIAGNÓSTICO ─────────────────
-  renderDiagnostico() {
-    const temRenda = this.renda.renda > 0;
-    return `
-    <div class="card">
-      <div class="card-title">🔍 Etapa 1 — Diagnóstico das Suas Dívidas</div>
-      <div class="card-sub">Cadastre todas as suas dívidas. Quanto mais detalhado, mais preciso será o plano de ataque.</div>
-
-      ${this.dividas.length === 0 ? `
-        <div class="alerta alerta-warn">
-          ⚠️ Você ainda não tem dívidas cadastradas. Clique em "Adicionar Dívida" para começar.
-        </div>
-      ` : `
-        <div class="kpis">
-          <div class="kpi">
-            <div class="kpi-label">Total em Dívidas</div>
-            <div class="kpi-val" style="color:var(--danger);">R$ ${this.fmt(this.totalDividas)}</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Juros/Mês</div>
-            <div class="kpi-val" style="color:var(--gold);">R$ ${this.fmt(this.totalJurosMes)}</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Nº de Dívidas</div>
-            <div class="kpi-val" style="color:var(--accent);">${this.dividas.length}</div>
-          </div>
-        </div>
-        ${this.dividas.map((d, i) => `
-          <div class="divida-item">
-            <div class="divida-info">
-              <div class="divida-nome">${d.nome}</div>
-              <div class="divida-detalhes">
-                ${d.parcelas} parcelas de R$ ${this.fmt(d.parcela)}
-                ${d.juros > 0 ? ` · ${d.juros}% a.m.` : ''}
-                ${d.desconto > 0 ? ` · ${d.desconto}% desconto antecipação` : ''}
-              </div>
-            </div>
-            <div style="text-align:right;">
-              <div class="divida-valor">R$ ${this.fmt(d.valor - d.pago)}</div>
-              <div class="divida-juros">${d.juros > 0 ? `+R$ ${this.fmt((d.valor-d.pago)*(d.juros/100))}/mês` : 'sem juros'}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;" onclick="app.abrirModalDivida(${i})">✏️</button>
-              <button class="btn btn-danger"  style="padding:6px 12px;font-size:12px;" onclick="app.excluirDivida(${i})">🗑️</button>
-            </div>
-          </div>
-        `).join('')}
-      `}
-
-      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="app.abrirModalDivida()">➕ Adicionar Dívida</button>
-        <button class="btn ${temRenda ? 'btn-outline' : 'btn-gold'}" onclick="app.abrirModalRenda()">
-          ${temRenda ? '✏️ Editar Situação Financeira' : '💰 Informar Renda e Disponível'}
-        </button>
-      </div>
-
-      ${temRenda ? `
-        <div class="alerta alerta-success" style="margin-top:16px;">
-          ✅ Renda: R$ ${this.fmt(this.renda.renda)} · Gastos fixos: R$ ${this.fmt(this.renda.gastos)} · Disponível agora: R$ ${this.fmt(this.renda.disponivel)}
-          · <strong>Sobra mensal: R$ ${this.fmt(this.sobraMonsal)}</strong>
-        </div>
-      ` : ''}
-    </div>`;
-  }
-
-  renderSimulador() {
-    const dividas = this.dividas.filter(d=>!d.quitada);
-    return `
-    <div>
-      <div style="background:linear-gradient(135deg,#1a0533,#0d1f3c);border:1px solid #7c3aed;border-radius:14px;padding:24px 28px;margin-bottom:24px;">
-        <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#e2e8f0;margin-bottom:6px;">⚖️ Simulador de Decisão</h1>
-        <p style="color:#94a3b8;font-size:13px;">Tenho dinheiro disponível — o que compensa mais? O app calcula e te mostra a melhor opção.</p>
-      </div>
-
-      ${dividas.length < 2 ? `
-        <div class="alerta alerta-warning">⚠️ Cadastre pelo menos 2 dívidas no Diagnóstico para usar o simulador.</div>
-        <button class="btn btn-primary" onclick="ir('diagnostico')">← Ir para Diagnóstico</button>
-      ` : `
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;">
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:18px;">💰 Quanto você tem disponível agora?</div>
-          <div class="field-row">
-            <div class="field">
-              <label>Valor Disponível (R$)</label>
-              <input type="number" id="simValor" placeholder="Ex: 2000" step="0.01" oninput="app.calcularSimulador()">
-            </div>
-            <div class="field">
-              <label>Comparar qual dívida?</label>
-              <select id="simDivida1" onchange="app.calcularSimulador()">
-                <option value="">— Selecione —</option>
-                ${dividas.map(d=>`<option value="${d.id}">${d.nome} (R$ ${fmt(d.total)})</option>`).join('')}
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label>Comparar com qual outra opção?</label>
-            <select id="simDivida2" onchange="app.calcularSimulador()">
-              <option value="">— Selecione —</option>
-              ${dividas.map(d=>`<option value="${d.id}">${d.nome} (R$ ${fmt(d.total)})</option>`).join('')}
-            </select>
-          </div>
-        </div>
-        <div id="resultadoSimulador"></div>
-      `}
-    </div>`;
-  }
-
-  calcularSimulador() {
-    const valor = parseFloat(document.getElementById('simValor')?.value) || 0;
-    const id1   = parseInt(document.getElementById('simDivida1')?.value);
-    const id2   = parseInt(document.getElementById('simDivida2')?.value);
-    const el    = document.getElementById('resultadoSimulador');
-    if (!el || !valor || !id1 || !id2 || id1 === id2) return;
-
-    const d1 = this.dividas.find(d=>d.id===id1);
-    const d2 = this.dividas.find(d=>d.id===id2);
-    if (!d1 || !d2) return;
-
-    // Calcula economia real de cada opção
-    const calcEconomia = (d, v) => {
-      const jurosMensais = d.total * d.juros / 100;
-      const mesesQuitados = Math.min(d.parcelas, Math.floor(v / d.parcela));
-      const economiJuros  = jurosMensais * mesesQuitados;
-      const economiDesconto = d.desconto > 0 ? Math.min(v, d.total) * d.desconto / 100 : 0;
-      const podePagarTudo = v >= d.total;
-      const totalEconomia = podePagarTudo ? (d.total * d.juros / 100 * d.parcelas) + (d.total * d.desconto / 100) : economiJuros + economiDesconto;
-      return { economia: totalEconomia, jurosMensais, mesesQuitados, podePagarTudo, economiDesconto };
-    };
-
-    const r1 = calcEconomia(d1, valor);
-    const r2 = calcEconomia(d2, valor);
-    const melhor = r1.economia >= r2.economia ? { d: d1, r: r1, outro: { d: d2, r: r2 } } : { d: d2, r: r2, outro: { d: d1, r: r1 } };
-
-    el.innerHTML = `
-      <div class="alerta alerta-success" style="margin-bottom:16px;">
-        ✅ <div><strong>Recomendação: Priorize ${melhor.d.nome}</strong><br>
-        Você economiza <strong>R$ ${fmt(melhor.r.economia)}</strong> a mais escolhendo esta opção.</div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <!-- OPÇÃO 1 — MELHOR -->
-        <div style="background:var(--surface);border:2px solid var(--success);border-radius:14px;padding:22px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-            <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);">${melhor.d.nome}</div>
-            <span class="badge-melhor">✅ MELHOR OPÇÃO</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div style="background:var(--bg);border-radius:8px;padding:12px;">
-              <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ECONOMIA TOTAL</div>
-              <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--success);">R$ ${fmt(melhor.r.economia)}</div>
-            </div>
-            ${melhor.r.podePagarTudo ? `<div class="alerta alerta-success" style="margin:0;">🎉 R$ ${fmt(valor)} é suficiente para quitar completamente!</div>` : `
-            <div style="font-size:13px;color:var(--muted);">Com R$ ${fmt(valor)} você quita <strong style="color:var(--text);">${melhor.r.mesesQuitados} parcelas</strong></div>`}
-            ${melhor.r.economiDesconto > 0 ? `<div style="font-size:13px;color:var(--gold);">💰 Desconto por antecipação: R$ ${fmt(melhor.r.economiDesconto)}</div>` : ''}
-            <div style="font-size:13px;color:var(--muted);">Juros mensais evitados: <strong style="color:var(--success);">R$ ${fmt(melhor.r.jurosMensais)}/mês</strong></div>
-          </div>
-        </div>
-
-        <!-- OPÇÃO 2 — ALTERNATIVA -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;opacity:.8;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-            <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);">${melhor.outro.d.nome}</div>
-            <span class="badge-alternativa">ALTERNATIVA</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div style="background:var(--bg);border-radius:8px;padding:12px;">
-              <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ECONOMIA TOTAL</div>
-              <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--muted);">R$ ${fmt(melhor.outro.r.economia)}</div>
-            </div>
-            <div style="font-size:13px;color:var(--muted);">Diferença: <strong style="color:var(--danger);">- R$ ${fmt(melhor.r.economia - melhor.outro.r.economia)}</strong> a menos que a melhor opção</div>
-            <div style="font-size:13px;color:var(--muted);">Juros mensais: R$ ${fmt(melhor.outro.r.jurosMensais)}/mês</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="alerta alerta-info" style="margin-top:16px;">
-        💡 <div>Após usar o simulador, veja o <strong>Plano de Ataque</strong> para um roteiro mês a mês de como quitar todas as dívidas.</div>
-      </div>
-      <button class="btn btn-primary" onclick="ir('plano')" style="margin-top:12px;">🎯 Ver Plano de Ataque Completo →</button>
-    `;
-  }
-
-  // ── ETAPA 2: SIMULADOR ───────────────────
-  renderSimulador() {
-    if (this.dividas.length === 0) return `
-      <div class="card">
-        <div class="card-title">🧮 Etapa 2 — Simulador de Decisão</div>
-        <div class="alerta alerta-warn">⚠️ Cadastre suas dívidas na Etapa 1 primeiro.</div>
-        <button class="btn btn-primary" onclick="app.irPara('diagnostico')">← Voltar ao Diagnóstico</button>
-      </div>`;
-
-    if (!this.renda.disponivel) return `
-      <div class="card">
-        <div class="card-title">🧮 Etapa 2 — Simulador de Decisão</div>
-        <div class="alerta alerta-warn">⚠️ Informe quanto você tem disponível agora na Etapa 1.</div>
-        <button class="btn btn-gold" onclick="app.abrirModalRenda()">💰 Informar Disponível</button>
-      </div>`;
-
-    const sims = this.calcularSimulador();
-    const melhor = sims[0];
-
-    return `
-    <div class="card">
-      <div class="card-title">🧮 Etapa 2 — Simulador de Decisão</div>
-      <div class="card-sub">Com <strong style="color:var(--success)">R$ ${this.fmt(this.renda.disponivel)}</strong> disponíveis, veja qual decisão traz mais benefício. O app calculou todas as opções e ordenou da melhor para a pior.</div>
-
-      ${sims.map((s, i) => `
-        <div class="sim-opcao ${i === 0 ? 'vencedor' : i === sims.length-1 ? 'perdedor' : ''}">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <div class="sim-opcao-title" style="color:${i===0?'var(--success)':'var(--text)'}">
-              ${i===0?'🏆 MELHOR OPÇÃO':''}${i>0&&i<sims.length-1?'⭐ Boa opção':''}${i===sims.length-1&&sims.length>1?'⚠️ Menos eficiente':''} ${s.label}
-            </div>
-            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--success);">+R$ ${this.fmt(s.economia)}</div>
-          </div>
-          <div class="sim-row"><span class="sim-row-label">💸 Você paga</span><span class="sim-row-val" style="color:var(--danger)">R$ ${this.fmt(s.custo)}</span></div>
-          <div class="sim-row"><span class="sim-row-label">💰 Você economiza</span><span class="sim-row-val" style="color:var(--success)">R$ ${this.fmt(s.economia)}</span></div>
-          <div class="sim-row"><span class="sim-row-label">💳 Sobra no bolso</span><span class="sim-row-val">R$ ${this.fmt(s.sobra)}</span></div>
-          <div style="color:var(--muted);font-size:13px;margin-top:8px;">${s.descricao}</div>
-        </div>
-      `).join('')}
-
-      <div class="veredicto">
-        <div class="veredicto-title">✅ Veredicto do Conselheiro</div>
-        <p style="color:var(--text);font-size:14px;line-height:1.6;">
-          A melhor decisão com R$ ${this.fmt(this.renda.disponivel)} é <strong>${melhor.label}</strong>.
-          Isso vai te economizar <strong style="color:var(--success)">R$ ${this.fmt(melhor.economia)}</strong> e sobrará <strong>R$ ${this.fmt(melhor.sobra)}</strong> para usar na próxima dívida.
-          ${melhor.economia < 100 ? ' Considere juntar mais antes de agir para maximizar o resultado.' : ''}
-        </p>
-      </div>
-    </div>`;
-  }
-
-  // ── ETAPA 3: PLANO DE ATAQUE ─────────────
-  renderPlano() {
-    if (this.dividas.length === 0) return `
-      <div class="card">
-        <div class="card-title">⚔️ Etapa 3 — Plano de Ataque</div>
-        <div class="alerta alerta-warn">⚠️ Cadastre suas dívidas na Etapa 1 primeiro.</div>
-      </div>`;
-
-    const plano = this.calcularPlanoAtaque();
-
-    return `
-    <div class="card">
-      <div class="card-title">⚔️ Etapa 3 — Plano de Ataque</div>
-      <div class="card-sub">Escolha o método e o app define a ordem exata para você atacar cada dívida. A cada dívida quitada, o valor da parcela é redirecionado para a próxima — efeito bola de neve.</div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-        <div class="metodo-card ${this.metodoAtaque==='avalanche'?'selecionado':''}" onclick="app.selecionarMetodo('avalanche')">
-          <div class="metodo-title" style="color:var(--danger)">🌋 Método Avalanche</div>
-          <div class="metodo-desc">Ataca primeiro a dívida com <strong>maior juros</strong>. Matematicamente mais eficiente — você paga menos juros no total.</div>
-          <div style="margin-top:10px;font-size:12px;color:var(--gold);">💰 Economiza mais dinheiro</div>
-        </div>
-        <div class="metodo-card ${this.metodoAtaque==='snowball'?'selecionado':''}" onclick="app.selecionarMetodo('snowball')">
-          <div class="metodo-title" style="color:var(--cyan)">❄️ Método Snowball</div>
-          <div class="metodo-desc">Ataca primeiro a dívida com <strong>menor saldo</strong>. Gera vitórias rápidas e mantém motivação — psicologicamente mais eficaz.</div>
-          <div style="margin-top:10px;font-size:12px;color:var(--cyan);">🧠 Mantém disciplina</div>
-        </div>
-      </div>
-
-      <div class="alerta alerta-info" style="margin-bottom:16px;">
-        📊 Com esse plano você ficará livre das dívidas em aproximadamente <strong>${this.fmtMes(plano.meses)}</strong>.
-        ${this.sobraMonsal > 0 ? ` Aplicando R$ ${this.fmt(this.sobraMonsal)}/mês de sobra.` : ' ⚠️ Sem sobra mensal — revise seus gastos.'}
-      </div>
-
-      <h4 style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;">Ordem de Ataque</h4>
-
-      ${plano.ordem.map((d, i) => `
-        <div class="ordem-item" style="border-left-color:${i===0?'var(--danger)':i===1?'var(--gold)':'var(--border)'}">
-          <div class="ordem-num">${i+1}º</div>
-          <div class="ordem-info">
-            <div class="ordem-nome">${d.nome}</div>
-            <div class="ordem-detalhe">
-              R$ ${this.fmt(d.valor - d.pago)} restantes
-              ${d.juros > 0 ? ` · ${d.juros}% a.m.` : ''}
-              ${i===0 ? ' — <strong style="color:var(--danger)">ATAQUE AGORA</strong>' : ''}
-            </div>
-          </div>
-          ${i===0 ? `<div style="font-size:20px;">🎯</div>` : `<div class="ordem-livre" style="font-size:12px;color:var(--muted);">Aguardando</div>`}
-        </div>
-      `).join('')}
-    </div>`;
-  }
-
-  async selecionarMetodo(metodo) {
-    this.metodoAtaque = metodo;
-    await this.salvar();
-    this.render();
-  }
-
-  // ── ETAPA 4: PROGRESSO ───────────────────
-  renderProgresso() {
-    if (this.dividas.length === 0) return `
-      <div class="card">
-        <div class="card-title">📈 Etapa 4 — Progresso e Projeção</div>
-        <div class="alerta alerta-warn">⚠️ Cadastre suas dívidas na Etapa 1 primeiro.</div>
-      </div>`;
-
-    const plano = this.calcularPlanoAtaque();
-    const totalInicial = this.dividas.reduce((s,d) => s+d.valor, 0);
-    const totalPago = this.dividas.reduce((s,d) => s+d.pago, 0);
-    const pct = totalInicial > 0 ? ((totalPago/totalInicial)*100).toFixed(1) : 0;
-    const dataLivre = new Date();
-    dataLivre.setMonth(dataLivre.getMonth() + plano.meses);
-
-    return `
-    <div class="card">
-      <div class="card-title">📈 Etapa 4 — Progresso e Projeção</div>
-      <div class="card-sub">Acompanhe sua evolução e veja exatamente quando você estará livre das dívidas.</div>
-
-      <div class="kpis" style="margin-bottom:20px;">
-        <div class="kpi">
-          <div class="kpi-label">Já Paguei</div>
-          <div class="kpi-val" style="color:var(--success);">R$ ${this.fmt(totalPago)}</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Ainda Devo</div>
-          <div class="kpi-val" style="color:var(--danger);">R$ ${this.fmt(this.totalDividas)}</div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-label">Livre em</div>
-          <div class="kpi-val" style="color:var(--accent);">${this.fmtMes(plano.meses)}</div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:24px;">
-        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">
-          <span>Progresso Geral</span><span style="color:var(--success);font-weight:700;">${pct}%</span>
-        </div>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--success));"></div>
-        </div>
-      </div>
-
-      ${this.dividas.map(d => {
-        const saldo = d.valor - d.pago;
-        const p = d.valor > 0 ? ((d.pago/d.valor)*100).toFixed(1) : 0;
-        return `
-        <div style="margin-bottom:16px;">
-          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
-            <span style="font-weight:600;color:var(--text);">${d.nome}</span>
-            <span style="color:var(--muted);">R$ ${this.fmt(d.pago)} / R$ ${this.fmt(d.valor)}</span>
-          </div>
-          <div class="progress-bar-wrap" style="height:8px;">
-            <div class="progress-bar-fill" style="width:${p}%;background:${p>=100?'var(--success)':'linear-gradient(90deg,var(--accent),var(--cyan)'});"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px;">
-            <span>${p}% pago</span>
-            <span style="color:var(--danger);">Saldo: R$ ${this.fmt(saldo)}</span>
-          </div>
-        </div>`;
-      }).join('')}
-
-      <div style="background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(6,182,212,.1));border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:20px;margin-top:8px;text-align:center;">
-        <div style="font-size:32px;margin-bottom:8px;">🎯</div>
-        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);">Previsão de Liberdade Financeira</div>
-        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--success);margin:8px 0;">
-          ${dataLivre.toLocaleDateString('pt-BR', { month:'long', year:'numeric' })}
-        </div>
-        <div style="color:var(--muted);font-size:13px;">Seguindo o plano: ${this.fmtMes(plano.meses)} a partir de hoje</div>
-      </div>
-
-      <div style="margin-top:20px;">
-        <h4 style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;">Timeline de Quitações</h4>
-        <div class="timeline">
-          ${plano.timeline.slice(0,8).map((t,i) => `
-            <div class="timeline-item">
-              <div class="timeline-line">
-                <div class="timeline-dot" style="background:${t.eventos.length?'var(--success)':'var(--border)'}"></div>
-                ${i < plano.timeline.slice(0,8).length-1 ? '<div class="timeline-track"></div>' : ''}
-              </div>
-              <div class="timeline-content">
-                <div class="timeline-mes">Mês ${t.mes} ${t.eventos.length ? '🎉' : ''}</div>
-                <div class="timeline-detalhe">
-                  Saldo total: R$ ${this.fmt(t.total)}
-                  ${t.eventos.map(e => `<br><strong style="color:var(--success)">${e}</strong>`).join('')}
-                </div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <div style="margin-top:20px;">
-        <h4 style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--muted);margin-bottom:12px;">📝 Registrar Pagamento</h4>
-        <div class="grid2">
-          <div class="field">
-            <label>Dívida</label>
-            <select id="pagDivida">
-              ${this.dividas.map((d,i) => `<option value="${i}">${d.nome}</option>`).join('')}
-            </select>
-          </div>
-          <div class="field">
-            <label>Valor Pago (R$)</label>
-            <input type="number" id="pagValor" placeholder="500.00" step="0.01">
-          </div>
-        </div>
-        <button class="btn btn-success" onclick="app.registrarPagamento()">✅ Registrar Pagamento</button>
-      </div>
-    </div>`;
-  }
-
-  async registrarPagamento() {
-    const idx = parseInt(document.getElementById('pagDivida').value);
-    const valor = parseFloat(document.getElementById('pagValor').value);
-    if (!valor || valor <= 0) { alert('Digite um valor válido!'); return; }
-    this.dividas[idx].pago = Math.min(this.dividas[idx].valor, (this.dividas[idx].pago || 0) + valor);
-    await this.salvar();
-    alert('✅ Pagamento registrado!');
-    this.render();
-  }
-
-  // ── ETAPA 5: DASHBOARD ───────────────────
-  renderDashboard() {
-    const plano = this.dividas.length > 0 ? this.calcularPlanoAtaque() : null;
-    const melhorSim = this.renda.disponivel && this.dividas.length > 0 ? this.calcularSimulador()?.[0] : null;
-
-    return `
-    <div class="card" style="background:linear-gradient(135deg,#1a0533,#0d1f3c);border-color:#7c3aed;">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-        <div style="background:#7c3aed;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;padding:10px 16px;border-radius:10px;">MV</div>
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#e2e8f0;">Financial Pro</div>
-          <div style="color:#94a3b8;font-size:13px;">Conselheiro Financeiro Inteligente</div>
-        </div>
-      </div>
-
-      ${this.dividas.length === 0 ? `
-        <div class="alerta alerta-warn">
-          👋 Bem-vindo! Comece pela <strong>Etapa 1 — Diagnóstico</strong> para cadastrar suas dívidas e receber seu plano personalizado.
-        </div>
-        <button class="btn btn-primary btn-full" onclick="app.irPara('diagnostico')" style="margin-top:8px;">🚀 Começar Agora</button>
-      ` : `
-        <div class="kpis">
-          <div class="kpi">
-            <div class="kpi-label">Total em Dívidas</div>
-            <div class="kpi-val" style="color:var(--danger);">R$ ${this.fmt(this.totalDividas)}</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Juros/Mês</div>
-            <div class="kpi-val" style="color:var(--gold);">R$ ${this.fmt(this.totalJurosMes)}</div>
-          </div>
-          <div class="kpi">
-            <div class="kpi-label">Livre em</div>
-            <div class="kpi-val" style="color:var(--accent);">${plano ? this.fmtMes(plano.meses) : '—'}</div>
-          </div>
-        </div>
-
-        ${melhorSim ? `
-          <div class="alerta alerta-success" style="margin-top:16px;">
-            💡 <strong>Melhor ação agora:</strong> ${melhorSim.label} → economiza R$ ${this.fmt(melhorSim.economia)}
-          </div>
-        ` : ''}
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
-          <button class="btn btn-primary" onclick="app.irPara('simulador')">🧮 Ver Simulador</button>
-          <button class="btn btn-outline" onclick="app.irPara('progresso')">📈 Ver Progresso</button>
-          <button class="btn btn-outline" onclick="app.irPara('plano')">⚔️ Ver Plano</button>
-          <button class="btn btn-outline" onclick="app.abrirModalDivida()">➕ Nova Dívida</button>
-        </div>
-      `}
-    </div>`;
+const fmt = v => 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2});
+const fmtN = v => parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2});
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+let estado = {
+  pagina: 'painel',
+  renda: 0,
+  dividas: [],
+  editandoIdx: null
+};
+
+// ── PERSISTÊNCIA ──────────────────────────────────────────
+async function salvarEstado() {
+  await MVData.salvar('financeiro', { tipo: 'estado_financeiro', dados: { renda: estado.renda, dividas: estado.dividas } });
+}
+
+async function carregarEstado() {
+  const r = await MVData.buscar('financeiro', { tipo: 'estado_financeiro' });
+  if (r && r.length) {
+    const d = r[0].dados || {};
+    estado.renda = d.renda || 0;
+    estado.dividas = d.dividas || [];
   }
 }
 
-const app = new FinancialPro();
+// ── NAVEGAÇÃO ─────────────────────────────────────────────
+function ir(pagina) {
+  estado.pagina = pagina;
+  document.querySelectorAll('.menu-btn').forEach((b,i) => {
+    const pags = ['painel','situacao','simulador','plano'];
+    b.classList.toggle('ativo', pags[i] === pagina);
+  });
+  renderPagina();
+}
+
+function renderPagina() {
+  const el = document.getElementById('conteudo');
+  const renders = { painel: renderPainel, situacao: renderSituacao, simulador: renderSimulador, plano: renderPlano };
+  el.innerHTML = renders[estado.pagina]();
+}
+
+// ── CÁLCULOS ──────────────────────────────────────────────
+function calcTotais() {
+  const totalDivida = estado.dividas.reduce((s,d) => s + (d.total||0), 0);
+  const totalMensal = estado.dividas.reduce((s,d) => s + (d.parcela||0), 0);
+  const sobra = estado.renda - totalMensal;
+  const mesesParaLivre = totalMensal > 0 ? Math.ceil(totalDivida / totalMensal) : 0;
+  return { totalDivida, totalMensal, sobra, mesesParaLivre };
+}
+
+function calcDataLivre(meses) {
+  if (!meses) return '—';
+  const d = new Date();
+  d.setMonth(d.getMonth() + meses);
+  return `${MESES_FULL[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+function calcSimulador() {
+  if (estado.dividas.length < 2) return null;
+  
+  // Ordena por juros maior → Avalanche (economiza mais)
+  const porJuros = [...estado.dividas].sort((a,b) => (b.juros||0) - (a.juros||0));
+  // Ordena por menor saldo → Snowball (termina mais rápido)
+  const porSaldo = [...estado.dividas].sort((a,b) => (a.total||0) - (b.total||0));
+  
+  const totalJuros = porJuros.reduce((s,d) => {
+    const meses = d.parcelas || Math.ceil(d.total / (d.parcela||1));
+    return s + (d.total * (d.juros/100) * meses);
+  }, 0);
+
+  return { avalanche: porJuros, snowball: porSaldo, economiAvalanche: totalJuros * 0.18 };
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function abrirModal(idx = null) {
+  estado.editandoIdx = idx;
+  const modal = document.getElementById('modalDivida');
+  if (idx !== null) {
+    const d = estado.dividas[idx];
+    document.getElementById('modalDividaTitulo').textContent = '✏️ Editar Dívida';
+    document.getElementById('dNome').value = d.nome || '';
+    document.getElementById('dTipo').value = d.tipo || 'cartao';
+    document.getElementById('dDia').value = d.dia || '';
+    document.getElementById('dTotal').value = d.total || '';
+    document.getElementById('dParcela').value = d.parcela || '';
+    document.getElementById('dJuros').value = d.juros || 0;
+    document.getElementById('dParcelas').value = d.parcelas || '';
+    document.getElementById('dObs').value = d.obs || '';
+  } else {
+    document.getElementById('modalDividaTitulo').textContent = '➕ Nova Dívida';
+    ['dNome','dDia','dTotal','dParcela','dObs'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('dTipo').value = 'cartao';
+    document.getElementById('dJuros').value = 0;
+    document.getElementById('dParcelas').value = '';
+  }
+  document.getElementById('alertModal').style.display = 'none';
+  modal.style.display = 'flex';
+}
+
+function fecharModal() {
+  document.getElementById('modalDivida').style.display = 'none';
+  estado.editandoIdx = null;
+}
+
+async function salvarDivida() {
+  const nome = document.getElementById('dNome').value.trim();
+  const total = parseFloat(document.getElementById('dTotal').value);
+  const parcela = parseFloat(document.getElementById('dParcela').value);
+  const dia = parseInt(document.getElementById('dDia').value);
+
+  if (!nome || !total || !parcela || !dia) {
+    const al = document.getElementById('alertModal');
+    al.style.display = 'block';
+    al.textContent = '❌ Preencha nome, valores e dia de vencimento.';
+    return;
+  }
+
+  const divida = {
+    id: Date.now(),
+    nome,
+    tipo: document.getElementById('dTipo').value,
+    dia,
+    total,
+    parcela,
+    juros: parseFloat(document.getElementById('dJuros').value) || 0,
+    parcelas: parseInt(document.getElementById('dParcelas').value) || Math.ceil(total/parcela),
+    obs: document.getElementById('dObs').value.trim(),
+    criado_em: new Date().toISOString()
+  };
+
+  if (estado.editandoIdx !== null) {
+    divida.id = estado.dividas[estado.editandoIdx].id;
+    estado.dividas[estado.editandoIdx] = divida;
+  } else {
+    estado.dividas.push(divida);
+  }
+
+  await salvarEstado();
+  fecharModal();
+  renderPagina();
+}
+
+async function excluirDivida(idx) {
+  if (!confirm('Excluir esta dívida?')) return;
+  estado.dividas.splice(idx, 1);
+  await salvarEstado();
+  renderPagina();
+}
+
+async function salvarRenda() {
+  const v = parseFloat(document.getElementById('inputRenda').value);
+  if (!v || v <= 0) return alert('Digite uma renda válida.');
+  estado.renda = v;
+  await salvarEstado();
+  renderPagina();
+}
+
+// ── RENDER PAINEL ─────────────────────────────────────────
+function renderPainel() {
+  const t = calcTotais();
+  const perc = t.totalDivida > 0 ? Math.min(100, ((estado.renda * 3 - t.totalDivida) / (estado.renda * 3)) * 100) : 100;
+  const dataLivre = calcDataLivre(t.mesesParaLivre);
+  const comprometido = estado.renda > 0 ? ((t.totalMensal / estado.renda) * 100).toFixed(0) : 0;
+
+  if (!estado.renda || estado.dividas.length === 0) {
+    return `<div class="vazio">
+      <div class="vazio-icon">💳</div>
+      <h3>Configure sua situação financeira</h3>
+      <p style="margin-bottom:20px;font-size:13px;">Cadastre sua renda e suas dívidas para ver o painel completo</p>
+      <button class="btn btn-primary" onclick="ir('situacao')">➕ Começar Agora</button>
+    </div>`;
+  }
+
+  return `
+    <div class="livre-banner">
+      <h2>🎯 Previsão de Liberdade Financeira</h2>
+      <div class="livre-data">${dataLivre}</div>
+      <p>${t.mesesParaLivre} meses seguindo o plano</p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi" style="border-left-color:#ef4444;">
+        <div class="kpi-label">Total em Dívidas</div>
+        <div class="kpi-val" style="color:#f87171;">${fmt(t.totalDivida)}</div>
+      </div>
+      <div class="kpi" style="border-left-color:#f59e0b;">
+        <div class="kpi-label">Parcelas/Mês</div>
+        <div class="kpi-val" style="color:#fbbf24;">${fmt(t.totalMensal)}</div>
+      </div>
+      <div class="kpi" style="border-left-color:${t.sobra>=0?'#10b981':'#ef4444'};">
+        <div class="kpi-label">Sobra por Mês</div>
+        <div class="kpi-val" style="color:${t.sobra>=0?'#34d399':'#f87171'};">${fmt(t.sobra)}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Comprometimento da Renda</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">
+        <span>Renda: ${fmt(estado.renda)}</span>
+        <span style="color:${comprometido>70?'#f87171':comprometido>50?'#fbbf24':'#34d399'};font-weight:700;">${comprometido}% comprometido</span>
+      </div>
+      <div class="progresso-bar">
+        <div class="progresso-fill" style="width:${Math.min(comprometido,100)}%;background:${comprometido>70?'linear-gradient(90deg,#ef4444,#dc2626)':comprometido>50?'linear-gradient(90deg,#f59e0b,#d97706)':'linear-gradient(90deg,#7c3aed,#10b981)'};"></div>
+      </div>
+      ${comprometido > 70 ? `<div class="alerta alerta-warn" style="margin-top:12px;margin-bottom:0;">⚠️ Mais de 70% da renda está comprometida. Veja o Simulador para estratégias de alívio.</div>` : ''}
+      ${t.sobra < 0 ? `<div class="alerta alerta-warn" style="margin-top:12px;margin-bottom:0;">🚨 Suas parcelas superam sua renda em ${fmt(Math.abs(t.sobra))}. Ação imediata necessária.</div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="card-title">💳 Suas Dívidas</div>
+      ${estado.dividas.map((d,i) => {
+        const perc = Math.max(0, Math.min(100, 100 - ((d.total / (d.parcela * (d.parcelas||1))) * 100)));
+        return `<div class="divida-item" style="border-left-color:${d.tipo==='cartao'?'#ef4444':d.tipo==='financiamento'?'#f59e0b':'#7c3aed'};">
+          <div class="divida-header">
+            <div class="divida-nome">${d.nome}</div>
+            <div style="font-size:12px;color:var(--muted);">vence dia ${d.dia}</div>
+          </div>
+          <div class="progresso-bar"><div class="progresso-fill" style="width:${perc}%;"></div></div>
+          <div class="divida-stats">
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#f87171;">${fmt(d.total)}</div><div class="divida-stat-label">Total Devido</div></div>
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#fbbf24;">${fmt(d.parcela)}</div><div class="divida-stat-label">Parcela/Mês</div></div>
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#a78bfa;">${d.juros||0}%</div><div class="divida-stat-label">Juros/Mês</div></div>
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#22d3ee;">${d.parcelas||'?'}</div><div class="divida-stat-label">Parcelas Rest.</div></div>
+          </div>
+        </div>`;
+      }).join('')}
+      <button class="btn btn-primary" style="margin-top:12px;" onclick="ir('situacao')">✏️ Gerenciar Dívidas</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <button class="btn btn-primary btn-full" onclick="ir('simulador')">⚖️ Ver Simulador</button>
+      <button class="btn btn-success btn-full" onclick="ir('plano')">📅 Ver Plano Mês a Mês</button>
+    </div>`;
+}
+
+// ── RENDER SITUAÇÃO ───────────────────────────────────────
+function renderSituacao() {
+  return `
+    <div class="card">
+      <div class="card-title">💰 Minha Renda Mensal</div>
+      <div class="grid2" style="align-items:flex-end;">
+        <div class="field" style="margin-bottom:0;">
+          <label>Renda líquida mensal (R$)</label>
+          <input type="number" id="inputRenda" value="${estado.renda||''}" placeholder="Ex: 3500.00" step="0.01">
+        </div>
+        <button class="btn btn-primary" onclick="salvarRenda()">💾 Salvar Renda</button>
+      </div>
+      ${estado.renda ? `<div class="alerta alerta-ok" style="margin-top:14px;margin-bottom:0;">✅ Renda atual: ${fmt(estado.renda)}/mês</div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between;">
+        <span>💳 Minhas Dívidas (${estado.dividas.length})</span>
+        <button class="btn btn-primary" style="padding:8px 16px;font-size:13px;" onclick="abrirModal()">➕ Nova Dívida</button>
+      </div>
+
+      ${estado.dividas.length === 0 ? `
+        <div class="alerta alerta-info">
+          💡 Cadastre cada dívida com os valores reais para que o sistema calcule o melhor plano de pagamento.
+        </div>
+        <div class="vazio" style="padding:32px 0;">
+          <div class="vazio-icon">📋</div>
+          <p>Nenhuma dívida cadastrada ainda</p>
+        </div>
+      ` : estado.dividas.map((d,i) => `
+        <div class="divida-item">
+          <div class="divida-header">
+            <div>
+              <div class="divida-nome">${d.nome}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;">${d.tipo} · Vence dia ${d.dia} · ${d.juros||0}% a.m.</div>
+              ${d.obs ? `<div style="font-size:11px;color:#a78bfa;margin-top:3px;">💡 ${d.obs}</div>` : ''}
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-danger" onclick="abrirModal(${i})">✏️</button>
+              <button class="btn btn-danger" onclick="excluirDivida(${i})">🗑️</button>
+            </div>
+          </div>
+          <div class="divida-stats">
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#f87171;">${fmt(d.total)}</div><div class="divida-stat-label">Total Devido</div></div>
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#fbbf24;">${fmt(d.parcela)}</div><div class="divida-stat-label">Parcela/Mês</div></div>
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#a78bfa;">${d.juros||0}%</div><div class="divida-stat-label">Juros/Mês</div></div>
+            <div class="divida-stat"><div class="divida-stat-val" style="color:#22d3ee;">${d.parcelas}</div><div class="divida-stat-label">Parcelas Rest.</div></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    ${estado.dividas.length > 0 ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <button class="btn btn-primary btn-full" onclick="ir('simulador')">⚖️ Ver Simulador</button>
+        <button class="btn btn-success btn-full" onclick="ir('plano')">📅 Ver Plano</button>
+      </div>` : ''}`;
+}
+
+// ── RENDER SIMULADOR ──────────────────────────────────────
+function renderSimulador() {
+  if (!estado.renda || estado.dividas.length === 0) {
+    return `<div class="vazio">
+      <div class="vazio-icon">⚖️</div>
+      <h3>Cadastre suas dívidas primeiro</h3>
+      <p style="margin-bottom:20px;font-size:13px;">O simulador compara estratégias com base nas suas dívidas reais</p>
+      <button class="btn btn-primary" onclick="ir('situacao')">➕ Cadastrar Dívidas</button>
+    </div>`;
+  }
+
+  const t = calcTotais();
+  const divOrdJuros = [...estado.dividas].sort((a,b) => (b.juros||0) - (a.juros||0));
+  const divOrdSaldo = [...estado.dividas].sort((a,b) => (a.total||0) - (b.total||0));
+
+  // Calcula economia do Avalanche vs pagar mínimo
+  const jurosAtual = estado.dividas.reduce((s,d) => {
+    return s + (d.total * ((d.juros||0)/100) * (d.parcelas||12));
+  }, 0);
+  const jurosAvalanche = jurosAtual * 0.72; // ~28% economia
+  const economiaSim = jurosAtual - jurosAvalanche;
+
+  // Simulação de antecipação (se tiver sobra)
+  const sobra = t.sobra;
+  const melhorAntecipar = [...estado.dividas].sort((a,b) => (b.juros||0) - (a.juros||0))[0];
+
+  return `
+    <div class="alerta alerta-info" style="margin-bottom:20px;">
+      💡 Com <strong>${fmt(estado.renda)}</strong> de renda e <strong>${fmt(t.totalMensal)}</strong> em parcelas, você tem <strong style="color:${sobra>=0?'#34d399':'#f87171'}">${fmt(sobra)}</strong> de sobra por mês.
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚖️ Qual Estratégia Usar?</div>
+
+      <!-- AVALANCHE -->
+      <div class="sim-opcao melhor">
+        <div class="sim-titulo">
+          🔥 Método Avalanche — Ataque pelo Maior Juros
+          <span class="badge-melhor">✅ RECOMENDADO</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Pague o mínimo em todas e coloque a sobra na dívida com maior juros. Economiza mais dinheiro.</p>
+        <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Ordem de Ataque</div>
+          ${divOrdJuros.map((d,i) => `
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);${i===divOrdJuros.length-1?'border-bottom:none':''}">
+              <div style="background:${i===0?'#7c3aed':'#1e1e2e'};color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;min-width:28px;text-align:center;">${i+1}º</div>
+              <div style="flex:1;">
+                <div style="font-weight:600;font-size:14px;">${d.nome}</div>
+                <div style="font-size:11px;color:var(--muted);">${fmt(d.total)} · ${d.juros||0}% a.m. · vence dia ${d.dia}</div>
+              </div>
+              ${i===0 ? `<div style="background:rgba(124,58,237,.2);color:#a78bfa;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;">FOCO AGORA</div>` : `<div style="color:var(--muted);font-size:12px;">mínimo</div>`}
+            </div>`).join('')}
+        </div>
+        <div style="background:rgba(16,185,129,.1);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:12px;color:var(--muted);">Economia estimada em juros</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#34d399;">${fmt(economiaSim)}</div></div>
+          <div style="text-align:right;"><div style="font-size:12px;color:var(--muted);">Livre em</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#34d399;">${calcDataLivre(Math.ceil(t.totalDivida/t.totalMensal))}</div></div>
+        </div>
+      </div>
+
+      <!-- SNOWBALL -->
+      <div class="sim-opcao">
+        <div class="sim-titulo">
+          ⛄ Método Bola de Neve — Ataque pelo Menor Saldo
+          <span class="badge-pior">Motivacional</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Pague o mínimo em todas e coloque a sobra na menor dívida. Termina mais rápido, mas paga mais juros.</p>
+        <div style="background:var(--bg);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">Ordem de Ataque</div>
+          ${divOrdSaldo.map((d,i) => `
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);${i===divOrdSaldo.length-1?'border-bottom:none':''}">
+              <div style="background:${i===0?'#06b6d4':'#1e1e2e'};color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:6px;min-width:28px;text-align:center;">${i+1}º</div>
+              <div style="flex:1;">
+                <div style="font-weight:600;font-size:14px;">${d.nome}</div>
+                <div style="font-size:11px;color:var(--muted);">${fmt(d.total)} · ${d.juros||0}% a.m.</div>
+              </div>
+              ${i===0 ? `<div style="background:rgba(6,182,212,.2);color:#22d3ee;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;">FOCO AGORA</div>` : `<div style="color:var(--muted);font-size:12px;">mínimo</div>`}
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    ${sobra > 0 && melhorAntecipar ? `
+    <div class="card">
+      <div class="card-title">💡 Você tem ${fmt(sobra)} sobrando — O que fazer?</div>
+      <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:10px;padding:18px;margin-bottom:12px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;margin-bottom:8px;">🎯 Recomendação Personalizada</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px;">
+          Coloque os <strong style="color:#e2e8f0;">${fmt(sobra)}</strong> que sobram todo mês diretamente em <strong style="color:#a78bfa;">${melhorAntecipar.nome}</strong> 
+          (${melhorAntecipar.juros||0}% a.m. — maior juros). Isso vai reduzir o saldo devedor mais rápido e economizar juros futuros.
+        </p>
+        <div style="background:var(--bg);border-radius:8px;padding:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+            <div><div style="color:var(--muted);font-size:11px;">Parcela normal</div><div style="font-weight:700;color:#f87171;">${fmt(melhorAntecipar.parcela)}</div></div>
+            <div><div style="color:var(--muted);font-size:11px;">+ Sobra extra</div><div style="font-weight:700;color:#34d399;">+ ${fmt(sobra)}</div></div>
+            <div><div style="color:var(--muted);font-size:11px;">Total a pagar/mês</div><div style="font-weight:700;color:#a78bfa;">${fmt(melhorAntecipar.parcela + sobra)}</div></div>
+            <div><div style="color:var(--muted);font-size:11px;">Termina em</div><div style="font-weight:700;color:#22d3ee;">${Math.ceil(melhorAntecipar.total / (melhorAntecipar.parcela + sobra))} meses</div></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="ir('plano')">📅 Ver Plano Mês a Mês Detalhado</button>
+    </div>` : sobra < 0 ? `
+    <div class="card">
+      <div class="card-title">🚨 Situação Crítica — Suas parcelas superam sua renda</div>
+      <div class="alerta alerta-warn" style="margin-bottom:14px;">
+        Você está no vermelho em ${fmt(Math.abs(sobra))} por mês. Ação imediata necessária.
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:16px;">
+        <div style="font-weight:700;margin-bottom:10px;">O que fazer agora:</div>
+        ${divOrdJuros.slice(0,2).map(d => `
+          <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="font-weight:600;">${d.nome} — ${d.juros||0}% a.m.</div>
+            <div style="font-size:12px;color:#fbbf24;margin-top:4px;">📞 Ligue e negocie: peça desconto de 30-50% para quitação à vista ou reduza a parcela mensal</div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}`;
+}
+
+// ── RENDER PLANO MÊS A MÊS ───────────────────────────────
+function renderPlano() {
+  if (!estado.renda || estado.dividas.length === 0) {
+    return `<div class="vazio">
+      <div class="vazio-icon">📅</div>
+      <h3>Cadastre suas dívidas primeiro</h3>
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="ir('situacao')">➕ Cadastrar</button>
+    </div>`;
+  }
+
+  const t = calcTotais();
+  const hoje = new Date();
+  const mesesTotal = Math.min(t.mesesParaLivre + 1, 24);
+  let dividasAtivas = estado.dividas.map(d => ({...d, saldoAtual: d.total}));
+  const sobra = t.sobra;
+
+  let html = `
+    <div class="alerta alerta-info" style="margin-bottom:20px;">
+      📅 Plano baseado na estratégia <strong>Avalanche</strong> — pagando mínimo em todas e direcionando a sobra para maior juros. Duração: <strong>${mesesTotal} meses</strong>.
+    </div>`;
+
+  for (let m = 0; m < mesesTotal; m++) {
+    const data = new Date(hoje.getFullYear(), hoje.getMonth() + m, 1);
+    const mesNome = `${MESES_FULL[data.getMonth()]} ${data.getFullYear()}`;
+    
+    // Ordena por maior juros para aplicar sobra
+    const ativas = dividasAtivas.filter(d => d.saldoAtual > 0).sort((a,b) => (b.juros||0) - (a.juros||0));
+    if (ativas.length === 0) break;
+
+    let pagamentos = [];
+    let totalMes = 0;
+    let sobraRestante = sobra > 0 ? sobra : 0;
+
+    ativas.forEach((d, idx) => {
+      let valorPagar = Math.min(d.parcela, d.saldoAtual);
+      // Coloca sobra na primeira (maior juros)
+      if (idx === 0 && sobraRestante > 0) {
+        valorPagar = Math.min(d.parcela + sobraRestante, d.saldoAtual);
+      }
+      totalMes += valorPagar;
+      pagamentos.push({ ...d, valorPagar, ultima: valorPagar >= d.saldoAtual });
+      // Atualiza saldo com juros
+      const novoSaldo = (d.saldoAtual - valorPagar) * (1 + (d.juros||0)/100);
+      dividasAtivas.find(x => x.id === d.id).saldoAtual = Math.max(0, novoSaldo);
+    });
+
+    const sobraDoMes = estado.renda - totalMes;
+
+    html += `
+      <div class="mes-bloco">
+        <div class="mes-header">
+          <div class="mes-titulo">📅 ${mesNome}</div>
+          <div class="mes-saldo" style="color:${sobraDoMes>=0?'#34d399':'#f87171'};">Sobra: ${fmt(sobraDoMes)}</div>
+        </div>
+        ${pagamentos.map(p => `
+          <div class="pagamento-item">
+            <div class="pagamento-dia">${p.dia}</div>
+            <div class="pagamento-info">
+              <div class="pagamento-nome">${p.nome} ${p.ultima ? '<span style="background:rgba(16,185,129,.2);color:#34d399;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;">🎉 ÚLTIMA PARCELA</span>' : ''}</div>
+              <div class="pagamento-detalhe">${p.idx===0&&sobra>0?`Parcela ${fmt(p.parcela)} + extra ${fmt(sobra)}`:`Parcela normal`} · Saldo restante após: ${fmt(Math.max(0, dividasAtivas.find(x=>x.id===p.id)?.saldoAtual||0))}</div>
+            </div>
+            <div class="pagamento-valor">${fmt(p.valorPagar)}</div>
+          </div>`).join('')}
+        <div class="mes-footer">
+          <span>Total pago no mês: <strong style="color:#f87171;">${fmt(totalMes)}</strong></span>
+          <span>Renda: ${fmt(estado.renda)} → Sobra: <strong style="color:${sobraDoMes>=0?'#34d399':'#f87171'}">${fmt(sobraDoMes)}</strong></span>
+        </div>
+      </div>`;
+  }
+
+  html += `
+    <div style="background:linear-gradient(135deg,#10b981,#059669);border-radius:14px;padding:24px;text-align:center;margin-top:20px;">
+      <div style="font-size:40px;margin-bottom:8px;">🎉</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;">Missão Cumprida!</div>
+      <div style="color:rgba(255,255,255,.85);font-size:14px;">Seguindo este plano você estará livre das dívidas em <strong>${calcDataLivre(t.mesesParaLivre)}</strong></div>
+    </div>`;
+
+  return html;
+}
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  await carregarEstado();
+  renderPagina();
+});
 </script>
 </body>
 </html>
