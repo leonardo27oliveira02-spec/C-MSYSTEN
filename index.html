@@ -3,267 +3,956 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MEGAVISION — Business Ecosystem</title>
+  <title>MEGAVISION — Financial Pro</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="megavision-data.js"></script>
   <script src="megavision-auth.js"></script>
+  <script src="megavision-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#7c3aed;--cyan:#06b6d4;--text:#e2e8f0;--muted:#94a3b8;}
+    :root{--bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#7c3aed;--cyan:#06b6d4;--gold:#f59e0b;--text:#e2e8f0;--muted:#94a3b8;--success:#10b981;--danger:#ef4444;}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
     .mv-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;}
     .mv-nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
-    .mv-nav-right{display:flex;align-items:center;gap:8px;}
-    .mv-dot{width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;display:inline-block;margin-right:4px;}
+    .mv-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s infinite;display:inline-block;margin-right:6px;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    .main{max-width:1100px;margin:0 auto;padding:32px 20px 60px;}
-    /* HERO */
-    .hero{background:linear-gradient(135deg,#0d0d1a,#1a0533,#0d1f3c);border-bottom:1px solid var(--border);padding:48px 24px;text-align:center;position:relative;overflow:hidden;}
-    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,.2) 0%,transparent 70%);}
-    .hero-title{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;position:relative;}
-    .hero-sub{color:var(--muted);font-size:15px;margin-bottom:28px;position:relative;}
-    .hero-stats{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;}
-    .hero-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 24px;text-align:center;}
-    .hero-stat-n{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;}
-    .hero-stat-l{color:var(--muted);font-size:11px;margin-top:2px;}
-    /* USER BANNER */
-    .user-banner{background:linear-gradient(135deg,#7c3aed,#4f46e5,#06b6d4);border-radius:14px;padding:18px 22px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-    .user-banner-info{display:flex;align-items:center;gap:12px;}
-    .user-avatar{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;}
-    /* TOOLS GRID */
-    .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:32px;}
-    .tool-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;text-decoration:none;display:block;transition:all .3s;position:relative;}
-    .tool-card:hover:not(.disabled){transform:translateY(-5px);border-color:var(--accent);box-shadow:0 16px 32px rgba(124,58,237,.18);}
-    .tool-card.disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
-    .tool-card.bloqueado{opacity:.7;cursor:pointer;pointer-events:all;}
-    .tool-card.bloqueado:hover{transform:translateY(-3px);border-color:#f59e0b;}
-    .tc-header{padding:22px;position:relative;}
-    .tc-icon{font-size:36px;margin-bottom:10px;}
-    .tc-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff;margin-bottom:3px;}
-    .tc-sub{color:rgba(255,255,255,.7);font-size:12px;}
-    .tc-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
-    .tc-body{padding:16px 18px;}
-    .tc-desc{color:var(--muted);font-size:12px;margin-bottom:12px;line-height:1.5;}
-    .tc-features{margin-bottom:12px;}
-    .tc-feat{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:5px;}
-    .tc-footer{display:flex;align-items:center;justify-content:space-between;}
-    .tc-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;}
-    .tc-link{font-size:13px;font-weight:700;}
-    /* FEATURES */
-    .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
-    .feat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;}
-    /* CTA */
-    .cta{background:linear-gradient(135deg,#7c3aed,#ec4899,#06b6d4);border-radius:14px;padding:36px;text-align:center;margin-bottom:32px;}
-    .cta h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:8px;}
-    .cta p{color:rgba(255,255,255,.85);margin-bottom:20px;}
-    .cta button{background:#fff;color:#7c3aed;padding:12px 28px;border-radius:10px;font-weight:800;font-size:14px;border:none;cursor:pointer;}
-    /* FOOTER */
-    .mv-footer{background:var(--surface);border-top:1px solid var(--border);padding:28px;text-align:center;color:var(--muted);font-size:12px;}
-    .mv-footer span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;}
-    @media(max-width:800px){.tools-grid{grid-template-columns:repeat(2,1fr);}.feat-grid{grid-template-columns:repeat(2,1fr);}}
-    @media(max-width:500px){.tools-grid,.feat-grid{grid-template-columns:1fr;}}
+    .menu-tabs{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:2px;overflow-x:auto;position:sticky;top:60px;z-index:99;}
+    .menu-tab{padding:13px 16px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+    .menu-tab.ativo{color:var(--accent);border-bottom-color:var(--accent);}
+    .main{max-width:1100px;margin:0 auto;padding:22px 18px 80px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+    .card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+    .kpi-l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
+    .kpi-v{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;}
+    .kpi-s{font-size:11px;color:var(--muted);margin-top:3px;}
+    .btn{padding:9px 16px;border-radius:8px;font-weight:600;font-size:13px;border:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+    .btn-p{background:var(--accent);color:#fff;}
+    .btn-s{background:var(--success);color:#fff;}
+    .btn-o{background:transparent;border:1px solid var(--border);color:var(--muted);}
+    .btn-o:hover{border-color:var(--accent);color:var(--text);}
+    .btn-d{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+    .btn-w{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+    .btn-sm{padding:5px 11px;font-size:12px;}
+    .btn-lg{padding:13px 22px;font-size:15px;font-weight:700;}
+    .field{margin-bottom:11px;}
+    .field label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+    .field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 11px;font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+    .field input:focus,.field select:focus{border-color:var(--accent);}
+    .field input::placeholder{color:#475569;}
+    .field select option{background:var(--surface);}
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:14px;}
+    .modal.ativo{display:flex;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;max-height:93vh;overflow-y:auto;}
+    .mh{padding:16px 20px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
+    .mh h3{font-family:'Syne',sans-serif;font-weight:800;color:#fff;font-size:16px;}
+    .mc{font-size:26px;cursor:pointer;background:none;border:none;color:rgba(255,255,255,.8);line-height:1;}
+    .mb{padding:20px;}
+    /* DIVIDA */
+    .dw{background:var(--bg);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+    .dh{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+    .dh:hover{background:rgba(124,58,237,.04);}
+    .di{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .db{border-top:1px solid var(--border);display:none;}
+    .db.ab{display:block;}
+    /* PAGAMENTO ITEM */
+    .pg-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surface);border-radius:8px;margin-bottom:6px;}
+    .pg-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px;}
+    /* PROGRESS */
+    .pb{height:5px;background:var(--border);border-radius:5px;margin-top:5px;}
+    .pf{height:5px;border-radius:5px;transition:width .4s;}
+    /* BADGE */
+    .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+    /* ALERTA */
+    .al{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:10px;}
+    .al-w{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fbbf24;}
+    .al-s{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#34d399;}
+    .al-d{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;}
+    .al-i{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.3);color:#22d3ee;}
+    /* RENDA BANNER */
+    .rb{background:linear-gradient(135deg,#1a0533,#0d1f3c);border:1px solid var(--accent);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+    /* SIM */
+    .so{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;}
+    .so.ml{border-color:var(--success);}
+    .so.nt{border-color:var(--gold);}
+    .so.pr{border-color:var(--danger);}
+    /* MES */
+    .mc2{background:var(--bg);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;overflow:hidden;}
+    .mh2{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+    .mh2:hover{background:rgba(124,58,237,.04);}
+    .mb2{padding:0 14px 10px;display:none;}
+    .mb2.ab{display:block;}
+    .ml2{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+    .ml2:last-child{border:none;}
+    .chart-wrap{position:relative;height:190px;}
+    /* TIPO SELECTOR */
+    .ts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;}
+    .tb{padding:9px 5px;border-radius:9px;border:2px solid var(--border);background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;}
+    .tb:hover,.tb.at{border-color:var(--accent);color:var(--text);background:rgba(124,58,237,.1);}
+    .tb span{display:block;font-size:20px;margin-bottom:3px;}
+    .ce{display:none;}
+    .ce.vi{display:block;}
+    /* HISTORICO */
+    .hist-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+    .hist-badge{font-size:18px;flex-shrink:0;}
+    /* TABS INTERNAS */
+    .itabs{display:flex;gap:6px;margin-bottom:14px;}
+    .itab{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;}
+    .itab.at{background:var(--accent);color:#fff;border-color:var(--accent);}
+    /* INFO BOX */
+    .ibox{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;}
+    @media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr;}.ts{grid-template-columns:repeat(2,1fr);}}
   </style>
 </head>
 <body>
 
 <nav class="mv-nav">
   <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION</a>
-  <div class="mv-nav-right" id="navRight">
-    <span><span class="mv-dot"></span><span id="navStatus" style="font-size:12px;color:var(--muted);">...</span></span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span><span class="mv-dot" id="mvDot"></span><span id="mvStatus" style="font-size:12px;color:var(--muted);">...</span></span>
+    <div id="mv-nav-status" style="display:flex;align-items:center;gap:8px;"></div>
+    <a href="index.html" style="color:var(--muted);font-size:13px;text-decoration:none;padding:5px 11px;border-radius:8px;border:1px solid var(--border);">← Início</a>
   </div>
 </nav>
 
-<div class="hero">
-  <h1 class="hero-title">Business Ecosystem</h1>
-  <p class="hero-sub">Ferramentas Integradas de Gestão Profissional</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="hero-stat-n" id="statAtivas">2</div><div class="hero-stat-l">Ferramentas Ativas</div></div>
-    <div class="hero-stat"><div class="hero-stat-n">☁️</div><div class="hero-stat-l">Supabase Online</div></div>
-    <div class="hero-stat"><div class="hero-stat-n">∞</div><div class="hero-stat-l">Grátis Sempre</div></div>
-  </div>
+<div class="menu-tabs">
+  <button class="menu-tab ativo" onclick="ir('dashboard')">📊 Dashboard</button>
+  <button class="menu-tab" onclick="ir('dividas')">💳 Dívidas</button>
+  <button class="menu-tab" onclick="ir('pagamentos')">💸 Pagamentos</button>
+  <button class="menu-tab" onclick="ir('simulador')">🧮 Simulador</button>
+  <button class="menu-tab" onclick="ir('plano')">📅 Plano</button>
+  <button class="menu-tab" onclick="ir('historico')">📋 Histórico</button>
 </div>
 
-<div class="main">
-
-  <!-- BANNER USUÁRIO (aparece quando logado) -->
-  <div id="userBanner" style="display:none;" class="user-banner">
-    <div class="user-banner-info">
-      <div class="user-avatar">👤</div>
-      <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#fff;font-size:16px;" id="userName">—</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.7);" id="userEmail">—</div>
+<!-- MODAL NOVA DÍVIDA -->
+<div id="mDiv" class="modal">
+  <div class="modal-box">
+    <div class="mh" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);">
+      <h3>➕ Nova Dívida</h3><button class="mc" onclick="fm('mDiv')">&times;</button>
+    </div>
+    <div class="mb">
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;">Tipo</label>
+        <div class="ts">
+          <div class="tb at" onclick="st('cartao')" id="t_cartao"><span>💳</span>Cartão</div>
+          <div class="tb" onclick="st('financiamento')" id="t_financiamento"><span>🏍️</span>Financiamento</div>
+          <div class="tb" onclick="st('parcelado')" id="t_parcelado"><span>📦</span>Parcelado</div>
+          <div class="tb" onclick="st('fixo')" id="t_fixo"><span>📌</span>Custo Fixo</div>
+        </div>
       </div>
-      <div id="userPlanoBadge"></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <a href="planos.html" style="background:rgba(255,255,255,.15);color:#fff;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;">⭐ Meu Plano</a>
-      <button onclick="MVAuth.logout()" style="background:rgba(255,255,255,.1);color:#fff;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;border:none;cursor:pointer;">Sair</button>
+      <div class="field"><label>Nome</label><input id="dN" placeholder="Ex: Nubank, Moto Honda..."></div>
+      <!-- CARTÃO -->
+      <div id="c_cartao" class="ce vi">
+        <div class="al al-i">💳 Após salvar, adicione cada compra individualmente.</div>
+        <div class="g2"><div class="field"><label>Limite (R$)</label><input id="cLim" type="number" placeholder="5000"></div><div class="field"><label>Dia Vencimento</label><input id="cDia" type="number" placeholder="10" min="1" max="31"></div></div>
+        <div class="field"><label>Juros Rotativo % a.m.</label><input id="cJur" type="number" placeholder="12.5" step="0.1"></div>
+      </div>
+      <!-- FINANCIAMENTO -->
+      <div id="c_financiamento" class="ce">
+        <div class="g2"><div class="field"><label>Valor Total (R$)</label><input id="fTot" type="number" placeholder="15000"></div><div class="field"><label>Já Pago (R$)</label><input id="fPg" type="number" placeholder="0" value="0"></div></div>
+        <div class="g2"><div class="field"><label>Parcela (R$)</label><input id="fPar" type="number" placeholder="450"></div><div class="field"><label>Juros % a.m.</label><input id="fJur" type="number" placeholder="1.5" step="0.1"></div></div>
+        <div class="g2"><div class="field"><label>Dia Vencimento</label><input id="fDia" type="number" placeholder="15" min="1" max="31"></div><div class="field"><label>Total Parcelas</label><input id="fTp" type="number" placeholder="36"></div></div>
+        <div class="field"><label>Parcelas Já Pagas</label><input id="fPp" type="number" placeholder="0" value="0"></div>
+      </div>
+      <!-- PARCELADO -->
+      <div id="c_parcelado" class="ce">
+        <div class="field"><label>Descrição do Item</label><input id="pDes" placeholder="Ex: Geladeira Brastemp"></div>
+        <div class="g2"><div class="field"><label>Valor Total (R$)</label><input id="pTot" type="number" placeholder="2500"></div><div class="field"><label>Nº Parcelas</label><input id="pNp" type="number" placeholder="12"></div></div>
+        <div class="g2"><div class="field"><label>Parcelas Pagas</label><input id="pPp" type="number" placeholder="0" value="0"></div><div class="field"><label>Dia Vencimento</label><input id="pDia" type="number" placeholder="10" min="1" max="31"></div></div>
+      </div>
+      <!-- FIXO -->
+      <div id="c_fixo" class="ce">
+        <div class="al al-i">📌 Custo mensal recorrente sem prazo de quitação.</div>
+        <div class="g2"><div class="field"><label>Valor Mensal (R$)</label><input id="xVal" type="number" placeholder="800"></div><div class="field"><label>Dia Vencimento</label><input id="xDia" type="number" placeholder="5" min="1" max="31"></div></div>
+        <div class="field"><label>Categoria</label><select id="xCat"><option value="moradia">🏠 Moradia</option><option value="educacao">📚 Educação</option><option value="saude">❤️ Saúde</option><option value="transporte">🚗 Transporte</option><option value="servicos">📡 Serviços</option><option value="outros">📌 Outros</option></select></div>
+      </div>
+      <button class="btn btn-p btn-lg" style="width:100%;margin-top:6px;" onclick="salvarDiv()">💾 Salvar</button>
     </div>
   </div>
-
-  <!-- BANNER NÃO LOGADO -->
-  <div id="bannerLogin" style="display:none;background:linear-gradient(135deg,#1a0533,#0d1f3c);border:1px solid #7c3aed;border-radius:14px;padding:20px 24px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;color:#e2e8f0;margin-bottom:4px;">👋 Bem-vindo ao MEGAVISION!</div>
-      <div style="color:#94a3b8;font-size:13px;">Faça login para acessar as ferramentas e salvar seus dados.</div>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <a href="auth.html" style="background:#7c3aed;color:#fff;padding:10px 20px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;">⚡ Entrar</a>
-      <a href="auth.html" style="background:transparent;color:#94a3b8;padding:10px 20px;border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;border:1px solid #1e1e2e;">Criar Conta</a>
-    </div>
-  </div>
-
-  <!-- FERRAMENTAS -->
-  <div id="ferramentas">
-    <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;text-align:center;margin-bottom:22px;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Ferramentas Disponíveis</h2>
-    <div class="tools-grid" id="toolsGrid">
-      <!-- Gerado pelo JS -->
-    </div>
-  </div>
-
-  <!-- RECURSOS -->
-  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;text-align:center;margin-bottom:16px;color:#e2e8f0;">💎 Recursos do Ecossistema</h2>
-  <div class="feat-grid" style="margin-bottom:28px;">
-    <div class="feat-card"><div style="font-size:28px;margin-bottom:10px;">☁️</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Supabase Online</div><div style="color:var(--muted);font-size:12px;">Dados sincronizados na nuvem.</div></div>
-    <div class="feat-card"><div style="font-size:28px;margin-bottom:10px;">🚀</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Zero Instalação</div><div style="color:var(--muted);font-size:12px;">Funciona direto no navegador.</div></div>
-    <div class="feat-card"><div style="font-size:28px;margin-bottom:10px;">💰</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Grátis Sempre</div><div style="color:var(--muted);font-size:12px;">Sem mensalidades obrigatórias.</div></div>
-    <div class="feat-card"><div style="font-size:28px;margin-bottom:10px;">📊</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Exportação Fácil</div><div style="color:var(--muted);font-size:12px;">CSV, JSON quando precisar.</div></div>
-    <div class="feat-card"><div style="font-size:28px;margin-bottom:10px;">🔒</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Dados Seguros</div><div style="color:var(--muted);font-size:12px;">RLS — só você vê seus dados.</div></div>
-    <div class="feat-card"><div style="font-size:28px;margin-bottom:10px;">⚡</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">Atualizações Rápidas</div><div style="color:var(--muted);font-size:12px;">Novas ferramentas sempre.</div></div>
-  </div>
-
-  <div class="cta">
-    <h2>🚀 Pronto para Começar?</h2>
-    <p>Escolha uma ferramenta e comece agora!</p>
-    <button onclick="document.getElementById('ferramentas').scrollIntoView({behavior:'smooth'})">Ver Ferramentas</button>
-  </div>
-
 </div>
 
-<footer class="mv-footer">
-  <span>MEGAVISION ECOSYSTEM</span> © 2026 — Todos os direitos reservados
-</footer>
+<!-- MODAL NOVA COMPRA CARTÃO -->
+<div id="mComp" class="modal">
+  <div class="modal-box">
+    <div class="mh" style="background:linear-gradient(135deg,#dc2626,#ef4444);">
+      <h3>🛒 Nova Compra — <span id="compCartaoNome">—</span></h3><button class="mc" onclick="fm('mComp')">&times;</button>
+    </div>
+    <div class="mb">
+      <div class="field"><label>Descrição</label><input id="cpDes" placeholder="Ex: Tênis Nike, Supermercado..."></div>
+      <div class="g2"><div class="field"><label>Valor Total (R$)</label><input id="cpVal" type="number" placeholder="350" oninput="calcCp()"></div><div class="field"><label>Nº Parcelas</label><input id="cpNp" type="number" placeholder="1" value="1" oninput="calcCp()"></div></div>
+      <div class="field"><label>Valor da Parcela (calculado)</label><input id="cpPc" readonly style="color:#34d399;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 11px;width:100%;font-size:14px;outline:none;"></div>
+      <div class="g2"><div class="field"><label>Parcelas Já Pagas</label><input id="cpPp" type="number" placeholder="0" value="0"></div><div class="field"><label>Mês da Compra</label><input id="cpMes" type="month"></div></div>
+      <button class="btn btn-p btn-lg" style="width:100%;margin-top:6px;" onclick="salvarComp()">🛒 Adicionar Compra</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR PAGAMENTO -->
+<div id="mPag" class="modal">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="mh" style="background:linear-gradient(135deg,#059669,#10b981);">
+      <h3 id="mPagTit">💸 Registrar Pagamento</h3><button class="mc" onclick="fm('mPag')">&times;</button>
+    </div>
+    <div class="mb" id="mPagBody"></div>
+  </div>
+</div>
+
+<!-- MODAL RENDA -->
+<div id="mRen" class="modal">
+  <div class="modal-box">
+    <div class="mh" style="background:linear-gradient(135deg,#059669,#10b981);">
+      <h3>💰 Minha Renda</h3><button class="mc" onclick="fm('mRen')">&times;</button>
+    </div>
+    <div class="mb">
+      <div class="field"><label>Salário / Renda Principal (R$)</label><input id="rSal" type="number" placeholder="3000"></div>
+      <div class="field"><label>Outras Receitas (R$)</label><input id="rOut" type="number" placeholder="0" value="0"></div>
+      <div class="field"><label>Gastos Essenciais (sem parcelas) (R$)</label><input id="rGas" type="number" placeholder="1200"><small style="color:var(--muted);font-size:11px;">Alimentação, transporte, higiene, etc.</small></div>
+      <button class="btn btn-s btn-lg" style="width:100%;margin-top:8px;" onclick="salvarRen()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SIMULAR ANTECIPAÇÃO -->
+<div id="mAnt" class="modal">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="mh" style="background:linear-gradient(135deg,#92400e,#f59e0b);">
+      <h3>⚡ Simular Antecipação</h3><button class="mc" onclick="fm('mAnt')">&times;</button>
+    </div>
+    <div class="mb" id="mAntBody"></div>
+  </div>
+</div>
+
+<div class="main" id="app"></div>
 
 <script>
-// ── DEFINIÇÃO DAS FERRAMENTAS ────────────────────────────────
-const FERRAMENTAS = [
-  { id:'financial-pro',      href:'financeiro-corrigido.html', icon:'💰', title:'Financial Pro',       sub:'Gestão Financeira',        cor:'#059669,#10b981', tag:'Financeiro',    tagCor:'#34d399',  tagBg:'rgba(16,185,129,.15)', ativa:true,
-    desc:'Controle completo de dívidas, metas, simulador e plano de quitação mês a mês.',
-    feats:['Cartão, financiamento, parcelado','Simulador de antecipação','Plano Avalanche/Snowball','Histórico de pagamentos'] },
-  { id:'leadership-academy', href:'avaliacao-desempenho.html', icon:'👥', title:'Leadership Academy',  sub:'Avaliação de Desempenho',  cor:'#1d4ed8,#3b82f6', tag:'RH & Liderança', tagCor:'#60a5fa',  tagBg:'rgba(59,130,246,.15)', ativa:true,
-    desc:'Sistema com 8 ferramentas para avaliar colaboradores e treinar líderes.',
-    feats:['KPIs e Metas SMART','Matriz Desempenho x Cultura','PDI e Feedback','Biblioteca de Treinamento'] },
-  { id:'assistente-vendas',  href:'assistente-vendas.html',    icon:'🤖', title:'Assistente Vendas',   sub:'Suporte Inteligente',      cor:'#6d28d9,#7c3aed', tag:'Comercial',     tagCor:'#a78bfa',  tagBg:'rgba(124,58,237,.15)', ativa:false,
-    desc:'Assistente para objeções, scripts e técnicas de vendas.',
-    feats:['Respostas a Objeções','Scripts de Vendas','Técnicas de Fechamento','Treinamento Guiado'] },
-  { id:'app-vendas',         href:'app-vendas.html',           icon:'📱', title:'App Vendas',          sub:'Controle de Vendas',       cor:'#c2410c,#f97316', tag:'Comercial',     tagCor:'#fb923c',  tagBg:'rgba(249,115,22,.15)', ativa:false,
-    desc:'Registro e acompanhamento de vendas com ranking e metas diárias.',
-    feats:['Registro de Vendas','Metas Diárias','Ranking de Vendedores','Relatórios'] },
-  { id:'control-vendas',     href:'control-vendas.html',       icon:'📊', title:'Control Vendas',      sub:'Pipeline e CRM',           cor:'#0e7490,#06b6d4', tag:'Comercial',     tagCor:'#22d3ee',  tagBg:'rgba(6,182,212,.15)',  ativa:false,
-    desc:'Pipeline de vendas com funil, follow-ups e análise de conversão.',
-    feats:['Funil Kanban','Gestão de Leads','Previsão de Fechamento','Relatórios'] },
-  { id:'quiz-itaipulandia',  href:'quiz-itaipulandia.html',    icon:'🎯', title:'Quiz Itaipu',         sub:'Treinamento Gamificado',   cor:'#be185d,#ec4899', tag:'Treinamento',   tagCor:'#f472b6',  tagBg:'rgba(236,72,153,.15)', ativa:false,
-    desc:'Quiz interativo para treinamento e capacitação da equipe.',
-    feats:['Perguntas por Tema','Ranking','Progresso Individual','Certificação'] },
-  { id:'vendas-passaporte',  href:'vendas-passaporte.html',    icon:'🌟', title:'Vendas Passaporte',   sub:'Programa de Incentivo',    cor:'#92400e,#f59e0b', tag:'Incentivo',     tagCor:'#fbbf24',  tagBg:'rgba(245,158,11,.15)', ativa:false,
-    desc:'Programa de passaporte com metas e recompensas progressivas.',
-    feats:['Metas por Etapa','Selos e Conquistas','Histórico','Premiações'] },
-];
+// ══════════════════════════════════════════════════════════════
+//  ESTADO
+// ══════════════════════════════════════════════════════════════
+let E = {
+  aba:'dashboard', dividas:[], renda:{salario:0,outras:0,gastos:0},
+  tipo:'cartao', cartaoAtivo:null, estrategia:'avalanche',
+  divAtiva:null, pagAba:'normal'
+};
 
-// ── INIT ─────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  // Verifica sessão
-  const sessao = await MVAuth.getSessao();
-  const usuario = sessao ? await MVAuth.getUsuario() : null;
+const TIPOS = {
+  cartao:        {icon:'💳',cor:'#f87171', bg:'rgba(239,68,68,.15)', label:'Cartão'},
+  financiamento: {icon:'🏍️',cor:'#fbbf24', bg:'rgba(245,158,11,.15)',label:'Financiamento'},
+  parcelado:     {icon:'📦',cor:'#a78bfa', bg:'rgba(124,58,237,.15)',label:'Parcelado'},
+  fixo:          {icon:'📌',cor:'#94a3b8', bg:'rgba(148,163,184,.1)',label:'Custo Fixo'}
+};
+const CAT = {moradia:'🏠',educacao:'📚',saude:'❤️',transporte:'🚗',servicos:'📡',outros:'📌'};
+const fmt  = v => (v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtd = d => new Date(d).toLocaleDateString('pt-BR');
+const hoje = () => new Date().toISOString().split('T')[0];
 
-  // Atualiza status
-  const s = MVData.status();
-  document.getElementById('navStatus').textContent = s.online ? 'Online' : 'Offline';
+// ══════════════════════════════════════════════════════════════
+//  INIT & DADOS
+// ══════════════════════════════════════════════════════════════
+async function init() {
+  const ok = await MVAuth.proteger("financial-pro");
+  if (!ok) return;
+  await load(); render();
+  setTimeout(()=>{ const s=MVData.status(); document.getElementById('mvDot').style.background=s.online?'#10b981':'#ef4444'; document.getElementById('mvStatus').textContent=s.online?'Online':'Offline'; },800);
+}
 
-  // Mostra banner correto
-  if (usuario) {
-    const plano = MVAuth.planos[usuario.plano] || MVAuth.planos.gratuito;
-    const banner = document.getElementById('userBanner');
-    banner.style.display = 'flex';
-    document.getElementById('userName').textContent = usuario.nome || 'Usuário';
-    document.getElementById('userEmail').textContent = usuario.email;
-    document.getElementById('userPlanoBadge').innerHTML = `<span style="background:${plano.cor}33;color:${plano.cor};border:1px solid ${plano.cor}55;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">${plano.emoji} ${plano.nome}</span>`;
+async function load() {
+  try {
+    const d=await MVData.buscar('financeiro',{tipo:'div_v4'}); if(d.length) E.dividas=d[0].dados||[];
+    const r=await MVData.buscar('financeiro',{tipo:'ren_v4'}); if(r.length) E.renda=r[0].dados||{salario:0,outras:0,gastos:0};
+  } catch(e){}
+  const ld=localStorage.getItem('mv_div4'); const lr=localStorage.getItem('mv_ren4');
+  if(!E.dividas.length&&ld) E.dividas=JSON.parse(ld);
+  if(!E.renda.salario&&lr) E.renda=JSON.parse(lr);
+}
 
-    // Navbar direita
-    document.getElementById('navRight').innerHTML = `
-      <span style="font-size:12px;color:#94a3b8;">${usuario.nome||usuario.email}</span>
-      <span style="background:${plano.cor}22;color:${plano.cor};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">${plano.emoji} ${plano.nome}</span>
-      ${usuario.plano==='admin'?`<a href="admin.html" style="color:#f59e0b;font-size:12px;text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid rgba(245,158,11,.3);">🛡️ Admin</a>`:''}
-      <button onclick="MVAuth.logout()" style="color:#94a3b8;font-size:12px;background:none;border:1px solid #1e1e2e;border-radius:6px;padding:5px 10px;cursor:pointer;">Sair</button>`;
-  } else {
-    document.getElementById('bannerLogin').style.display = 'flex';
-    document.getElementById('navRight').innerHTML = `
-      <a href="auth.html" style="color:#94a3b8;font-size:13px;text-decoration:none;padding:6px 14px;border-radius:8px;border:1px solid #1e1e2e;">Entrar</a>
-      <a href="auth.html" style="background:#7c3aed;color:#fff;font-size:13px;text-decoration:none;padding:6px 14px;border-radius:8px;font-weight:600;">Criar Conta</a>`;
+async function save() {
+  localStorage.setItem('mv_div4',JSON.stringify(E.dividas));
+  localStorage.setItem('mv_ren4',JSON.stringify(E.renda));
+  try{ await MVData.salvar('financeiro',{tipo:'div_v4',dados:E.dividas}); await MVData.salvar('financeiro',{tipo:'ren_v4',dados:E.renda}); }catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MODAIS
+// ══════════════════════════════════════════════════════════════
+function am(id){document.getElementById(id).classList.add('ativo');}
+function fm(id){document.getElementById(id).classList.remove('ativo');}
+function st(t){ E.tipo=t; ['cartao','financiamento','parcelado','fixo'].forEach(x=>{document.getElementById('t_'+x).classList.toggle('at',x===t);document.getElementById('c_'+x).classList.toggle('vi',x===t);}); }
+function calcCp(){ const v=parseFloat(document.getElementById('cpVal').value)||0,n=parseInt(document.getElementById('cpNp').value)||1; document.getElementById('cpPc').value=n>0?(v/n).toFixed(2):''; }
+
+// ══════════════════════════════════════════════════════════════
+//  SALVAR DÍVIDAS
+// ══════════════════════════════════════════════════════════════
+async function salvarDiv() {
+  const nome=document.getElementById('dN').value.trim(); if(!nome){alert('Digite o nome!');return;}
+  const t=E.tipo; let d={id:Date.now(),nome,tipo:t,pagHistorico:[],criado_em:new Date().toISOString()};
+  if(t==='cartao'){d.limite=+document.getElementById('cLim').value||0;d.dia=+document.getElementById('cDia').value||10;d.juros=+document.getElementById('cJur').value||0;d.compras=[];}
+  else if(t==='financiamento'){
+    d.total=+document.getElementById('fTot').value||0; d.pago=+document.getElementById('fPg').value||0;
+    d.parcela=+document.getElementById('fPar').value||0; d.juros=+document.getElementById('fJur').value||0;
+    d.dia=+document.getElementById('fDia').value||15; d.totalParc=+document.getElementById('fTp').value||0;
+    d.parcPagas=+document.getElementById('fPp').value||0; d.restante=Math.max(d.total-d.pago,0);
+    d.mesesRest=d.totalParc-d.parcPagas; d.economiaTotalAcum=0;
+  } else if(t==='parcelado'){
+    d.desc=document.getElementById('pDes').value; d.total=+document.getElementById('pTot').value||0;
+    d.nParc=+document.getElementById('pNp').value||1; d.parcPagas=+document.getElementById('pPp').value||0;
+    d.dia=+document.getElementById('pDia').value||10; d.parcela=d.nParc>0?d.total/d.nParc:0;
+    d.mesesRest=d.nParc-d.parcPagas; d.restante=d.parcela*d.mesesRest; d.pago=d.parcela*d.parcPagas;
+  } else if(t==='fixo'){
+    d.valorMensal=+document.getElementById('xVal').value||0; d.dia=+document.getElementById('xDia').value||5;
+    d.categoria=document.getElementById('xCat').value; d.parcela=d.valorMensal;
+  }
+  E.dividas.push(d); await save(); fm('mDiv'); render();
+}
+
+async function salvarComp() {
+  const c=E.dividas.find(d=>d.id===E.cartaoAtivo); if(!c) return;
+  const des=document.getElementById('cpDes').value.trim(), val=+document.getElementById('cpVal').value||0;
+  const np=+document.getElementById('cpNp').value||1, pp=+document.getElementById('cpPp').value||0;
+  if(!des||!val){alert('Preencha descrição e valor!');return;}
+  c.compras=c.compras||[];
+  c.compras.push({id:Date.now(),des,valor:val,nParc:np,parcPagas:pp,parcela:parseFloat((val/np).toFixed(2)),mes:document.getElementById('cpMes').value,mesesPagos:[],pagHistorico:[],criado_em:new Date().toISOString()});
+  await save(); fm('mComp'); render();
+}
+
+async function salvarRen() {
+  E.renda={salario:+document.getElementById('rSal').value||0,outras:+document.getElementById('rOut').value||0,gastos:+document.getElementById('rGas').value||0};
+  await save(); fm('mRen'); render();
+}
+
+async function excDiv(id){if(!confirm('Excluir?'))return; E.dividas=E.dividas.filter(d=>d.id!==id); await save(); render();}
+async function excComp(cid,compid){const c=E.dividas.find(d=>d.id===cid); if(c){c.compras=c.compras.filter(x=>x.id!==compid); await save(); render();}}
+
+// ══════════════════════════════════════════════════════════════
+//  MODAL PAGAMENTO — NÚCLEO DO SISTEMA
+// ══════════════════════════════════════════════════════════════
+function abrirPag(divId, subId=null) {
+  const d=E.dividas.find(x=>x.id===divId); if(!d) return;
+  E.divAtiva={divId,subId};
+  document.getElementById('mPagTit').textContent=`💸 Registrar Pagamento — ${d.nome}`;
+  const body=document.getElementById('mPagBody');
+  const T=TIPOS[d.tipo]||TIPOS.fixo;
+
+  // ── CARTÃO ──
+  if(d.tipo==='cartao') {
+    const comp=subId ? d.compras.find(c=>c.id===subId) : null;
+    body.innerHTML=`
+    <div class="al al-i" style="margin-bottom:12px;">💳 ${comp?`Compra: <strong>${comp.des}</strong>`:`Cartão: <strong>${d.nome}</strong>`}</div>
+    <div class="field"><label>Data do Pagamento</label><input type="date" id="pData" value="${hoje()}"></div>
+    <div class="field"><label>Tipo de Pagamento</label>
+      <select id="pTipoCartao" onchange="atualizarCamposCartao()">
+        <option value="parcela">Pagar parcela(s) do mês</option>
+        <option value="fatura_total">Pagar fatura total</option>
+        <option value="parcial">Pagamento parcial da fatura</option>
+      </select>
+    </div>
+    <div id="camposCartaoParcela">
+      <div class="field"><label>Quantas parcelas pagar agora?</label>
+        <input type="number" id="pQtdParc" placeholder="1" value="1" min="1" oninput="calcPagCartao()">
+      </div>
+      <div class="ibox" id="resumoCartao" style="margin-bottom:12px;"></div>
+    </div>
+    <div id="camposCartaoTotal" style="display:none;">
+      <div class="field"><label>Valor Total a Pagar (R$)</label><input type="number" id="pValTotal" placeholder="Ex: 1200" oninput="calcPagCartaoTotal()"></div>
+      <div class="ibox" id="resumoCartaoTotal" style="margin-bottom:12px;"></div>
+    </div>
+    <div id="camposCartaoParcial" style="display:none;">
+      <div class="field"><label>Valor Parcial (R$)</label><input type="number" id="pValParcial" placeholder="Ex: 500"></div>
+      <div class="al al-w">⚠️ Pagamento parcial pode gerar juros rotativos de ${d.juros}% a.m.</div>
+    </div>
+    <div class="field"><label>Observação (opcional)</label><input id="pObs" placeholder="Ex: Paguei com PIX..."></div>
+    <button class="btn btn-s btn-lg" style="width:100%;" onclick="confirmarPagCartao(${divId},${subId||null})">✅ Confirmar Pagamento</button>`;
+    setTimeout(()=>calcPagCartao(),50);
   }
 
-  // Renderiza cards das ferramentas
-  renderTools(usuario);
-});
+  // ── FINANCIAMENTO ──
+  else if(d.tipo==='financiamento') {
+    const rest=d.mesesRest||0; const parc=d.parcela||0; const jur=d.juros||0;
+    body.innerHTML=`
+    <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-weight:700;color:#fbbf24;">🏍️ ${d.nome}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Parcela: R$ ${fmt(parc)} · ${rest} parcelas restantes · ${jur}% a.m.</div>
+    </div>
+    <div class="itabs">
+      <button class="itab at" id="ptab_normal" onclick="trocarPagAba('normal')">Pagamento Normal</button>
+      <button class="itab" id="ptab_antecipado" onclick="trocarPagAba('antecipado')">⚡ Antecipação de Parcelas</button>
+    </div>
+    <!-- NORMAL -->
+    <div id="paba_normal">
+      <div class="field"><label>Data do Pagamento</label><input type="date" id="pDataN" value="${hoje()}"></div>
+      <div class="field"><label>Quantas parcelas pagar agora?</label><input type="number" id="pQtdN" placeholder="1" value="1" min="1" max="${rest}" oninput="calcPagFin()"></div>
+      <div class="ibox" id="resumoFinNormal" style="margin-bottom:12px;"></div>
+      <div class="field"><label>Observação</label><input id="pObsN" placeholder="Ex: Paguei no banco..."></div>
+      <button class="btn btn-s btn-lg" style="width:100%;" onclick="confirmarPagFin(${divId},'normal')">✅ Confirmar</button>
+    </div>
+    <!-- ANTECIPADO -->
+    <div id="paba_antecipado" style="display:none;">
+      <div class="al al-i">⚡ Antecipação aplica desconto dos juros futuros. Informe quantas parcelas quer quitar hoje.</div>
+      <div class="field"><label>Data do Pagamento</label><input type="date" id="pDataA" value="${hoje()}"></div>
+      <div class="field"><label>Quantas parcelas antecipar?</label><input type="number" id="pQtdA" placeholder="Ex: 4" min="1" max="${rest}" oninput="calcPagFin()"></div>
+      <div class="ibox" id="resumoFinAnt" style="margin-bottom:12px;"></div>
+      <div class="field"><label>Valor Real Pago (R$)</label><input type="number" id="pValRealA" placeholder="Confirmado na financeira" step="0.01"></div>
+      <div class="field"><label>Observação</label><input id="pObsA" placeholder="Ex: Antecipei 4 parcelas com 8% desconto..."></div>
+      <button class="btn btn-w btn-lg" style="width:100%;" onclick="confirmarPagFin(${divId},'antecipado')">⚡ Confirmar Antecipação</button>
+    </div>`;
+    setTimeout(()=>calcPagFin(),50);
+  }
 
-function renderTools(usuario) {
-  const plano = usuario ? (MVAuth.planos[usuario.plano] || MVAuth.planos.gratuito) : null;
-  const ferrsPermitidas = plano ? plano.ferramentas : [];
-  const grid = document.getElementById('toolsGrid');
-  let ativas = 0;
+  // ── PARCELADO ──
+  else if(d.tipo==='parcelado') {
+    const rest=d.mesesRest||0;
+    body.innerHTML=`
+    <div style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-weight:700;color:#a78bfa;">📦 ${d.nome}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">${d.desc||''} · ${rest} parcelas restantes de R$ ${fmt(d.parcela)}</div>
+    </div>
+    <div class="field"><label>Data do Pagamento</label><input type="date" id="pDataP" value="${hoje()}"></div>
+    <div class="field"><label>Quantas parcelas pagar agora?</label>
+      <input type="number" id="pQtdP" placeholder="1" value="1" min="1" max="${rest}" oninput="calcPagParc()">
+    </div>
+    <div class="ibox" id="resumoParc" style="margin-bottom:12px;"></div>
+    <div class="field"><label>Observação</label><input id="pObsP" placeholder="Ex: Paguei as últimas 3 da geladeira..."></div>
+    <button class="btn btn-s btn-lg" style="width:100%;" onclick="confirmarPagParc(${divId})">✅ Confirmar Pagamento</button>`;
+    setTimeout(()=>calcPagParc(),50);
+  }
 
-  grid.innerHTML = FERRAMENTAS.map(f => {
-    const temAcesso = plano && (ferrsPermitidas.includes('*') || ferrsPermitidas.includes(f.id));
-    const logado = !!usuario;
-    let classe = '', badge = '', link = f.href, onclick = '';
+  // ── FIXO ──
+  else if(d.tipo==='fixo') {
+    body.innerHTML=`
+    <div style="background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.2);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-weight:700;color:#94a3b8;">${CAT[d.categoria]||'📌'} ${d.nome}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">R$ ${fmt(d.valorMensal)}/mês · Vence dia ${d.dia}</div>
+    </div>
+    <div class="field"><label>Data do Pagamento</label><input type="date" id="pDataX" value="${hoje()}"></div>
+    <div class="field"><label>Valor Real Pago (R$)</label><input type="number" id="pValX" value="${d.valorMensal}" step="0.01"></div>
+    <div class="field"><label>Mês de Referência</label><input type="month" id="pMesX" value="${new Date().toISOString().slice(0,7)}"></div>
+    <div class="field"><label>Observação</label><input id="pObsX" placeholder="Ex: Paguei via débito automático..."></div>
+    <button class="btn btn-s btn-lg" style="width:100%;" onclick="confirmarPagFixo(${divId})">✅ Confirmar Pagamento</button>`;
+  }
 
-    if (!f.ativa) {
-      // Ferramenta ainda em desenvolvimento
-      classe = 'disabled';
-      badge = `<span class="tc-badge" style="background:#f59e0b;color:#000;">EM BREVE</span>`;
-      link = '#';
-    } else if (!logado) {
-      // Não logado — convida a fazer login
-      classe = 'bloqueado';
-      badge = `<span class="tc-badge" style="background:rgba(124,58,237,.3);color:#a78bfa;">🔒 Login</span>`;
-      link = `auth.html?redirect=${encodeURIComponent(f.href)}`;
-    } else if (!temAcesso) {
-      // Logado mas sem plano
-      classe = 'bloqueado';
-      badge = `<span class="tc-badge" style="background:rgba(245,158,11,.2);color:#fbbf24;">🔒 Upgrade</span>`;
-      link = 'planos.html';
-    } else {
-      // Liberado!
-      ativas++;
-      badge = `<span class="tc-badge" style="background:rgba(16,185,129,.2);color:#34d399;">✅ Ativo</span>`;
-    }
-
-    return `
-    <a href="${link}" class="tool-card ${classe}">
-      <div class="tc-header" style="background:linear-gradient(135deg,${f.cor});">
-        ${badge}
-        <div class="tc-icon">${f.icon}</div>
-        <div class="tc-title">${f.title}</div>
-        <div class="tc-sub">${f.sub}</div>
-      </div>
-      <div class="tc-body">
-        <p class="tc-desc">${f.desc}</p>
-        <div class="tc-features">
-          ${f.feats.map(ft => `<div class="tc-feat"><span style="color:${f.ativa&&(temAcesso||!usuario)?'#10b981':'#475569'};">${f.ativa&&(temAcesso||!usuario)?'✓':'○'}</span>${ft}</div>`).join('')}
-        </div>
-        <div class="tc-footer">
-          <span class="tc-tag" style="background:${f.tagBg};color:${f.tagCor};">${f.tag}</span>
-          <span class="tc-link" style="color:${classe==='disabled'?'#475569':f.ativa?f.tagCor:'#fbbf24'};">
-            ${classe==='disabled'?'Em breve':!logado?'Fazer Login →':!temAcesso?'Ver Planos →':'Acessar →'}
-          </span>
-        </div>
-      </div>
-    </a>`;
-  }).join('');
-
-  document.getElementById('statAtivas').textContent = ativas || FERRAMENTAS.filter(f=>f.ativa).length;
+  am('mPag');
 }
+
+// ── CÁLCULOS MODAL ──
+function atualizarCamposCartao() {
+  const tp=document.getElementById('pTipoCartao')?.value;
+  document.getElementById('camposCartaoParcela').style.display=tp==='parcela'?'block':'none';
+  document.getElementById('camposCartaoTotal').style.display=tp==='fatura_total'?'block':'none';
+  document.getElementById('camposCartaoParcial').style.display=tp==='parcial'?'block':'none';
+}
+
+function calcPagCartao() {
+  const d=E.dividas.find(x=>x.id===E.divAtiva?.divId); if(!d) return;
+  const qtd=parseInt(document.getElementById('pQtdParc')?.value)||1;
+  const fatura=calcCartao(d).faturaAtual;
+  const r=document.getElementById('resumoCartao'); if(!r) return;
+  r.innerHTML=`
+  <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Fatura atual</span><span style="color:#f87171;font-weight:700;">R$ ${fmt(fatura)}</span></div>
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Parcelas a pagar</span><span style="color:#e2e8f0;font-weight:600;">${qtd} parcela(s)</span></div>
+    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;margin-top:2px;"><span style="color:var(--muted);">Total a pagar</span><span style="font-family:'Syne',sans-serif;font-weight:800;color:#34d399;">R$ ${fmt(fatura * Math.min(qtd,1))}</span></div>
+  </div>`;
+}
+
+function trocarPagAba(aba) {
+  ['normal','antecipado'].forEach(a=>{
+    document.getElementById(`ptab_${a}`)?.classList.toggle('at',a===aba);
+    document.getElementById(`paba_${a}`).style.display=a===aba?'block':'none';
+  });
+  calcPagFin();
+}
+
+function calcPagFin() {
+  const d=E.dividas.find(x=>x.id===E.divAtiva?.divId); if(!d) return;
+  const parc=d.parcela||0, jur=d.juros||0, rest=d.mesesRest||0;
+  // Normal
+  const qtdN=parseInt(document.getElementById('pQtdN')?.value)||1;
+  const rN=document.getElementById('resumoFinNormal'); if(rN) rN.innerHTML=`
+  <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Parcelas selecionadas</span><span style="font-weight:600;">${qtdN}x de R$ ${fmt(parc)}</span></div>
+    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;"><span style="color:var(--muted);">Total a pagar</span><span style="font-family:'Syne',sans-serif;font-weight:800;color:#34d399;">R$ ${fmt(parc*qtdN)}</span></div>
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Restará após</span><span style="color:#f87171;">${Math.max(rest-qtdN,0)} parcelas</span></div>
+  </div>`;
+  // Antecipado
+  const qtdA=parseInt(document.getElementById('pQtdA')?.value)||0;
+  const rA=document.getElementById('resumoFinAnt'); if(rA&&qtdA>0) {
+    const semDesc=parc*qtdA;
+    let comDesc=0; for(let i=1;i<=qtdA;i++) comDesc+=parc/Math.pow(1+jur/100,i);
+    comDesc=parseFloat(comDesc.toFixed(2));
+    const eco=parseFloat((semDesc-comDesc).toFixed(2));
+    rA.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;">
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Sem desconto</span><span style="color:#f87171;text-decoration:line-through;">R$ ${fmt(semDesc)}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">💰 Com desconto estimado</span><span style="font-family:'Syne',sans-serif;font-weight:800;color:#34d399;">R$ ${fmt(comDesc)}</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">✨ Economia estimada</span><span style="font-weight:700;color:#a78bfa;">R$ ${fmt(eco)}</span></div>
+      <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;"><span style="color:var(--muted);">Meses que ficam livres</span><span style="font-weight:700;color:#22d3ee;">${qtdA} meses</span></div>
+      <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Restará após</span><span style="color:#f87171;">${Math.max(rest-qtdA,0)} parcelas</span></div>
+      <div class="al al-i" style="margin:0;">Confirme o valor real com a financeira antes de pagar!</div>
+    </div>`;
+    if(!document.getElementById('pValRealA').value) document.getElementById('pValRealA').value=comDesc.toFixed(2);
+  }
+}
+
+function calcPagParc() {
+  const d=E.dividas.find(x=>x.id===E.divAtiva?.divId); if(!d) return;
+  const qtd=parseInt(document.getElementById('pQtdP')?.value)||1;
+  const r=document.getElementById('resumoParc'); if(!r) return;
+  r.innerHTML=`
+  <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">${qtd}x parcelas de R$ ${fmt(d.parcela)}</span><span style="font-weight:600;">${d.parcPagas+qtd}/${d.nParc} total</span></div>
+    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;"><span style="color:var(--muted);">Total a pagar</span><span style="font-family:'Syne',sans-serif;font-weight:800;color:#34d399;">R$ ${fmt(d.parcela*qtd)}</span></div>
+    <div style="display:flex;justify-content:space-between;"><span style="color:var(--muted);">Restará após</span><span style="color:#a78bfa;">${Math.max(d.mesesRest-qtd,0)} parcelas</span></div>
+  </div>`;
+}
+
+// ── CONFIRMAR PAGAMENTOS ──
+async function confirmarPagCartao(divId, subId) {
+  const d=E.dividas.find(x=>x.id===divId); if(!d) return;
+  const tp=document.getElementById('pTipoCartao').value;
+  const data=document.getElementById('pData').value;
+  const obs=document.getElementById('pObs').value;
+  let valor=0, desc='';
+
+  if(tp==='parcela') {
+    const qtd=parseInt(document.getElementById('pQtdParc').value)||1;
+    valor=calcCartao(d).faturaAtual; desc=`${qtd} parcela(s) do mês`;
+  } else if(tp==='fatura_total') {
+    valor=+document.getElementById('pValTotal').value||0; desc='Fatura total';
+  } else {
+    valor=+document.getElementById('pValParcial').value||0; desc='Pagamento parcial';
+  }
+
+  const mes=data.slice(0,7);
+  const reg={id:Date.now(),tipo:'cartao',subtipo:tp,valor,data,mes,desc,obs,criado_em:new Date().toISOString()};
+  d.pagHistorico=d.pagHistorico||[]; d.pagHistorico.push(reg);
+
+  // Marca compras como pagas no mês
+  if(d.compras&&tp!=='parcial') {
+    d.compras.forEach(c=>{
+      if(c.nParc-(c.parcPagas||0)>0){ c.mesesPagos=c.mesesPagos||[]; if(!c.mesesPagos.includes(mes)){c.mesesPagos.push(mes);c.parcPagas=(c.parcPagas||0)+1;} }
+    });
+  }
+  await save(); fm('mPag'); render();
+  alert(`✅ Pagamento de R$ ${fmt(valor)} registrado!`);
+}
+
+async function confirmarPagFin(divId, modo) {
+  const d=E.dividas.find(x=>x.id===divId); if(!d) return;
+  if(modo==='normal') {
+    const qtd=parseInt(document.getElementById('pQtdN').value)||1;
+    const data=document.getElementById('pDataN').value;
+    const obs=document.getElementById('pObsN').value;
+    const valor=d.parcela*qtd;
+    d.parcPagas=(d.parcPagas||0)+qtd; d.mesesRest=Math.max((d.mesesRest||0)-qtd,0);
+    d.pago=(d.pago||0)+valor; d.restante=Math.max((d.restante||0)-valor,0);
+    d.pagHistorico=d.pagHistorico||[];
+    d.pagHistorico.push({id:Date.now(),tipo:'financiamento',subtipo:'normal',qtdParc:qtd,valor,data,obs,criado_em:new Date().toISOString()});
+    await save(); fm('mPag'); render();
+    alert(`✅ ${qtd} parcela(s) pagas! Restam ${d.mesesRest} parcelas.`);
+  } else {
+    const qtd=parseInt(document.getElementById('pQtdA').value)||0;
+    const data=document.getElementById('pDataA').value;
+    const valReal=+document.getElementById('pValRealA').value||0;
+    const obs=document.getElementById('pObsA').value;
+    if(!qtd||!valReal){alert('Preencha quantidade e valor real!');return;}
+    const semDesc=d.parcela*qtd;
+    const eco=parseFloat(Math.max(semDesc-valReal,0).toFixed(2));
+    d.parcPagas=(d.parcPagas||0)+qtd; d.mesesRest=Math.max((d.mesesRest||0)-qtd,0);
+    d.pago=(d.pago||0)+valReal; d.restante=Math.max((d.restante||0)-semDesc,0);
+    d.economiaTotalAcum=(d.economiaTotalAcum||0)+eco;
+    d.pagHistorico=d.pagHistorico||[];
+    d.pagHistorico.push({id:Date.now(),tipo:'financiamento',subtipo:'antecipado',qtdParc:qtd,valor:valReal,semDesconto:semDesc,economia:eco,data,obs,criado_em:new Date().toISOString()});
+    await save(); fm('mPag'); render();
+    alert(`⚡ Antecipação registrada!\n${qtd} parcelas quitadas\nEconomia real: R$ ${fmt(eco)}\nRestam ${d.mesesRest} parcelas.`);
+  }
+}
+
+async function confirmarPagParc(divId) {
+  const d=E.dividas.find(x=>x.id===divId); if(!d) return;
+  const qtd=parseInt(document.getElementById('pQtdP').value)||1;
+  const data=document.getElementById('pDataP').value;
+  const obs=document.getElementById('pObsP').value;
+  const valor=d.parcela*qtd;
+  d.parcPagas=(d.parcPagas||0)+qtd; d.mesesRest=Math.max((d.mesesRest||0)-qtd,0);
+  d.pago=(d.pago||0)+valor; d.restante=Math.max((d.restante||0)-valor,0);
+  d.pagHistorico=d.pagHistorico||[];
+  d.pagHistorico.push({id:Date.now(),tipo:'parcelado',qtdParc:qtd,valor,data,obs,criado_em:new Date().toISOString()});
+  await save(); fm('mPag'); render();
+  alert(`✅ ${qtd} parcela(s) pagas! Restam ${d.mesesRest} parcelas.`);
+}
+
+async function confirmarPagFixo(divId) {
+  const d=E.dividas.find(x=>x.id===divId); if(!d) return;
+  const data=document.getElementById('pDataX').value;
+  const valor=+document.getElementById('pValX').value||0;
+  const mes=document.getElementById('pMesX').value;
+  const obs=document.getElementById('pObsX').value;
+  d.pagHistorico=d.pagHistorico||[];
+  d.pagHistorico.push({id:Date.now(),tipo:'fixo',valor,data,mes,obs,criado_em:new Date().toISOString()});
+  if(!d.mesesPagos) d.mesesPagos=[];
+  if(!d.mesesPagos.includes(mes)) d.mesesPagos.push(mes);
+  await save(); fm('mPag'); render();
+  alert(`✅ Pagamento de R$ ${fmt(valor)} registrado!`);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CÁLCULOS GERAIS
+// ══════════════════════════════════════════════════════════════
+function calcCartao(d) {
+  const compras=d.compras||[];
+  const faturaAtual=compras.reduce((s,c)=>{ const r=c.nParc-(c.parcPagas||0); return r>0?s+c.parcela:s; },0);
+  const totalRest=compras.reduce((s,c)=>s+(c.parcela*Math.max(c.nParc-(c.parcPagas||0),0)),0);
+  const totalComp=compras.reduce((s,c)=>s+c.valor,0);
+  const totalPago=compras.reduce((s,c)=>s+(c.parcela*(c.parcPagas||0)),0);
+  return {faturaAtual,totalRest,totalComp,totalPago};
+}
+
+function calcTotais() {
+  const rT=E.renda.salario+E.renda.outras;
+  let parc=0,rest=0,total=0,ecoAcum=0;
+  E.dividas.forEach(d=>{
+    if(d.tipo==='cartao'){const c=calcCartao(d);parc+=c.faturaAtual;rest+=c.totalRest;total+=c.totalComp;}
+    else if(d.tipo==='fixo'){parc+=d.valorMensal||0;}
+    else{parc+=d.parcela||0;rest+=d.restante||0;total+=d.total||0;ecoAcum+=d.economiaTotalAcum||0;}
+  });
+  const livre=rT-E.renda.gastos-parc;
+  const pct=rT>0?((parc+E.renda.gastos)/rT*100):0;
+  return {rT,parc,rest,total,livre,pct,ecoAcum};
+}
+
+function gerarPlano(est='avalanche') {
+  let divs=E.dividas.filter(d=>d.tipo!=='fixo').map(d=>{
+    const r=d.tipo==='cartao'?calcCartao(d).totalRest:(d.restante||0);
+    const p=d.tipo==='cartao'?calcCartao(d).faturaAtual:(d.parcela||0);
+    return{id:d.id,nome:d.nome,tipo:d.tipo,restante:r,parcela:p,juros:d.juros||0,dia:d.dia||10};
+  }).filter(d=>d.restante>0).map(d=>({...d}));
+  if(est==='avalanche') divs.sort((a,b)=>b.juros-a.juros);
+  if(est==='snowball')  divs.sort((a,b)=>a.restante-b.restante);
+  const t=calcTotais(); const extra=Math.max(t.livre,0);
+  const plano=[]; let mes=1;
+  while(divs.some(d=>d.restante>0)&&mes<=60){
+    const pags=[]; let ex=extra;
+    divs.forEach((d,i)=>{ if(d.restante<=0) return; let p=d.parcela; if(i===0&&ex>0){p+=ex;ex=0;} p=Math.min(p,d.restante); d.restante=Math.max(d.restante-p,0); pags.push({nome:d.nome,tipo:d.tipo,valor:p,restante:d.restante,dia:d.dia}); });
+    const dt=new Date(); dt.setMonth(dt.getMonth()+mes-1);
+    plano.push({mes,label:dt.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}),pagamentos:pags,totalPago:pags.reduce((s,p)=>s+p.valor,0),ativas:divs.filter(d=>d.restante>0).length});
+    mes++; divs=divs.filter(d=>d.restante>0);
+  }
+  return plano;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════════════════
+function ir(aba){ E.aba=aba; document.querySelectorAll('.menu-tab').forEach((t,i)=>t.classList.toggle('ativo',['dashboard','dividas','pagamentos','simulador','plano','historico'][i]===aba)); render(); }
+function render(){ document.getElementById('app').innerHTML=({dashboard:rDash,dividas:rDividas,pagamentos:rPagamentos,simulador:rSimulador,plano:rPlano,historico:rHistorico})[E.aba](); if(E.aba==='dashboard') setTimeout(rGraficos,60); }
+
+function rDash() {
+  const t=calcTotais(); const mes=new Date().toISOString().slice(0,7);
+  const prog=t.total>0?((t.total-t.rest)/t.total*100):0;
+  const pen=E.dividas.filter(d=>{ if(d.tipo==='fixo') return !(d.mesesPagos||[]).includes(mes); if(d.tipo==='cartao') return calcCartao(d).faturaAtual>0&&!(d.pagHistorico||[]).some(p=>p.mes===mes); return (d.restante||0)>0&&!(d.pagHistorico||[]).some(p=>p.data?.slice(0,7)===mes); });
+  return `
+  ${!E.renda.salario?`<div class="al al-w">⚠️ Configure sua renda <button class="btn btn-sm btn-o" style="margin-left:8px;" onclick="am('mRen')">Configurar →</button></div>`:''}
+  <div class="rb">
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;">Renda Total</div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;">R$ ${fmt(t.rT)}</div></div>
+    <div style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Comprometido</div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:${t.pct>80?'#f87171':t.pct>60?'#fbbf24':'#34d399'};">${t.pct.toFixed(0)}%</div></div>
+    <div style="text-align:center;"><div style="font-size:11px;color:var(--muted);">Livre/mês</div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:${t.livre>=0?'#34d399':'#f87171'};">R$ ${fmt(t.livre)}</div></div>
+    ${t.ecoAcum>0?`<div style="text-align:center;"><div style="font-size:11px;color:var(--muted);">💰 Economizado</div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#a78bfa;">R$ ${fmt(t.ecoAcum)}</div></div>`:''}
+    <button class="btn btn-sm btn-o" onclick="am('mRen')">✏️</button>
+  </div>
+  <div class="g4" style="margin-bottom:14px;">
+    <div class="kpi" style="border-left:4px solid #ef4444;"><div class="kpi-l">Total Dívidas</div><div class="kpi-v" style="color:#f87171;">R$ ${fmt(t.rest)}</div><div class="kpi-s">${prog.toFixed(0)}% quitado</div></div>
+    <div class="kpi" style="border-left:4px solid #f59e0b;"><div class="kpi-l">Parcelas/mês</div><div class="kpi-v" style="color:#fbbf24;">R$ ${fmt(t.parc)}</div><div class="kpi-s">${pen.length} pendente(s)</div></div>
+    <div class="kpi" style="border-left:4px solid #10b981;"><div class="kpi-l">Progresso</div><div class="kpi-v" style="color:#34d399;">${prog.toFixed(0)}%</div><div class="kpi-s">do total quitado</div></div>
+    <div class="kpi" style="border-left:4px solid #7c3aed;"><div class="kpi-l">Quitação em</div><div class="kpi-v" style="color:#a78bfa;">${gerarPlano().length||'—'}</div><div class="kpi-s">meses (Avalanche)</div></div>
+  </div>
+  <div class="g2" style="margin-bottom:14px;">
+    <div class="card"><div class="card-title">📊 Distribuição</div><div class="chart-wrap"><canvas id="cPizza"></canvas></div></div>
+    <div class="card"><div class="card-title">📈 Projeção</div><div class="chart-wrap"><canvas id="cLinha"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💳 Situação Atual <button class="btn btn-sm btn-p" onclick="am('mDiv')">➕ Nova Dívida</button></div>
+    ${E.dividas.length===0?`<div style="text-align:center;padding:28px;color:var(--muted);">Nenhuma dívida cadastrada</div>`:
+    E.dividas.map(d=>{
+      const T=TIPOS[d.tipo]||TIPOS.fixo; let parc=0,rest=0,prog=0,sub='';
+      if(d.tipo==='cartao'){const c=calcCartao(d);parc=c.faturaAtual;rest=c.totalRest;prog=c.totalComp>0?(c.totalPago/c.totalComp*100):0;sub=`${(d.compras||[]).length} compras`;}
+      else if(d.tipo==='fixo'){parc=d.valorMensal;sub=CAT[d.categoria]||'📌';}
+      else{parc=d.parcela||0;rest=d.restante||0;prog=d.total>0?((d.pago||0)/d.total*100):0;sub=`${d.mesesRest||0} meses · ${d.juros||0}% a.m.`;}
+      const mesP=d.tipo==='fixo'?(d.mesesPagos||[]).includes(mes):d.tipo==='cartao'?(d.pagHistorico||[]).some(p=>p.mes===mes):(d.pagHistorico||[]).some(p=>p.data?.slice(0,7)===mes);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:9px;margin-bottom:7px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:${T.bg};display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">${T.icon}</div>
+        <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">${d.nome}</div><div style="font-size:11px;color:var(--muted);">${sub}</div>${d.tipo!=='fixo'?`<div class="pb" style="margin-top:4px;"><div class="pf" style="width:${Math.min(prog,100).toFixed(0)}%;background:${T.cor};"></div></div>`:''}</div>
+        <div style="text-align:right;flex-shrink:0;"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:${T.cor};">R$ ${fmt(parc)}<span style="font-size:10px;font-weight:400;color:var(--muted);">/mês</span></div>${rest>0?`<div style="font-size:11px;color:var(--muted);">Restam R$ ${fmt(rest)}</div>`:''}</div>
+        <button onclick="abrirPag(${d.id})" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid ${mesP?'rgba(16,185,129,.3)':'var(--border)'};background:${mesP?'rgba(16,185,129,.15)':'transparent'};color:${mesP?'#34d399':'var(--muted)'};">${mesP?'✅ Pago':'💸 Pagar'}</button>
+      </div>`;}).join('')}
+    ${pen.length>0?`<div class="al al-w">⚠️ ${pen.length} pendente(s) este mês</div>`:''}
+  </div>
+  <div class="g2"><button class="btn btn-p btn-lg" style="width:100%;" onclick="am('mDiv')">➕ Nova Dívida</button><button class="btn btn-o btn-lg" style="width:100%;" onclick="ir('simulador')">🧮 Simulador</button></div>`;
+}
+
+function rGraficos() {
+  const ctx1=document.getElementById('cPizza'); if(ctx1&&E.dividas.length){ new Chart(ctx1,{type:'doughnut',data:{labels:E.dividas.map(d=>d.nome),datasets:[{data:E.dividas.map(d=>d.tipo==='cartao'?calcCartao(d).totalRest:d.tipo==='fixo'?d.valorMensal*12:(d.restante||0)),backgroundColor:E.dividas.map(d=>(TIPOS[d.tipo]||TIPOS.fixo).cor),borderWidth:2,borderColor:'#111118'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},boxWidth:10}}}}}); }
+  const ctx2=document.getElementById('cLinha'); if(ctx2){ const pl=gerarPlano(),t=calcTotais(); let ac=0; const lb=['Hoje',...pl.slice(0,11).map(p=>p.label.split(' ')[0].substring(0,3))]; const vl=[t.rest,...pl.slice(0,11).map(p=>{ac+=p.totalPago;return Math.max(t.rest-ac,0);})]; new Chart(ctx2,{type:'line',data:{labels:lb,datasets:[{label:'Restante',data:vl,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,.1)',fill:true,tension:.4,pointBackgroundColor:'#7c3aed',pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#1e1e2e'}},y:{ticks:{color:'#94a3b8',font:{size:9},callback:v=>`R$${(v/1000).toFixed(0)}k`},grid:{color:'#1e1e2e'}}}}}); }
+}
+
+function rDividas() {
+  const mes=new Date().toISOString().slice(0,7);
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">💳 Minhas Dívidas</h2>
+    <button class="btn btn-p" onclick="am('mDiv')">➕ Nova</button>
+  </div>
+  ${E.dividas.length===0?`<div style="text-align:center;padding:48px;color:var(--muted);"><div style="font-size:48px;margin-bottom:12px;">💳</div><h3 style="font-family:'Syne',sans-serif;color:var(--text);margin-bottom:12px;">Nenhuma dívida</h3><button class="btn btn-p btn-lg" onclick="am('mDiv')">➕ Adicionar</button></div>`:
+  E.dividas.map(d=>{
+    const T=TIPOS[d.tipo]||TIPOS.fixo; const mesP=d.tipo==='fixo'?(d.mesesPagos||[]).includes(mes):d.tipo==='cartao'?(d.pagHistorico||[]).some(p=>p.mes===mes):(d.pagHistorico||[]).some(p=>p.data?.slice(0,7)===mes);
+    let corpo='';
+    if(d.tipo==='cartao'){
+      const c=calcCartao(d);
+      corpo=`<div style="padding:10px 14px;background:rgba(239,68,68,.06);">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div><div style="font-size:11px;color:var(--muted);">Fatura/mês</div><div style="font-family:'Syne',sans-serif;font-weight:800;color:#f87171;font-size:18px;">R$ ${fmt(c.faturaAtual)}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Total restante</div><div style="font-family:'Syne',sans-serif;font-weight:700;color:#f87171;">R$ ${fmt(c.totalRest)}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Limite</div><div style="font-weight:700;">R$ ${fmt(d.limite)}</div></div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="btn btn-sm btn-p" onclick="abrirNovaCompra(${d.id})">🛒 + Compra</button>
+            <button class="btn btn-sm btn-s" onclick="abrirPag(${d.id})">💸 Pagar</button>
+          </div>
+        </div>
+        ${(d.compras||[]).length===0?`<div style="text-align:center;padding:14px;color:var(--muted);font-size:13px;">Nenhuma compra adicionada</div>`:
+        (d.compras||[]).map(c=>{
+          const rp=c.nParc-(c.parcPagas||0); const pg=c.nParc>0?((c.parcPagas||0)/c.nParc*100):0;
+          const cp=(c.mesesPagos||[]).includes(mes);
+          return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border-radius:8px;margin-bottom:5px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:120px;"><div style="font-weight:600;font-size:13px;">${c.des}</div><div style="font-size:11px;color:var(--muted);">${c.parcPagas||0}/${c.nParc} parcelas · R$ ${fmt(c.parcela)}/mês</div><div class="pb"><div class="pf" style="width:${pg.toFixed(0)}%;background:#f87171;"></div></div></div>
+            <div style="text-align:right;"><div style="font-weight:700;color:${rp>0?'#f87171':'#34d399'};">${rp>0?`${rp}x R$ ${fmt(c.parcela)}`:'✅ Quitado'}</div></div>
+            <div style="display:flex;gap:4px;">
+              <button onclick="abrirPag(${d.id},${c.id})" style="padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid ${cp?'rgba(16,185,129,.3)':'var(--border)'};background:${cp?'rgba(16,185,129,.15)':'transparent'};color:${cp?'#34d399':'var(--muted)'};">${cp?'✅':'💸'}</button>
+              <button onclick="excComp(${d.id},${c.id})" class="btn btn-sm btn-d">🗑</button>
+            </div>
+          </div>`;}).join('')}
+      </div>`;
+    } else if(d.tipo==='financiamento'){
+      const pg=d.totalParc>0?(d.parcPagas/d.totalParc*100):0;
+      corpo=`<div style="padding:10px 14px;background:rgba(245,158,11,.06);">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <div><div style="font-size:11px;color:var(--muted);">Parcela</div><div style="font-family:'Syne',sans-serif;font-weight:800;color:#fbbf24;">R$ ${fmt(d.parcela)}/mês</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Restante</div><div style="font-weight:700;color:#fbbf24;">R$ ${fmt(d.restante)}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Parcelas</div><div style="font-weight:700;">${d.parcPagas}/${d.totalParc}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Economia</div><div style="font-weight:700;color:#a78bfa;">R$ ${fmt(d.economiaTotalAcum||0)}</div></div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-s" onclick="abrirPag(${d.id})">💸 Pagar</button>
+          </div>
+        </div>
+        <div class="pb"><div class="pf" style="width:${pg.toFixed(0)}%;background:#fbbf24;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted);"><span>${pg.toFixed(0)}% pago</span><span>${d.mesesRest} meses · ${d.juros}% a.m.</span></div>
+      </div>`;
+    } else if(d.tipo==='parcelado'){
+      const pg=d.nParc>0?(d.parcPagas/d.nParc*100):0;
+      corpo=`<div style="padding:10px 14px;background:rgba(124,58,237,.06);">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <div><div style="font-size:11px;color:var(--muted);">${d.desc||''}</div><div style="font-family:'Syne',sans-serif;font-weight:800;color:#a78bfa;">R$ ${fmt(d.parcela)}/mês</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Progresso</div><div style="font-weight:700;">${d.parcPagas}/${d.nParc}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Restante</div><div style="font-weight:700;color:#a78bfa;">R$ ${fmt(d.restante)}</div></div>
+          <button class="btn btn-sm btn-s" onclick="abrirPag(${d.id})">💸 Pagar</button>
+        </div>
+        <div class="pb"><div class="pf" style="width:${pg.toFixed(0)}%;background:#a78bfa;"></div></div>
+      </div>`;
+    } else {
+      corpo=`<div style="padding:10px 14px;background:rgba(148,163,184,.06);display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:11px;color:var(--muted);">${CAT[d.categoria]||'📌'} Vence dia ${d.dia}</div><div style="font-family:'Syne',sans-serif;font-weight:800;color:#94a3b8;">R$ ${fmt(d.valorMensal)}/mês</div></div>
+        <button class="btn btn-sm btn-s" onclick="abrirPag(${d.id})">💸 Pagar</button>
+      </div>`;
+    }
+    return `<div class="dw">
+      <div class="dh" onclick="tgDiv(${d.id})">
+        <div class="di" style="background:${T.bg};">${T.icon}</div>
+        <div style="flex:1;"><div style="font-weight:700;font-size:14px;">${d.nome}</div><div style="font-size:11px;color:var(--muted);">${T.label} · Vence dia ${d.dia||'—'}</div></div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${mesP?`<span class="badge" style="background:rgba(16,185,129,.15);color:#34d399;">✅ Pago</span>`:`<span class="badge" style="background:rgba(239,68,68,.1);color:#f87171;">Pendente</span>`}
+          <button onclick="event.stopPropagation();excDiv(${d.id})" class="btn btn-sm btn-d">🗑</button>
+          <span id="arr_${d.id}" style="color:var(--muted);">▼</span>
+        </div>
+      </div>
+      <div class="db ab" id="bdy_${d.id}">${corpo}</div>
+    </div>`;}).join('')}`;
+}
+
+function abrirNovaCompra(cid){ E.cartaoAtivo=cid; const c=E.dividas.find(d=>d.id===cid); document.getElementById('compCartaoNome').textContent=c?.nome||'—'; document.getElementById('cpMes').value=new Date().toISOString().slice(0,7); ['cpDes','cpVal','cpPp'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cpNp').value='1'; document.getElementById('cpPc').value=''; am('mComp'); }
+function tgDiv(id){ const b=document.getElementById(`bdy_${id}`),a=document.getElementById(`arr_${id}`); if(b){b.classList.toggle('ab');if(a)a.textContent=b.classList.contains('ab')?'▲':'▼';} }
+
+function rPagamentos() {
+  const mes=new Date().toISOString().slice(0,7);
+  const pendentes=E.dividas.filter(d=>{
+    if(d.tipo==='cartao') return calcCartao(d).faturaAtual>0&&!(d.pagHistorico||[]).some(p=>p.mes===mes);
+    if(d.tipo==='fixo') return !(d.mesesPagos||[]).includes(mes);
+    return (d.restante||0)>0&&!(d.pagHistorico||[]).some(p=>p.data?.slice(0,7)===mes);
+  });
+  return `
+  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px;">💸 Pagamentos</h2>
+  ${pendentes.length>0?`
+  <div class="card">
+    <div class="card-title" style="color:#fbbf24;">⚠️ Pendentes este Mês (${pendentes.length})</div>
+    ${pendentes.map(d=>{
+      const T=TIPOS[d.tipo]||TIPOS.fixo;
+      const val=d.tipo==='cartao'?calcCartao(d).faturaAtual:d.tipo==='fixo'?d.valorMensal:d.parcela;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border:1px solid rgba(245,158,11,.2);border-left:4px solid #f59e0b;border-radius:9px;margin-bottom:7px;">
+        <div style="font-size:22px;">${T.icon}</div>
+        <div style="flex:1;"><div style="font-weight:700;">${d.nome}</div><div style="font-size:11px;color:var(--muted);">Vence dia ${d.dia||'—'}</div></div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#fbbf24;">R$ ${fmt(val)}</div>
+        <button class="btn btn-sm btn-s" onclick="abrirPag(${d.id})">💸 Pagar</button>
+      </div>`;}).join('')}
+    <div style="display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--border);"><span style="color:var(--muted);font-size:13px;">Total pendente</span><span style="font-family:'Syne',sans-serif;font-weight:800;color:#fbbf24;">R$ ${fmt(pendentes.reduce((s,d)=>s+(d.tipo==='cartao'?calcCartao(d).faturaAtual:d.tipo==='fixo'?d.valorMensal:d.parcela),0))}</span></div>
+  </div>`:`<div class="al al-s">✅ Todas as dívidas deste mês estão pagas!</div>`}
+  <div class="card">
+    <div class="card-title">📋 Todas as Dívidas</div>
+    ${E.dividas.map(d=>{
+      const T=TIPOS[d.tipo]||TIPOS.fixo;
+      const val=d.tipo==='cartao'?calcCartao(d).faturaAtual:d.tipo==='fixo'?d.valorMensal:d.parcela;
+      const mesP=d.tipo==='fixo'?(d.mesesPagos||[]).includes(mes):d.tipo==='cartao'?(d.pagHistorico||[]).some(p=>p.mes===mes):(d.pagHistorico||[]).some(p=>p.data?.slice(0,7)===mes);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:9px;margin-bottom:7px;">
+        <div style="font-size:22px;">${T.icon}</div>
+        <div style="flex:1;"><div style="font-weight:700;">${d.nome}</div><div style="font-size:11px;color:var(--muted);">${T.label} · dia ${d.dia||'—'}</div></div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:${T.cor};">R$ ${fmt(val)}</div>
+        <button onclick="abrirPag(${d.id})" style="padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid ${mesP?'rgba(16,185,129,.3)':'var(--border)'};background:${mesP?'rgba(16,185,129,.15)':'transparent'};color:${mesP?'#34d399':'var(--muted)'};">${mesP?'✅ Pago':'💸 Pagar'}</button>
+      </div>`;}).join('')}
+  </div>`;
+}
+
+function rSimulador() {
+  const t=calcTotais(); const pA=gerarPlano('avalanche'); const pS=gerarPlano('snowball');
+  return `
+  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px;">🧮 Simulador</h2>
+  <div class="card">
+    <div class="card-title">💰 Simular com Grana Disponível</div>
+    <div class="field"><label>Quanto tenho disponível (R$)</label><input id="simV" type="number" placeholder="Ex: 2000" oninput="calcSim()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 11px;font-size:14px;outline:none;"></div>
+    <div id="simRes"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚔️ Avalanche vs Snowball</div>
+    <div class="g2">
+      <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:16px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#a78bfa;margin-bottom:5px;">🔥 Avalanche</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Maior juros primeiro</div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#a78bfa;">${pA.length}</div>
+        <div style="font-size:12px;color:var(--muted);">meses para quitar</div>
+      </div>
+      <div style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:12px;padding:16px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#22d3ee;margin-bottom:5px;">❄️ Snowball</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Menor dívida primeiro</div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#22d3ee;">${pS.length}</div>
+        <div style="font-size:12px;color:var(--muted);">meses para quitar</div>
+      </div>
+    </div>
+    ${t.livre>0?`<div class="al al-s" style="margin-top:10px;">✅ R$ ${fmt(t.livre)}/mês livres para acelerar!</div>`:t.livre<0?`<div class="al al-d" style="margin-top:10px;">⚠️ Déficit de R$ ${fmt(Math.abs(t.livre))}/mês — parcelas superam renda disponível</div>`:''}
+  </div>`;
+}
+
+function calcSim() {
+  const grana=parseFloat(document.getElementById('simV')?.value)||0;
+  const div=document.getElementById('simRes'); if(!div||!grana){if(div)div.innerHTML='';return;}
+  const divs=E.dividas.filter(d=>d.tipo!=='fixo').map(d=>({nome:d.nome,tipo:d.tipo,rest:d.tipo==='cartao'?calcCartao(d).totalRest:(d.restante||0),parc:d.tipo==='cartao'?calcCartao(d).faturaAtual:(d.parcela||0),juros:d.juros||0})).filter(d=>d.rest>0).sort((a,b)=>b.juros-a.juros);
+  if(!divs.length){div.innerHTML='<div class="al al-s">🎉 Sem dívidas para quitar!</div>';return;}
+  div.innerHTML=divs.slice(0,3).map((d,i)=>{
+    const qt=grana>=d.rest; const eco=qt?(d.rest*d.juros/100*(d.rest/d.parc||1)/2):(grana*d.juros/100*12);
+    const cls=['ml','nt','pr'][i]; const tags=['🏆 Melhor opção','⚡ Alternativa','📌 Outra opção'][i];
+    const cors=['#34d399','#fbbf24','#94a3b8'][i]; const bgs=['rgba(16,185,129,.15)','rgba(245,158,11,.15)','rgba(148,163,184,.1)'][i];
+    return `<div class="so ${cls}"><span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;background:${bgs};color:${cors};margin-bottom:7px;">${tags}</span>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:5px;">${qt?`✅ Quitar ${d.nome}`:`Abater R$ ${fmt(grana)} em ${d.nome}`}</div>
+      <div style="font-size:13px;color:#34d399;margin-bottom:3px;">💰 ~R$ ${fmt(eco)} economizados em juros</div>
+      <div style="font-size:12px;color:var(--muted);">${qt?`Libera R$ ${fmt(d.parc)}/mês · ${d.juros}% a.m. eliminado`:`Saldo: R$ ${fmt(d.rest)} → R$ ${fmt(Math.max(d.rest-grana,0))}`}</div>
+    </div>`;}).join('');
+}
+
+function rPlano() {
+  const pl=gerarPlano(E.estrategia);
+  if(!E.dividas.filter(d=>d.tipo!=='fixo').length) return `<div style="text-align:center;padding:48px;color:var(--muted);"><div style="font-size:48px;margin-bottom:12px;">📅</div><h3 style="font-family:'Syne',sans-serif;color:var(--text);">Adicione dívidas para ver o plano</h3></div>`;
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+    <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">📅 Plano Mês a Mês</h2>
+    <div style="display:flex;gap:7px;">
+      <button class="btn btn-sm ${E.estrategia==='avalanche'?'btn-p':'btn-o'}" onclick="E.estrategia='avalanche';render();">🔥 Avalanche</button>
+      <button class="btn btn-sm ${E.estrategia==='snowball'?'btn-p':'btn-o'}" onclick="E.estrategia='snowball';render();">❄️ Snowball</button>
+    </div>
+  </div>
+  <div class="al al-${E.estrategia==='avalanche'?'w':'i'}" style="margin-bottom:12px;">${E.estrategia==='avalanche'?'🔥 <strong>Avalanche:</strong> Maior juros primeiro — máxima economia.':'❄️ <strong>Snowball:</strong> Menor dívida primeiro — motivação progressiva.'}</div>
+  ${pl.map((m,i)=>`
+  <div class="mc2">
+    <div class="mh2" onclick="tgMes(${i})">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:${m.ativas===0?'rgba(16,185,129,.15)':'rgba(124,58,237,.12)'};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:${m.ativas===0?'#34d399':'#a78bfa'};">${m.mes}</div>
+        <div><div style="font-weight:700;font-size:13px;text-transform:capitalize;">${m.label}</div><div style="font-size:11px;color:var(--muted);">${m.pagamentos.length} pagamento(s) · ${m.ativas} restante(s)</div></div>
+      </div>
+      <div style="text-align:right;"><div style="font-family:'Syne',sans-serif;font-weight:800;color:#f87171;">R$ ${fmt(m.totalPago)}</div><div style="font-size:11px;color:var(--muted);">a pagar</div></div>
+    </div>
+    <div class="mb2 ${i===0?'ab':''}" id="msb_${i}">
+      ${m.pagamentos.map(p=>`<div class="ml2"><div style="display:flex;align-items:center;gap:8px;"><span>${(TIPOS[p.tipo]||TIPOS.fixo).icon}</span><div><div style="font-weight:600;">${p.nome}</div><div style="font-size:11px;color:var(--muted);">📅 Dia ${p.dia}</div></div></div><div style="text-align:right;"><div style="font-weight:700;color:#f87171;">R$ ${fmt(p.valor)}</div>${p.restante>0?`<div style="font-size:11px;color:var(--muted);">Restam R$ ${fmt(p.restante)}</div>`:`<div style="font-size:11px;color:#34d399;">✅ Quitado!</div>`}</div></div>`).join('')}
+      ${m.ativas===0?`<div style="text-align:center;padding:8px;color:#34d399;font-weight:600;">🎉 Todas quitadas!</div>`:''}
+    </div>
+  </div>`).join('')}`;
+}
+
+function tgMes(i){ const el=document.getElementById(`msb_${i}`); if(el) el.classList.toggle('ab'); }
+
+function rHistorico() {
+  const todos=[];
+  E.dividas.forEach(d=>{
+    (d.pagHistorico||[]).forEach(p=>{ todos.push({...p,divNome:d.nome,divTipo:d.tipo}); });
+    if(d.tipo==='fixo'&&d.mesesPagos) d.mesesPagos.forEach(m=>{ if(!(d.pagHistorico||[]).some(p=>p.mes===m)) todos.push({id:m+d.id,divNome:d.nome,divTipo:'fixo',valor:d.valorMensal,mes:m,data:m+'-01',desc:'Custo fixo mensal',criado_em:m+'-01'}); });
+  });
+  todos.sort((a,b)=>new Date(b.data||b.criado_em)-new Date(a.data||a.criado_em));
+  const totalPago=todos.reduce((s,p)=>s+p.valor,0);
+  const totalEco=todos.filter(p=>p.economia).reduce((s,p)=>s+p.economia,0);
+  const antecipacoes=todos.filter(p=>p.subtipo==='antecipado');
+
+  // Agrupa por mês
+  const porMes={};
+  todos.forEach(p=>{ const m=(p.data||p.criado_em).slice(0,7); if(!porMes[m]) porMes[m]=[]; porMes[m].push(p); });
+
+  return `
+  <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px;">📋 Histórico de Pagamentos</h2>
+  <div class="g3" style="margin-bottom:14px;">
+    <div class="kpi" style="border-left:4px solid #34d399;"><div class="kpi-l">Total Pago</div><div class="kpi-v" style="color:#34d399;">R$ ${fmt(totalPago)}</div><div class="kpi-s">${todos.length} pagamento(s)</div></div>
+    <div class="kpi" style="border-left:4px solid #a78bfa;"><div class="kpi-l">Economia Acumulada</div><div class="kpi-v" style="color:#a78bfa;">R$ ${fmt(totalEco)}</div><div class="kpi-s">${antecipacoes.length} antecipação(ões)</div></div>
+    <div class="kpi" style="border-left:4px solid #22d3ee;"><div class="kpi-l">Parcelas Antecipadas</div><div class="kpi-v" style="color:#22d3ee;">${antecipacoes.reduce((s,p)=>s+(p.qtdParc||0),0)}</div><div class="kpi-s">parcelas adiantadas</div></div>
+  </div>
+  ${todos.length===0?`<div style="text-align:center;padding:40px;color:var(--muted);"><div style="font-size:48px;margin-bottom:12px;">📋</div><h3 style="font-family:'Syne',sans-serif;color:var(--text);">Nenhum pagamento registrado</h3></div>`:
+  Object.entries(porMes).sort((a,b)=>b[0].localeCompare(a[0])).map(([mes,pags])=>{
+    const totalMes=pags.reduce((s,p)=>s+p.valor,0);
+    const dt=new Date(mes+'-02'); const label=dt.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    return `<div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;text-transform:capitalize;">${label}</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;color:#34d399;">R$ ${fmt(totalMes)}</div>
+      </div>
+      ${pags.map(p=>{
+        const T=TIPOS[p.divTipo]||TIPOS.fixo;
+        const isAnt=p.subtipo==='antecipado';
+        return `<div class="hist-item">
+          <div class="hist-badge">${isAnt?'⚡':T.icon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:13px;">${p.divNome}</div>
+            <div style="font-size:11px;color:var(--muted);">${p.data?fmtd(p.data):mes} · ${isAnt?`${p.qtdParc} parcelas antecipadas`:p.desc||T.label}${p.obs?` · ${p.obs}`:''}</div>
+            ${isAnt&&p.economia?`<div style="font-size:11px;color:#a78bfa;">💰 Economizou R$ ${fmt(p.economia)}</div>`:''}
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-weight:700;color:#34d399;">R$ ${fmt(p.valor)}</div>
+            ${isAnt&&p.semDesconto?`<div style="font-size:11px;color:var(--muted);text-decoration:line-through;">R$ ${fmt(p.semDesconto)}</div>`:''}
+          </div>
+        </div>`;}).join('')}
+    </div>`;}).join('')}`;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const ok = await MVAuth.proteger("financial-pro");
+  if (!ok) return;
+  await init();
+});
 </script>
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:18px;text-align:center;font-size:12px;color:var(--muted);margin-top:32px;">
+  <span style="background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;">MEGAVISION ECOSYSTEM</span> © 2026
+</footer>
 </body>
 </html>
