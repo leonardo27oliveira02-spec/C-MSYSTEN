@@ -9,171 +9,219 @@
   <script src="megavision-auth.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root{--bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#7c3aed;--text:#e2e8f0;--muted:#94a3b8;}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    body{background:#0a0a0f;color:#e2e8f0;font-family:'DM Sans',sans-serif;min-height:100vh;}
-    .mv-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.97);backdrop-filter:blur(16px);border-bottom:1px solid #1e1e2e;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;}
-    .mv-nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
-    .main{max-width:1100px;margin:0 auto;padding:32px 24px;}
-    .page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:28px;display:flex;align-items:center;gap:10px;}
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
-    .kpi{background:#111118;border:1px solid #1e1e2e;border-left:4px solid #7c3aed;border-radius:12px;padding:18px;}
-    .kpi-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
-    .kpi-valor{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;}
-    .card{background:#111118;border:1px solid #1e1e2e;border-radius:12px;padding:22px;margin-bottom:20px;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+    .mv-nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+    .mv-nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(135deg,#f59e0b,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+    .mv-nav-right{display:flex;align-items:center;gap:8px;}
+    .main{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
     .card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+    .kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+    .kpi-l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
+    .kpi-v{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
+    .btn{padding:8px 14px;border-radius:8px;font-weight:600;font-size:12px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .btn-p{background:var(--accent);color:#fff;}
+    .btn-s{background:#10b981;color:#fff;}
+    .btn-d{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2);}
+    .btn-w{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
     table{width:100%;border-collapse:collapse;}
-    th{background:#1e1e2e;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:10px 14px;text-align:left;font-weight:700;}
-    td{padding:12px 14px;border-bottom:1px solid #1e1e2e;font-size:13px;color:#e2e8f0;}
-    tr:hover td{background:rgba(124,58,237,.04);}
-    .badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-    .badge-gratuito{background:rgba(148,163,184,.15);color:#94a3b8;}
-    .badge-basico{background:rgba(6,182,212,.15);color:#22d3ee;}
-    .badge-premium{background:rgba(124,58,237,.15);color:#a78bfa;}
-    .badge-admin{background:rgba(245,158,11,.15);color:#fbbf24;}
-    .badge-pendente{background:rgba(245,158,11,.15);color:#fbbf24;}
-    .badge-aprovado{background:rgba(16,185,129,.15);color:#34d399;}
-    .badge-recusado{background:rgba(239,68,68,.15);color:#f87171;}
-    .btn-sm{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;border:none;cursor:pointer;}
-    .btn-aprovar{background:#10b981;color:#fff;}
-    .btn-recusar{background:#ef4444;color:#fff;margin-left:4px;}
-    select.plano-select{background:#0a0a0f;border:1px solid #1e1e2e;color:#e2e8f0;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;}
+    th{background:#1e1e2e;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding:10px 14px;text-align:left;font-weight:700;}
+    td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+    tr:hover td{background:rgba(124,58,237,.03);}
+    .badge{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+    .al{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;}
+    .al-s{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#34d399;}
+    .al-w{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fbbf24;}
+    select.ps{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 9px;border-radius:6px;font-size:12px;cursor:pointer;}
+    input.di{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 9px;border-radius:6px;font-size:12px;width:120px;}
+    .tabs{display:flex;gap:6px;margin-bottom:18px;}
+    .tab{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;}
+    .tab.at{background:var(--accent);color:#fff;border-color:var(--accent);}
+    @media(max-width:700px){.g4{grid-template-columns:repeat(2,1fr);}}
   </style>
 </head>
 <body>
+
 <nav class="mv-nav">
-  <a href="index.html" class="mv-nav-logo">⚡ MEGAVISION Admin</a>
-  <a href="#" onclick="MVAuth.logout()" style="color:#94a3b8;font-size:13px;text-decoration:none;">Sair</a>
+  <a href="index.html" class="mv-nav-logo">🛡️ MEGAVISION Admin</a>
+  <div class="mv-nav-right">
+    <span id="adminInfo" style="font-size:12px;color:#94a3b8;"></span>
+    <a href="index.html" style="color:#94a3b8;font-size:12px;text-decoration:none;padding:5px 10px;border-radius:6px;border:1px solid #1e1e2e;">← Ecosystem</a>
+    <button onclick="MVAuth.logout()" style="color:#94a3b8;font-size:12px;background:none;border:1px solid #1e1e2e;border-radius:6px;padding:5px 10px;cursor:pointer;">Sair</button>
+  </div>
 </nav>
 
-<div class="main">
-  <div class="page-title">🛡️ Painel Admin <span style="font-size:13px;color:#94a3b8;font-weight:400;font-family:'DM Sans',sans-serif;" id="adminEmail"></span></div>
-
-  <div class="kpis">
-    <div class="kpi"><div class="kpi-label">Total Usuários</div><div class="kpi-valor" id="kpiTotal">—</div></div>
-    <div class="kpi" style="border-left-color:#10b981;"><div class="kpi-label">Assinantes Ativos</div><div class="kpi-valor" id="kpiAtivos">—</div></div>
-    <div class="kpi" style="border-left-color:#f59e0b;"><div class="kpi-label">Pedidos Pendentes</div><div class="kpi-valor" id="kpiPendentes">—</div></div>
-    <div class="kpi" style="border-left-color:#06b6d4;"><div class="kpi-label">Premium</div><div class="kpi-valor" id="kpiPremium">—</div></div>
-  </div>
-
-  <!-- PEDIDOS PENDENTES -->
-  <div class="card">
-    <div class="card-title">
-      ⏳ Pedidos de Upgrade Pendentes
-      <button onclick="carregarDados()" style="background:#1e1e2e;color:#94a3b8;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;">🔄 Atualizar</button>
-    </div>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead><tr>
-          <th>Data</th><th>Nome</th><th>Email</th><th>Plano</th><th>Comprovante</th><th>Ações</th>
-        </tr></thead>
-        <tbody id="tabelaPedidos">
-          <tr><td colspan="6" style="text-align:center;color:#475569;">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- TODOS OS USUÁRIOS -->
-  <div class="card">
-    <div class="card-title">👥 Todos os Usuários</div>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead><tr>
-          <th>Nome</th><th>Email</th><th>Plano Atual</th><th>Desde</th><th>Alterar Plano</th>
-        </tr></thead>
-        <tbody id="tabelaUsuarios">
-          <tr><td colspan="5" style="text-align:center;color:#475569;">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div class="main" id="app">
+  <div style="text-align:center;padding:60px;color:#94a3b8;">Verificando acesso...</div>
 </div>
 
 <script>
-  async function init() {
-    const usuario = await MVAuth.getUsuario();
-    if (!usuario || usuario.plano !== 'admin') {
-      alert('Acesso restrito a admins.');
-      window.location.href = 'index.html';
-      return;
-    }
-    document.getElementById('adminEmail').textContent = usuario.email;
-    await carregarDados();
+let abaAtual = 'pedidos';
+
+async function init() {
+  const usuario = await MVAuth.getUsuario();
+  if (!usuario || usuario.plano !== 'admin') {
+    alert('Acesso restrito a admins.');
+    window.location.href = 'index.html';
+    return;
+  }
+  document.getElementById('adminInfo').textContent = usuario.email;
+  await renderAdmin();
+}
+
+async function renderAdmin() {
+  const [usuarios, pedidos] = await Promise.all([
+    _mvClient.from('mv_usuarios').select('*').order('criado_em', { ascending: false }),
+    _mvClient.from('mv_pedidos').select('*').order('criado_em', { ascending: false })
+  ]);
+
+  const us = usuarios.data || [];
+  const ps = pedidos.data || [];
+  const pendentes = ps.filter(p => p.status === 'pendente');
+  const hoje = new Date();
+  const expirandoEm7 = us.filter(u => u.plano_fim && new Date(u.plano_fim) > hoje && new Date(u.plano_fim) < new Date(hoje.getTime() + 7*24*60*60*1000));
+
+  document.getElementById('app').innerHTML = `
+  <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:20px;">🛡️ Painel Admin</div>
+
+  ${pendentes.length > 0 ? `<div class="al al-w">⚠️ ${pendentes.length} pedido(s) aguardando aprovação!</div>` : ''}
+  ${expirandoEm7.length > 0 ? `<div class="al al-w">⏰ ${expirandoEm7.length} plano(s) expirando nos próximos 7 dias!</div>` : ''}
+
+  <div class="g4">
+    <div class="kpi" style="border-left:4px solid #7c3aed;"><div class="kpi-l">Total Usuários</div><div class="kpi-v" style="color:#a78bfa;">${us.length}</div></div>
+    <div class="kpi" style="border-left:4px solid #10b981;"><div class="kpi-l">Planos Ativos</div><div class="kpi-v" style="color:#34d399;">${us.filter(u=>u.plano!=='gratuito').length}</div></div>
+    <div class="kpi" style="border-left:4px solid #f59e0b;"><div class="kpi-l">Pedidos Pendentes</div><div class="kpi-v" style="color:#fbbf24;">${pendentes.length}</div></div>
+    <div class="kpi" style="border-left:4px solid #06b6d4;"><div class="kpi-l">Premium</div><div class="kpi-v" style="color:#22d3ee;">${us.filter(u=>u.plano==='premium').length}</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab ${abaAtual==='pedidos'?'at':''}" onclick="trocarAba('pedidos')">⏳ Pedidos Pendentes (${pendentes.length})</button>
+    <button class="tab ${abaAtual==='usuarios'?'at':''}" onclick="trocarAba('usuarios')">👥 Usuários (${us.length})</button>
+    <button class="tab ${abaAtual==='todos_pedidos'?'at':''}" onclick="trocarAba('todos_pedidos')">📋 Todos os Pedidos</button>
+  </div>
+
+  <div id="abaConteudo">
+    ${renderAba(abaAtual, us, ps, pendentes)}
+  </div>`;
+}
+
+function trocarAba(aba) {
+  abaAtual = aba;
+  renderAdmin();
+}
+
+function renderAba(aba, us, ps, pendentes) {
+  if (aba === 'pedidos') {
+    if (!pendentes.length) return `<div class="al al-s">✅ Nenhum pedido pendente!</div>`;
+    return `<div class="card">
+      <div class="card-title">⏳ Aguardando Aprovação <button class="btn btn-p" onclick="renderAdmin()">🔄 Atualizar</button></div>
+      <div style="overflow-x:auto;"><table>
+        <thead><tr><th>Data</th><th>Nome</th><th>Email</th><th>Plano</th><th>Comprovante</th><th>Ações</th></tr></thead>
+        <tbody>${pendentes.map(p => `
+          <tr>
+            <td style="color:#94a3b8;">${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+            <td style="font-weight:600;">${p.nome||'—'}</td>
+            <td style="color:#94a3b8;">${p.email}</td>
+            <td><span class="badge" style="background:rgba(124,58,237,.15);color:#a78bfa;">${p.plano_solicitado}</span></td>
+            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94a3b8;font-size:11px;" title="${p.comprovante_url||''}">${p.comprovante_url||'—'}</td>
+            <td>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <input type="date" id="fim_${p.id}" class="di" placeholder="Expiração (opcional)">
+                <button class="btn btn-s" onclick="aprovar('${p.id}','${p.user_id}','${p.plano_solicitado}')">✅ Aprovar</button>
+                <button class="btn btn-d" onclick="recusar('${p.id}')">✗ Recusar</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
   }
 
-  async function carregarDados() {
-    await carregarPedidos();
-    await carregarUsuarios();
+  if (aba === 'usuarios') {
+    const hoje = new Date();
+    return `<div class="card">
+      <div class="card-title">👥 Todos os Usuários</div>
+      <div style="overflow-x:auto;"><table>
+        <thead><tr><th>Nome</th><th>Email</th><th>Plano</th><th>Validade</th><th>Status</th><th>Alterar</th></tr></thead>
+        <tbody>${us.map(u => {
+          const exp = u.plano_fim ? new Date(u.plano_fim) : null;
+          const expirado = exp && exp < hoje;
+          const expirando = exp && !expirado && exp < new Date(hoje.getTime() + 7*24*60*60*1000);
+          const CORES = {gratuito:'#94a3b8',basico:'#06b6d4',premium:'#7c3aed',admin:'#f59e0b'};
+          return `<tr>
+            <td style="font-weight:600;">${u.nome||'—'}</td>
+            <td style="color:#94a3b8;font-size:12px;">${u.email}</td>
+            <td><span class="badge" style="background:${CORES[u.plano]||'#94a3b8'}22;color:${CORES[u.plano]||'#94a3b8'};">${u.plano}</span></td>
+            <td style="font-size:12px;color:${expirado?'#f87171':expirando?'#fbbf24':'#94a3b8'};">
+              ${u.plano_fim ? new Date(u.plano_fim).toLocaleDateString('pt-BR') : '∞'}
+              ${expirado?'⚠️ Expirado':expirando?'⏰ Expira em breve':''}
+            </td>
+            <td><span class="badge" style="background:${u.plano_ativo?'rgba(16,185,129,.15)':'rgba(239,68,68,.12)'};color:${u.plano_ativo?'#34d399':'#f87171'};">${u.plano_ativo?'Ativo':'Inativo'}</span></td>
+            <td>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <select class="ps" id="pl_${u.user_id}" onchange="">
+                  <option value="gratuito" ${u.plano==='gratuito'?'selected':''}>Gratuito</option>
+                  <option value="basico" ${u.plano==='basico'?'selected':''}>Básico</option>
+                  <option value="premium" ${u.plano==='premium'?'selected':''}>Premium</option>
+                  <option value="admin" ${u.plano==='admin'?'selected':''}>Admin</option>
+                </select>
+                <input type="date" id="vl_${u.user_id}" class="di" value="${u.plano_fim?u.plano_fim.split('T')[0]:''}" placeholder="Validade">
+                <button class="btn btn-p" onclick="alterarPlano('${u.user_id}')">Salvar</button>
+              </div>
+            </td>
+          </tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
   }
 
-  async function carregarPedidos() {
-    const { data } = await _mvClient.from('mv_pedidos').select('*').order('criado_em', { ascending: false });
-    const pendentes = (data||[]).filter(p => p.status === 'pendente');
-    document.getElementById('kpiPendentes').textContent = pendentes.length;
-
-    const tbody = document.getElementById('tabelaPedidos');
-    if (!pendentes.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#475569;">Nenhum pedido pendente ✅</td></tr>';
-      return;
-    }
-    tbody.innerHTML = pendentes.map(p => `
-      <tr>
-        <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
-        <td>${p.nome||'—'}</td>
-        <td style="color:#94a3b8;">${p.email}</td>
-        <td><span class="badge badge-${p.plano_solicitado}">${p.plano_solicitado}</span></td>
-        <td><span style="color:#94a3b8;font-size:11px;word-break:break-all;">${(p.comprovante_url||'').substring(0,40)}...</span></td>
-        <td>
-          <button class="btn-sm btn-aprovar" onclick="aprovarPedido('${p.id}','${p.user_id}','${p.plano_solicitado}')">✅ Aprovar</button>
-          <button class="btn-sm btn-recusar" onclick="recusarPedido('${p.id}')">✗ Recusar</button>
-        </td>
-      </tr>`).join('');
+  if (aba === 'todos_pedidos') {
+    return `<div class="card">
+      <div class="card-title">📋 Histórico de Pedidos</div>
+      <div style="overflow-x:auto;"><table>
+        <thead><tr><th>Data</th><th>Email</th><th>Plano</th><th>Status</th></tr></thead>
+        <tbody>${ps.map(p => {
+          const CORS = {pendente:'#fbbf24',aprovado:'#34d399',recusado:'#f87171'};
+          return `<tr>
+            <td style="color:#94a3b8;">${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+            <td>${p.email}</td>
+            <td><span class="badge" style="background:rgba(124,58,237,.15);color:#a78bfa;">${p.plano_solicitado}</span></td>
+            <td><span class="badge" style="background:${CORS[p.status]||'#94a3b8'}22;color:${CORS[p.status]||'#94a3b8'};">${p.status}</span></td>
+          </tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
   }
+}
 
-  async function carregarUsuarios() {
-    const { data } = await _mvClient.from('mv_usuarios').select('*').order('criado_em', { ascending: false });
-    const todos = data || [];
-    document.getElementById('kpiTotal').textContent = todos.length;
-    document.getElementById('kpiAtivos').textContent = todos.filter(u => u.plano !== 'gratuito').length;
-    document.getElementById('kpiPremium').textContent = todos.filter(u => u.plano === 'premium').length;
+async function aprovar(pedidoId, userId, plano) {
+  const fim = document.getElementById(`fim_${pedidoId}`)?.value || null;
+  if (!confirm(`Ativar plano "${plano}" para este usuário?${fim?`\nValidade: ${fim}`:'\nSem expiração (permanente)'}`)) return;
+  await _mvClient.from('mv_pedidos').update({ status:'aprovado', atualizado_em: new Date().toISOString() }).eq('id', pedidoId);
+  await MVAuth.atualizarPlano(userId, plano, fim ? new Date(fim).toISOString() : null);
+  alert('✅ Plano ativado!');
+  renderAdmin();
+}
 
-    const tbody = document.getElementById('tabelaUsuarios');
-    tbody.innerHTML = todos.map(u => `
-      <tr>
-        <td style="font-weight:600;">${u.nome||'—'}</td>
-        <td style="color:#94a3b8;">${u.email}</td>
-        <td><span class="badge badge-${u.plano}">${u.plano}</span></td>
-        <td style="color:#64748b;">${new Date(u.criado_em).toLocaleDateString('pt-BR')}</td>
-        <td>
-          <select class="plano-select" onchange="alterarPlano('${u.user_id}', this.value)">
-            <option value="gratuito" ${u.plano==='gratuito'?'selected':''}>Gratuito</option>
-            <option value="basico"   ${u.plano==='basico'?'selected':''}>Básico</option>
-            <option value="premium"  ${u.plano==='premium'?'selected':''}>Premium</option>
-            <option value="admin"    ${u.plano==='admin'?'selected':''}>Admin</option>
-          </select>
-        </td>
-      </tr>`).join('');
-  }
+async function recusar(pedidoId) {
+  if (!confirm('Recusar este pedido?')) return;
+  await _mvClient.from('mv_pedidos').update({ status:'recusado', atualizado_em: new Date().toISOString() }).eq('id', pedidoId);
+  renderAdmin();
+}
 
-  async function aprovarPedido(pedidoId, userId, plano) {
-    if (!confirm(`Ativar plano "${plano}" para este usuário?`)) return;
-    await _mvClient.from('mv_pedidos').update({ status: 'aprovado', atualizado_em: new Date().toISOString() }).eq('id', pedidoId);
-    await MVAuth.atualizarPlano(userId, plano);
-    alert('✅ Plano ativado!');
-    await carregarDados();
-  }
+async function alterarPlano(userId) {
+  const plano = document.getElementById(`pl_${userId}`)?.value;
+  const validade = document.getElementById(`vl_${userId}`)?.value || null;
+  if (!confirm(`Alterar para "${plano}"?`)) return;
+  await MVAuth.atualizarPlano(userId, plano, validade ? new Date(validade).toISOString() : null);
+  alert('✅ Plano atualizado!');
+  renderAdmin();
+}
 
-  async function recusarPedido(pedidoId) {
-    if (!confirm('Recusar este pedido?')) return;
-    await _mvClient.from('mv_pedidos').update({ status: 'recusado', atualizado_em: new Date().toISOString() }).eq('id', pedidoId);
-    await carregarDados();
-  }
-
-  async function alterarPlano(userId, plano) {
-    await MVAuth.atualizarPlano(userId, plano);
-  }
-
-  document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
